@@ -97,3 +97,16 @@ export type FootprintResult = {
   potentialMonthlySavingKgCO2e: number;
   assumptions: string[];
 };
+
+export type Recommendation = {
+  id: string;
+  category: CarbonCategory;
+  title: string;
+  reason: string;
+  action: string;
+  estimatedSavingKgCO2ePerMonth: number;
+  difficulty: Difficulty;
+  impact: ImpactLevel;
+  moneySavingPotential: "none" | "low" | "medium" | "high";
+  weeklyChallenge: string;
+};
