@@ -1,0 +1,27 @@
+[
+  {
+    "id": "india-grid-electricity-fy-2024-25",
+    "label": "India grid electricity",
+    "value": 0.71,
+    "unit": "kg CO2/kWh",
+    "sourceName": "Central Electricity Authority baseline database",
+    "sourceUrl": "https://cea.nic.in/",
+    "note": "Educational estimate using 0.710 kg CO2/kWh for India grid electricity."
+  },
+  {
+    "id": "petrol-two-wheeler-urban",
+    "label": "Petrol two-wheeler travel",
+    "value": 0.12,
+    "unit": "kg CO2e/km",
+    "sourceName": "Carbon Compass educational factor set",
+    "note": "Simplified urban scooter and bike estimate for awareness calculations."
+  },
+  {
+    "id": "lpg-cylinder-india",
+    "label": "Domestic LPG cylinder",
+    "value": 42.5,
+    "unit": "kg CO2e/cylinder",
+    "sourceName": "Carbon Compass educational factor set",
+    "note": "Approximate household LPG combustion estimate for educational calculations."
+  }
+]
