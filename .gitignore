@@ -12,6 +12,8 @@ build/
 coverage/
 playwright-report/
 test-results/
+.playwright-mcp/
+*.tsbuildinfo
 
 # Local logs and AI-agent command captures
 logs/
@@ -31,4 +33,3 @@ key.md
 Thumbs.db
 .vscode/
 .idea/
-
