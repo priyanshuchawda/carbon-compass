@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     ".agent/**",
     "*.log",
     "*.cjs",
+    // Generated coverage output:
+    "coverage/**",
   ]),
 ]);
 
