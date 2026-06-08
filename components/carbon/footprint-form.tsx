@@ -96,7 +96,13 @@ export function FootprintForm() {
   }
 
   return (
-    <form className="mt-8 grid gap-6">
+    <form
+      className="mt-8 grid gap-6"
+      onSubmit={(event) => {
+        event.preventDefault();
+        window.location.assign("/dashboard");
+      }}
+    >
       <div className="flex flex-wrap gap-3">
         <button
           type="button"
@@ -113,16 +119,19 @@ export function FootprintForm() {
         </legend>
         <NumberField
           label="Two-wheeler km per week"
+          name="twoWheelerKmPerWeek"
           value={input.transport.twoWheelerKmPerWeek}
           onChange={(value) => updateNumber(["transport", "twoWheelerKmPerWeek"], value)}
         />
         <NumberField
           label="Car km per week"
+          name="carKmPerWeek"
           value={input.transport.carKmPerWeek}
           onChange={(value) => updateNumber(["transport", "carKmPerWeek"], value)}
         />
         <NumberField
           label="Public transport trips per week"
+          name="publicTransportTripsPerWeek"
           value={input.transport.publicTransportTripsPerWeek}
           onChange={(value) =>
             updateNumber(["transport", "publicTransportTripsPerWeek"], value)
@@ -130,6 +139,7 @@ export function FootprintForm() {
         />
         <NumberField
           label="Cab or auto trips per week"
+          name="cabAutoTripsPerWeek"
           value={input.transport.cabAutoTripsPerWeek}
           onChange={(value) => updateNumber(["transport", "cabAutoTripsPerWeek"], value)}
         />
@@ -141,16 +151,19 @@ export function FootprintForm() {
         </legend>
         <NumberField
           label="Monthly electricity kWh"
+          name="monthlyElectricityKWh"
           value={input.energy.monthlyElectricityKWh}
           onChange={(value) => updateNumber(["energy", "monthlyElectricityKWh"], value)}
         />
         <NumberField
           label="LPG cylinders per month"
+          name="lpgCylindersPerMonth"
           value={input.energy.lpgCylindersPerMonth}
           onChange={(value) => updateNumber(["energy", "lpgCylindersPerMonth"], value)}
         />
         <NumberField
           label="AC hours per day"
+          name="acHoursPerDay"
           value={input.energy.acHoursPerDay}
           onChange={(value) => updateNumber(["energy", "acHoursPerDay"], value)}
         />
@@ -163,6 +176,8 @@ export function FootprintForm() {
         <label className="grid gap-2 text-sm font-medium text-slate-800">
           Diet type
           <select
+            name="dietType"
+            autoComplete="off"
             value={input.food.dietType}
             onChange={(event) =>
               setInput((current) => ({
@@ -183,6 +198,7 @@ export function FootprintForm() {
         </label>
         <NumberField
           label="Food delivery per week"
+          name="foodDeliveryPerWeek"
           value={input.food.foodDeliveryPerWeek}
           onChange={(value) => updateNumber(["food", "foodDeliveryPerWeek"], value)}
         />
@@ -194,11 +210,13 @@ export function FootprintForm() {
         </legend>
         <NumberField
           label="Clothes bought per month"
+          name="clothesPerMonth"
           value={input.shopping.clothesPerMonth}
           onChange={(value) => updateNumber(["shopping", "clothesPerMonth"], value)}
         />
         <NumberField
           label="Online orders per month"
+          name="onlineOrdersPerMonth"
           value={input.shopping.onlineOrdersPerMonth}
           onChange={(value) => updateNumber(["shopping", "onlineOrdersPerMonth"], value)}
         />
@@ -211,6 +229,7 @@ export function FootprintForm() {
         <label className="flex items-center gap-3 text-sm font-medium text-slate-800">
           <input
             type="checkbox"
+            name="recycles"
             checked={input.waste.recycles}
             onChange={(event) =>
               setInput((current) => ({
@@ -223,23 +242,36 @@ export function FootprintForm() {
           Recycles dry waste
         </label>
       </fieldset>
+
+      <div className="flex flex-wrap gap-3">
+        <button
+          type="submit"
+          className="inline-flex min-h-12 items-center justify-center rounded-md bg-emerald-700 px-5 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-emerald-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+        >
+          Calculate and view dashboard
+        </button>
+      </div>
     </form>
   );
 }
 
 type NumberFieldProps = {
   label: string;
+  name: string;
   value: number;
   onChange: (value: string) => void;
 };
 
-function NumberField({ label, value, onChange }: NumberFieldProps) {
+function NumberField({ label, name, value, onChange }: NumberFieldProps) {
   return (
     <label className="grid gap-2 text-sm font-medium text-slate-800">
       {label}
       <input
         type="number"
+        name={name}
+        autoComplete="off"
         min={0}
+        step="any"
         value={numberValue(value)}
         onChange={(event) => onChange(event.target.value)}
         className="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-base text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
