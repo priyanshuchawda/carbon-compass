@@ -27,4 +27,13 @@ test("navigates from landing to dashboard and action plan", async ({ page }) => 
   await expect(page.getByRole("article").first()).toContainText(
     /replace 2 short fuel trips/i,
   );
+
+  await page.getByRole("link", { name: /create report/i }).click();
+  await expect(page).toHaveURL(/\/report$/);
+  await expect(
+    page.getByRole("heading", { level: 1, name: /carbon compass report/i }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: /progress trend/i }),
+  ).toContainText(/best improvement/i);
 });
