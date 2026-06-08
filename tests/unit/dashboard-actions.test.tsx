@@ -34,6 +34,15 @@ describe("dashboard and action plan", () => {
     expect(
       screen.getByRole("link", { name: /open full action plan/i }),
     ).toHaveAttribute("href", "/actions");
+
+    const simulator = screen.getByRole("region", {
+      name: /what-if simulator/i,
+    });
+    expect(simulator).toHaveTextContent(/swap short fuel trips/i);
+    expect(simulator).toHaveTextContent(/reduce ac by 1 hour/i);
+    expect(simulator).toHaveTextContent(/before/i);
+    expect(simulator).toHaveTextContent(/after/i);
+    expect(simulator).toHaveTextContent(/estimated saving/i);
   });
 
   it("renders a prioritized weekly action plan", () => {

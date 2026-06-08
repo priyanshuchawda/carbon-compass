@@ -15,6 +15,9 @@ test("navigates from landing to dashboard and action plan", async ({ page }) => 
   await expect(
     page.getByRole("region", { name: /category breakdown/i }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: /what-if simulator/i }),
+  ).toContainText(/estimated saving/i);
 
   await page.getByRole("link", { name: /open full action plan/i }).click();
   await expect(page).toHaveURL(/\/actions$/);
