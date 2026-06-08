@@ -25,6 +25,9 @@ describe("input flow UI", () => {
     expect(screen.getByLabelText(/clothes bought per month/i))
       .toBeInTheDocument();
     expect(screen.getByLabelText(/recycles dry waste/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /calculate and view dashboard/i }),
+    ).toBeInTheDocument();
   });
 
   it("fills practical demo data for a student in Pune", async () => {

@@ -3,7 +3,10 @@ import { expect, test } from "@playwright/test";
 test("navigates from landing to dashboard and action plan", async ({ page }) => {
   await page.goto("/");
 
-  await page.getByRole("link", { name: /view demo dashboard/i }).click();
+  await page.getByRole("link", { name: /calculate my footprint/i }).click();
+  await expect(page).toHaveURL(/\/calculator$/);
+  await page.getByRole("button", { name: /use pune student demo data/i }).click();
+  await page.getByRole("button", { name: /calculate and view dashboard/i }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(
     page.getByRole("heading", {

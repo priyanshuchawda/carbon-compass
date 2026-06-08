@@ -8,6 +8,7 @@ export function OnboardingForm() {
           City
           <input
             name="city"
+            autoComplete="address-level2"
             defaultValue="Pune"
             className="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-base text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
           />
@@ -16,6 +17,7 @@ export function OnboardingForm() {
           Country
           <input
             name="country"
+            autoComplete="country-name"
             defaultValue="India"
             className="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-base text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
           />
@@ -25,6 +27,7 @@ export function OnboardingForm() {
           <input
             name="householdSize"
             type="number"
+            autoComplete="off"
             min={1}
             max={20}
             defaultValue={1}
@@ -35,6 +38,7 @@ export function OnboardingForm() {
           Persona
           <select
             name="persona"
+            autoComplete="off"
             defaultValue="student"
             className="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-base text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
           >
@@ -47,6 +51,7 @@ export function OnboardingForm() {
           Main transport mode
           <select
             name="mainTransportMode"
+            autoComplete="off"
             defaultValue="two-wheeler"
             className="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-base text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
           >
@@ -60,6 +65,7 @@ export function OnboardingForm() {
           Main goal
           <select
             name="mainGoal"
+            autoComplete="off"
             defaultValue="reduce_carbon"
             className="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-base text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
           >
