@@ -3,11 +3,14 @@ import { AssistantInsight } from "@/components/carbon/assistant-insight";
 import { CategoryBreakdown } from "@/components/carbon/category-breakdown";
 import { MetricCard } from "@/components/carbon/metric-card";
 import { RecommendationCard } from "@/components/carbon/recommendation-card";
+import { WhatIfSimulator } from "@/components/carbon/what-if-simulator";
 import {
+  demoFootprintInput,
   demoFootprintResult,
   demoProfile,
   demoRecommendations,
 } from "@/lib/carbon/demo";
+import { SIMULATION_ACTIONS, simulateAction } from "@/lib/carbon/simulator";
 
 function kg(value: number): string {
   return `${Math.round(value)} kg CO2e`;
@@ -18,6 +21,9 @@ export default function DashboardPage() {
     (item) => item.category === demoFootprintResult.topCategory,
   );
   const leadingRecommendation = demoRecommendations[0];
+  const simulations = SIMULATION_ACTIONS.map((action) =>
+    simulateAction(demoFootprintInput, demoProfile, action.id),
+  );
 
   return (
     <main id="main-content" className="min-h-screen bg-[#f6fbf8]">
@@ -105,6 +111,10 @@ export default function DashboardPage() {
             ))}
           </div>
         </section>
+
+        <div className="mt-8">
+          <WhatIfSimulator simulations={simulations} />
+        </div>
       </section>
     </main>
   );

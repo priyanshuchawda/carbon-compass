@@ -21,6 +21,7 @@ export const EMISSION_FACTORS = {
   },
   energy: {
     electricityKgPerKWh: INDIA_GRID_ELECTRICITY_FACTOR.value,
+    acKWhPerHour: 1,
     lpgCylinderKg: 42.5,
     renewableElectricityReduction: 0.5,
   },
