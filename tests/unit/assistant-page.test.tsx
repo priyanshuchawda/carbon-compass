@@ -43,7 +43,11 @@ describe("Assistant Page Component", () => {
 
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue({
       ok: true,
-      json: async () => ({ content: "This is a mock assistant reply." }),
+      json: async () => ({
+        content: "This is a mock assistant reply.",
+        costUSD: 0,
+        isDemo: true,
+      }),
     } as Response);
 
     render(<AssistantPage />);
