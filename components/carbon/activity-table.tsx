@@ -1,7 +1,4 @@
-import {
-  ACTIVITY_CATEGORY_META,
-  getActivityType,
-} from "@/lib/carbon/activity-types";
+import { ACTIVITY_CATEGORY_META, getActivityType } from "@/lib/carbon/activity-types";
 import type { ActivityLogEntry } from "@/lib/carbon/activity-log";
 
 type ActivityTableProps = {
@@ -65,9 +62,7 @@ export function ActivityTable({ entries, onEdit, onDelete }: ActivityTableProps)
                     {meta.label}
                   </span>
                 </td>
-                <td className="px-6 py-4 font-medium">
-                  {activity?.label ?? entry.activityType}
-                </td>
+                <td className="px-6 py-4 font-medium">{activity?.label ?? entry.activityType}</td>
                 <td className="whitespace-nowrap px-6 py-4 text-right font-mono">
                   {entry.value} {activity?.unit ?? ""}
                 </td>

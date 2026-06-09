@@ -40,7 +40,7 @@ describe("AssistantInsight", () => {
         recommendation={recommendation}
         profile={studentProfile}
         footprint={demoFootprintInput}
-      />,
+      />
     );
 
     const allText = document.body.textContent ?? "";
@@ -54,11 +54,11 @@ describe("AssistantInsight", () => {
         recommendation={recommendation}
         profile={studentProfile}
         footprint={demoFootprintInput}
-      />,
+      />
     );
 
     expect(screen.getByRole("heading", { level: 2 })).toHaveTextContent(
-      /transport|energy|food|shopping|waste/i,
+      /transport|energy|food|shopping|waste/i
     );
   });
 
@@ -69,7 +69,7 @@ describe("AssistantInsight", () => {
         recommendation={recommendation}
         profile={studentProfile}
         footprint={demoFootprintInput}
-      />,
+      />
     );
 
     expect(document.body.textContent).toContain(recommendation.reason);
@@ -82,7 +82,7 @@ describe("AssistantInsight", () => {
         recommendation={recommendation}
         profile={studentProfile}
         footprint={demoFootprintInput}
-      />,
+      />
     );
 
     expect(document.body.textContent).toContain(recommendation.weeklyChallenge);
@@ -95,7 +95,7 @@ describe("AssistantInsight", () => {
         recommendation={recommendation}
         profile={studentProfile}
         footprint={demoFootprintInput}
-      />,
+      />
     );
 
     expect(document.body.textContent).toContain("For a student in India");
@@ -108,7 +108,7 @@ describe("AssistantInsight", () => {
         recommendation={recommendation}
         profile={workingProfile}
         footprint={demoFootprintInput}
-      />,
+      />
     );
 
     expect(document.body.textContent).toContain("As a working professional");
@@ -121,7 +121,7 @@ describe("AssistantInsight", () => {
         recommendation={recommendation}
         profile={workingProfile}
         footprint={demoFootprintInput}
-      />,
+      />
     );
 
     expect(document.body.textContent).toContain("and save money");
@@ -134,11 +134,11 @@ describe("AssistantInsight", () => {
         recommendation={recommendation}
         profile={studentProfile}
         footprint={demoFootprintInput}
-      />,
+      />
     );
 
     expect(document.body.textContent).toContain(
-      String(recommendation.estimatedSavingKgCO2ePerMonth),
+      String(recommendation.estimatedSavingKgCO2ePerMonth)
     );
   });
 
@@ -149,11 +149,9 @@ describe("AssistantInsight", () => {
         recommendation={recommendation}
         profile={studentProfile}
         footprint={demoFootprintInput}
-      />,
+      />
     );
 
-    expect(
-      screen.getByRole("region", { name: /compass assistant insight/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: /compass assistant insight/i })).toBeInTheDocument();
   });
 });

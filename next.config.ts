@@ -1,7 +1,5 @@
 import type { NextConfig } from "next";
-
 import { securityHeaders } from "./lib/carbon/security/headers";
-
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,

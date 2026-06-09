@@ -33,10 +33,7 @@ const MONEY_SCORE: Record<Recommendation["moneySavingPotential"], number> = {
   none: 0,
 };
 
-function categoryPercentage(
-  result: FootprintResult,
-  category: CarbonCategory,
-): number {
+function categoryPercentage(result: FootprintResult, category: CarbonCategory): number {
   return result.breakdown.find((item) => item.category === category)?.percentage ?? 0;
 }
 
@@ -44,19 +41,12 @@ function categoryKg(result: FootprintResult, category: CarbonCategory): number {
   return result.breakdown.find((item) => item.category === category)?.kgCO2e ?? 0;
 }
 
-function saving(
-  result: FootprintResult,
-  category: CarbonCategory,
-  fallback: number,
-): number {
+function saving(result: FootprintResult, category: CarbonCategory, fallback: number): number {
   const fromCategory = categoryKg(result, category) * POTENTIAL_SAVINGS_TARGET_FACTOR;
   return Math.round(Math.max(fromCategory, fallback));
 }
 
-function withSaving(
-  draft: RecommendationDraft,
-  result: FootprintResult,
-): Recommendation {
+function withSaving(draft: RecommendationDraft, result: FootprintResult): Recommendation {
   const { baseSavingKgCO2ePerMonth, ...recommendation } = draft;
 
   return {
@@ -64,7 +54,7 @@ function withSaving(
     estimatedSavingKgCO2ePerMonth: saving(
       result,
       recommendation.category,
-      baseSavingKgCO2ePerMonth,
+      baseSavingKgCO2ePerMonth
     ),
   };
 }
@@ -72,18 +62,12 @@ function withSaving(
 function topOrHighShare(
   result: FootprintResult,
   category: CarbonCategory,
-  threshold: number,
+  threshold: number
 ): boolean {
-  return (
-    result.topCategory === category ||
-    categoryPercentage(result, category) >= threshold
-  );
+  return result.topCategory === category || categoryPercentage(result, category) >= threshold;
 }
 
-function transportRules(
-  input: FootprintInput,
-  result: FootprintResult,
-): RecommendationDraft[] {
+function transportRules(input: FootprintInput, result: FootprintResult): RecommendationDraft[] {
   if (!topOrHighShare(result, "transport", 35)) {
     return [];
   }
@@ -123,10 +107,7 @@ function transportRules(
   ];
 }
 
-function energyRules(
-  input: FootprintInput,
-  result: FootprintResult,
-): RecommendationDraft[] {
+function energyRules(input: FootprintInput, result: FootprintResult): RecommendationDraft[] {
   if (!topOrHighShare(result, "energy", 30)) {
     return [];
   }
@@ -137,8 +118,7 @@ function energyRules(
       category: "energy",
       title: "Reduce AC use by 1 hour per day",
       reason: "Home energy is a major part of your monthly footprint.",
-      action:
-        "Use fan cooling for one AC hour each day or set a timer before sleeping.",
+      action: "Use fan cooling for one AC hour each day or set a timer before sleeping.",
       baseSavingKgCO2ePerMonth: input.energy.acHoursPerDay > 0 ? 10 : 5,
       difficulty: "medium",
       impact: "medium",
@@ -196,10 +176,7 @@ function foodRules(input: FootprintInput, result: FootprintResult): Recommendati
   return rules;
 }
 
-function shoppingRules(
-  input: FootprintInput,
-  result: FootprintResult,
-): RecommendationDraft[] {
+function shoppingRules(input: FootprintInput, result: FootprintResult): RecommendationDraft[] {
   if (
     !topOrHighShare(result, "shopping", 18) &&
     input.shopping.clothesPerMonth < 3 &&
@@ -224,10 +201,7 @@ function shoppingRules(
   ];
 }
 
-function wasteRules(
-  input: FootprintInput,
-  result: FootprintResult,
-): RecommendationDraft[] {
+function wasteRules(input: FootprintInput, result: FootprintResult): RecommendationDraft[] {
   if (
     !topOrHighShare(result, "waste", 10) &&
     input.waste.recycles &&
@@ -279,7 +253,7 @@ export function goalScore(goal: MainGoal, recommendation: Recommendation): numbe
 function rankRecommendations(
   recommendations: Recommendation[],
   result: FootprintResult,
-  profile: UserProfile,
+  profile: UserProfile
 ): Recommendation[] {
   return [...recommendations].sort((left, right) => {
     const leftScore =
@@ -302,7 +276,7 @@ function rankRecommendations(
 export function getRecommendations(
   input: FootprintInput,
   result: FootprintResult,
-  profile: UserProfile,
+  profile: UserProfile
 ): Recommendation[] {
   const drafts = [
     ...transportRules(input, result),

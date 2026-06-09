@@ -83,7 +83,7 @@ describe("Assistant Chat API Route", () => {
         profile: mockProfile,
         result: mockResult,
         footprint: mockFootprint,
-        messages: [{ role: "user", content: "What is my biggest driver?" }]
+        messages: [{ role: "user", content: "What is my biggest driver?" }],
       }),
     });
 
@@ -108,7 +108,7 @@ describe("Assistant Chat API Route", () => {
         profile: mockProfile,
         result: mockResult,
         footprint: mockFootprint,
-        messages: [{ role: "invalid-role", content: "" }] // Invalid role/empty content
+        messages: [{ role: "invalid-role", content: "" }], // Invalid role/empty content
       }),
     });
 
@@ -152,7 +152,7 @@ describe("Assistant Chat API Route", () => {
         profile: mockProfile,
         result: mockResult,
         footprint: mockFootprint,
-        messages: [{ role: "user", content: "What is my biggest driver?" }]
+        messages: [{ role: "user", content: "What is my biggest driver?" }],
       }),
     });
 

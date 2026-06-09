@@ -13,7 +13,8 @@
 const CONTROL_CHARS = /[\x00-\x08\x0b\x0c\x0e-\x1f]/g;
 
 /** Zero-width and bidirectional-override characters used to hide content. */
-const INVISIBLE_CHARS = /[\u200b-\u200d\u200e-\u200f\u202a-\u202e\u2060-\u2064\ufeff\ufe00-\ufe0f\u00ad\u180e]/g;
+const INVISIBLE_CHARS =
+  /[\u200b-\u200d\u200e-\u200f\u202a-\u202e\u2060-\u2064\ufeff\ufe00-\ufe0f\u00ad\u180e]/g;
 
 /**
  * Sanitize a free-text string.

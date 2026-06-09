@@ -1,18 +1,18 @@
 import { z } from "zod";
 import type { CarbonCategory } from "@/lib/carbon/types";
+import type { ActivityTypeId } from "@/lib/carbon/activity-types";
+import { ACTIVITY_TYPES } from "@/lib/carbon/activity-types";
 
 export const ACTIVITY_LOG_SCHEMA_VERSION = 1;
 export const ACTIVITY_LOG_STORAGE_KEY = "carbon-compass:activities:v1";
 
-type ActivityLogStorage =
-  | Pick<Storage, "getItem" | "setItem" | "removeItem">
-  | undefined;
+type ActivityLogStorage = Pick<Storage, "getItem" | "setItem" | "removeItem"> | undefined;
 
 export type ActivityLogEntry = {
   id: string;
   recordedAt: string;
   category: CarbonCategory;
-  activityType: string;
+  activityType: ActivityTypeId;
   value: number;
   kgCO2e: number;
 };
@@ -22,7 +22,10 @@ export const activityLogEntrySchema = z
     id: z.string().min(1),
     recordedAt: z.string().datetime(),
     category: z.enum(["transport", "energy", "food", "shopping", "waste"]),
-    activityType: z.string().min(1),
+    activityType: z.custom<ActivityTypeId>(
+      (val) => typeof val === "string" && ACTIVITY_TYPES.some((a) => a.id === val),
+      "Invalid activity type ID"
+    ),
     value: z.number().finite().nonnegative(),
     kgCO2e: z.number().finite(),
   })
@@ -44,8 +47,7 @@ function safeStorage(): ActivityLogStorage {
 
 function sortEntries(entries: ActivityLogEntry[]): ActivityLogEntry[] {
   return [...entries].sort(
-    (left, right) =>
-      new Date(right.recordedAt).getTime() - new Date(left.recordedAt).getTime(),
+    (left, right) => new Date(right.recordedAt).getTime() - new Date(left.recordedAt).getTime()
   );
 }
 
@@ -57,9 +59,7 @@ export function makeActivityId(): string {
     return globalThis.crypto.randomUUID();
   }
 
-  return `activity-${Date.now().toString(36)}-${Math.floor(
-    Math.random() * 1e9,
-  ).toString(36)}`;
+  return `activity-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e9).toString(36)}`;
 }
 
 export function loadActivityLog(storage = safeStorage()): ActivityLogEntry[] {
@@ -82,29 +82,35 @@ export function loadActivityLog(storage = safeStorage()): ActivityLogEntry[] {
 
 export function saveActivityLog(
   entries: ActivityLogEntry[],
-  storage = safeStorage(),
-): void {
+  storage = safeStorage()
+): { ok: boolean; reason?: string } {
   if (!storage) {
-    return;
+    return { ok: false, reason: "Storage not available" };
   }
 
   const safeEntries = z.array(activityLogEntrySchema).safeParse(entries);
   if (!safeEntries.success) {
-    return;
+    return { ok: false, reason: "Validation failed: " + safeEntries.error.message };
   }
 
-  storage.setItem(
-    ACTIVITY_LOG_STORAGE_KEY,
-    JSON.stringify({
-      schemaVersion: ACTIVITY_LOG_SCHEMA_VERSION,
-      entries: sortEntries(safeEntries.data),
-    }),
-  );
+  try {
+    storage.setItem(
+      ACTIVITY_LOG_STORAGE_KEY,
+      JSON.stringify({
+        schemaVersion: ACTIVITY_LOG_SCHEMA_VERSION,
+        entries: sortEntries(safeEntries.data),
+      })
+    );
+    return { ok: true };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Write failed";
+    return { ok: false, reason: msg };
+  }
 }
 
 export function addActivityLogEntry(
   entry: ActivityLogEntry,
-  storage = safeStorage(),
+  storage = safeStorage()
 ): ActivityLogEntry[] {
   const entries = sortEntries([...loadActivityLog(storage), entry]);
   saveActivityLog(entries, storage);
@@ -114,19 +120,14 @@ export function addActivityLogEntry(
 export function updateActivityLogEntry(
   id: string,
   nextEntry: ActivityLogEntry,
-  storage = safeStorage(),
+  storage = safeStorage()
 ): ActivityLogEntry[] {
-  const entries = loadActivityLog(storage).map((entry) =>
-    entry.id === id ? nextEntry : entry,
-  );
+  const entries = loadActivityLog(storage).map((entry) => (entry.id === id ? nextEntry : entry));
   saveActivityLog(entries, storage);
   return loadActivityLog(storage);
 }
 
-export function deleteActivityLogEntry(
-  id: string,
-  storage = safeStorage(),
-): ActivityLogEntry[] {
+export function deleteActivityLogEntry(id: string, storage = safeStorage()): ActivityLogEntry[] {
   const entries = loadActivityLog(storage).filter((entry) => entry.id !== id);
   saveActivityLog(entries, storage);
   return entries;

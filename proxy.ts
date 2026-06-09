@@ -25,7 +25,10 @@ export function proxy(request: NextRequest): NextResponse {
         try {
           const originUrl = new URL(origin);
           if (originUrl.host !== request.nextUrl.host) {
-            return jsonResponse({ error: "Forbidden: Cross-origin requests are not allowed." }, 403);
+            return jsonResponse(
+              { error: "Forbidden: Cross-origin requests are not allowed." },
+              403
+            );
           }
         } catch {
           return jsonResponse({ error: "Forbidden: Malformed origin header." }, 403);

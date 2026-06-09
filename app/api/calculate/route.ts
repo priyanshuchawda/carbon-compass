@@ -1,31 +1,13 @@
 import { calculateFootprint } from "@/lib/carbon/calculate";
 import { footprintRequestSchema } from "@/lib/validation/schemas";
-
-async function parseJson(request: Request): Promise<unknown> {
-  try {
-    return await request.json();
-  } catch {
-    return null;
-  }
-}
+import { parseBoundedBody, apiSuccess } from "@/lib/carbon/api-utils";
 
 export async function POST(request: Request): Promise<Response> {
-  const payload = footprintRequestSchema.safeParse(await parseJson(request));
-
-  if (!payload.success) {
-    return Response.json(
-      {
-        error: "Invalid input",
-        issues: payload.error.issues.map((issue) => ({
-          path: issue.path.join("."),
-          message: issue.message,
-        })),
-      },
-      { status: 400 },
-    );
+  const parsed = await parseBoundedBody(request, footprintRequestSchema);
+  if (!parsed.success) {
+    return parsed.errorResponse;
   }
 
-  return Response.json({
-    result: calculateFootprint(payload.data.footprint, payload.data.profile),
-  });
+  const result = calculateFootprint(parsed.data.footprint, parsed.data.profile);
+  return apiSuccess({ result });
 }

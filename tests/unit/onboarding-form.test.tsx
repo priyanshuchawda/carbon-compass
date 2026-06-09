@@ -18,9 +18,12 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
 }));
 
-const mockSaveProfile = vi.fn();
+const { mockSaveProfile } = vi.hoisted(() => ({
+  mockSaveProfile: vi.fn().mockReturnValue({ ok: true }),
+}));
+
 vi.mock("@/lib/carbon/session", () => ({
-  saveSessionProfile: (p: unknown) => mockSaveProfile(p),
+  saveSessionProfile: mockSaveProfile,
 }));
 
 describe("OnboardingForm", () => {
@@ -37,25 +40,21 @@ describe("OnboardingForm", () => {
   it("has a visible submit button", () => {
     render(<OnboardingForm />);
 
-    expect(
-      screen.getByRole("button", { name: /continue to calculator/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /continue to calculator/i })).toBeInTheDocument();
   });
 
   it("saves profile and navigates to /calculator on submit", async () => {
     const user = userEvent.setup();
     render(<OnboardingForm />);
 
-    await user.click(
-      screen.getByRole("button", { name: /continue to calculator/i }),
-    );
+    await user.click(screen.getByRole("button", { name: /continue to calculator/i }));
 
     expect(mockSaveProfile).toHaveBeenCalledWith(
       expect.objectContaining({
         city: "Pune",
         country: "India",
         persona: "student",
-      }),
+      })
     );
     expect(mockPush).toHaveBeenCalledWith("/calculator");
   });
@@ -68,13 +67,9 @@ describe("OnboardingForm", () => {
     await user.clear(cityInput);
     await user.type(cityInput, "Mumbai");
 
-    await user.click(
-      screen.getByRole("button", { name: /continue to calculator/i }),
-    );
+    await user.click(screen.getByRole("button", { name: /continue to calculator/i }));
 
-    expect(mockSaveProfile).toHaveBeenCalledWith(
-      expect.objectContaining({ city: "Mumbai" }),
-    );
+    expect(mockSaveProfile).toHaveBeenCalledWith(expect.objectContaining({ city: "Mumbai" }));
   });
 
   it("persists selected goal in saved profile", async () => {
@@ -84,12 +79,10 @@ describe("OnboardingForm", () => {
     const goalSelect = screen.getByLabelText(/main goal/i);
     await user.selectOptions(goalSelect, "save_money");
 
-    await user.click(
-      screen.getByRole("button", { name: /continue to calculator/i }),
-    );
+    await user.click(screen.getByRole("button", { name: /continue to calculator/i }));
 
     expect(mockSaveProfile).toHaveBeenCalledWith(
-      expect.objectContaining({ mainGoal: "save_money" }),
+      expect.objectContaining({ mainGoal: "save_money" })
     );
   });
 });

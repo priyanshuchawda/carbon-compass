@@ -12,8 +12,10 @@ const MAX_DEPTH = 3;
 const GOOGLE_API_KEY_PATTERN = /\bAIza[0-9A-Za-z_-]{20,}\b/g;
 const BEARER_TOKEN_PATTERN = /\bbearer\s+[a-z0-9._~+/=-]{12,}/gi;
 const HEADER_SECRET_PATTERN = /(authorization\s*[:=]\s*)(bearer\s+)?[^\s,;}\]]+/gi;
-const URL_SECRET_PARAM_PATTERN = /((?:[?&]|\b)(?:key|api_key|apiKey|access_token|refresh_token|token|auth|authorization)=)([^&#\s]+)/gi;
-const SENSITIVE_FIELD_PATTERN = /^(api[-_]?key|apikey|authorization|access[-_]?token|accesstoken|refresh[-_]?token|refreshtoken|token|secret|password|credential)s?$/i;
+const URL_SECRET_PARAM_PATTERN =
+  /((?:[?&]|\b)(?:key|api_key|apiKey|access_token|refresh_token|token|auth|authorization)=)([^&#\s]+)/gi;
+const SENSITIVE_FIELD_PATTERN =
+  /^(api[-_]?key|apikey|authorization|access[-_]?token|accesstoken|refresh[-_]?token|refreshtoken|token|secret|password|credential)s?$/i;
 
 function truncateString(value: string): string {
   if (value.length <= MAX_STRING_LENGTH) {
@@ -87,9 +89,10 @@ export interface SanitizedError {
  */
 export function redactError(error: unknown): SanitizedError {
   const name = error instanceof Error ? error.name : "Error";
-  const message = error instanceof Error 
-    ? redactSensitiveString(error.message)
-    : redactSensitiveString(String(error));
+  const message =
+    error instanceof Error
+      ? redactSensitiveString(error.message)
+      : redactSensitiveString(String(error));
 
   const safeError: SanitizedError = {
     name,

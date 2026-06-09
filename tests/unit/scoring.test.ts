@@ -72,7 +72,7 @@ describe("eco scoring", () => {
     };
 
     expect(calculateEcoScore(180, habitsInput, profile)).toBeGreaterThan(
-      calculateEcoScore(180, baseInput, profile),
+      calculateEcoScore(180, baseInput, profile)
     );
   });
 });

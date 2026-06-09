@@ -1,8 +1,6 @@
 "use client";
 
-/* eslint-disable react-hooks/set-state-in-effect */
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { loadMonthlyGoal, saveMonthlyGoal } from "@/lib/carbon/progress";
 
 type GoalSetterProps = {
@@ -10,20 +8,22 @@ type GoalSetterProps = {
   isDemo?: boolean;
 };
 
-export function GoalSetter({ currentMonthlyKg, isDemo = false }: GoalSetterProps) {
-  const [goal, setGoal] = useState<number | null>(null);
-  const [inputValue, setInputValue] = useState("");
-  const [feedback, setFeedback] = useState("");
+type GoalFormState = {
+  goal: number | null;
+  inputValue: string;
+};
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const savedGoal = loadMonthlyGoal();
-      setGoal(savedGoal);
-      if (savedGoal !== null) {
-        setInputValue(String(savedGoal));
-      }
-    }
-  }, []);
+function loadInitialGoalState(): GoalFormState {
+  const savedGoal = loadMonthlyGoal();
+  return {
+    goal: savedGoal,
+    inputValue: savedGoal === null ? "" : String(savedGoal),
+  };
+}
+
+export function GoalSetter({ currentMonthlyKg, isDemo = false }: GoalSetterProps) {
+  const [{ goal, inputValue }, setGoalFormState] = useState(loadInitialGoalState);
+  const [feedback, setFeedback] = useState("");
 
   function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -31,31 +31,38 @@ export function GoalSetter({ currentMonthlyKg, isDemo = false }: GoalSetterProps
       setFeedback("Complete the calculator first to set a goal for your real data.");
       return;
     }
-    const parsed = Number(inputValue);
     if (inputValue.trim() === "") {
-      saveMonthlyGoal(null);
-      setGoal(null);
-      setFeedback("Goal cleared successfully.");
+      const res = saveMonthlyGoal(null);
+      if (res.ok) {
+        setGoalFormState({ goal: null, inputValue: "" });
+        setFeedback("Goal cleared successfully.");
+      } else {
+        setFeedback("Failed to clear goal: " + res.reason);
+      }
       return;
     }
+    const parsed = Number(inputValue);
     if (Number.isNaN(parsed) || parsed < 0) {
       setFeedback("Please enter a valid target footprint.");
       return;
     }
-    saveMonthlyGoal(parsed);
-    setGoal(parsed);
-    setFeedback("Goal saved successfully!");
+    const res = saveMonthlyGoal(parsed);
+    if (res.ok) {
+      setGoalFormState({ goal: parsed, inputValue });
+      setFeedback("Goal saved successfully!");
+    } else {
+      setFeedback("Failed to save goal: " + res.reason);
+    }
   }
 
   // Calculate progress percentage
-  const progressPercent = goal && goal > 0 
-    ? Math.min(Math.round((currentMonthlyKg / goal) * 100), 100)
-    : 0;
+  const progressPercent =
+    goal && goal > 0 ? Math.min(Math.round((currentMonthlyKg / goal) * 100), 100) : 0;
 
   const isGoalMet = goal !== null && currentMonthlyKg <= goal;
 
   return (
-    <section 
+    <section
       aria-label="Monthly footprint target goal tracker"
       className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
     >
@@ -77,7 +84,7 @@ export function GoalSetter({ currentMonthlyKg, isDemo = false }: GoalSetterProps
             placeholder="e.g. 150"
             value={inputValue}
             onChange={(e) => {
-              setInputValue(e.target.value);
+              setGoalFormState((current) => ({ ...current, inputValue: e.target.value }));
               setFeedback("");
             }}
             className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
@@ -93,9 +100,12 @@ export function GoalSetter({ currentMonthlyKg, isDemo = false }: GoalSetterProps
           <button
             type="button"
             onClick={() => {
-              setInputValue("");
-              saveMonthlyGoal(null);
-              setGoal(null);
+              const result = saveMonthlyGoal(null);
+              if (!result.ok) {
+                setFeedback("Failed to clear goal: " + result.reason);
+                return;
+              }
+              setGoalFormState({ goal: null, inputValue: "" });
               setFeedback("Goal cleared.");
             }}
             className="inline-flex min-h-[38px] items-center justify-center rounded-md border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
@@ -115,7 +125,10 @@ export function GoalSetter({ currentMonthlyKg, isDemo = false }: GoalSetterProps
         <div className="mt-5 border-t border-slate-100 pt-4">
           <div className="flex justify-between items-center text-sm">
             <span className="text-slate-600">
-              Current: <strong className="text-slate-950 font-semibold">{Math.round(currentMonthlyKg)} kg</strong>
+              Current:{" "}
+              <strong className="text-slate-950 font-semibold">
+                {Math.round(currentMonthlyKg)} kg
+              </strong>
             </span>
             <span className="text-slate-600">
               Target: <strong className="text-emerald-800 font-semibold">{goal} kg</strong>

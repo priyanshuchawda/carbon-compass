@@ -44,13 +44,10 @@ export const demoFootprintInput = {
   },
 } satisfies FootprintInput;
 
-export const demoFootprintResult = calculateFootprint(
-  demoFootprintInput,
-  demoProfile,
-);
+export const demoFootprintResult = calculateFootprint(demoFootprintInput, demoProfile);
 
 export const demoRecommendations = getRecommendations(
   demoFootprintInput,
   demoFootprintResult,
-  demoProfile,
+  demoProfile
 );

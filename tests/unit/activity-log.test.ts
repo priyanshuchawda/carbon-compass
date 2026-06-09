@@ -26,11 +26,7 @@ const mockStorage = () => {
   };
 };
 
-const makeEntry = (
-  id: string,
-  recordedAt: string,
-  value = 10,
-): ActivityLogEntry => ({
+const makeEntry = (id: string, recordedAt: string, value = 10): ActivityLogEntry => ({
   id,
   recordedAt,
   category: "transport",
@@ -71,10 +67,7 @@ describe("activity log storage", () => {
     storage.setItem(ACTIVITY_LOG_STORAGE_KEY, "{bad-json");
     expect(loadActivityLog(storage)).toEqual([]);
 
-    storage.setItem(
-      ACTIVITY_LOG_STORAGE_KEY,
-      JSON.stringify({ schemaVersion: 99, entries: [] }),
-    );
+    storage.setItem(ACTIVITY_LOG_STORAGE_KEY, JSON.stringify({ schemaVersion: 99, entries: [] }));
     expect(loadActivityLog(storage)).toEqual([]);
   });
 
@@ -85,10 +78,7 @@ describe("activity log storage", () => {
 
     saveActivityLog([older, newer], storage);
 
-    expect(loadActivityLog(storage).map((entry) => entry.id)).toEqual([
-      "newer",
-      "older",
-    ]);
+    expect(loadActivityLog(storage).map((entry) => entry.id)).toEqual(["newer", "older"]);
   });
 
   it("skips saving invalid entries", () => {
@@ -107,7 +97,7 @@ describe("activity log storage", () => {
     const updated = updateActivityLogEntry(
       "entry-1",
       { ...entry, value: 12, kgCO2e: 2.16 },
-      storage,
+      storage
     );
     expect(updated[0]).toMatchObject({ value: 12, kgCO2e: 2.16 });
 

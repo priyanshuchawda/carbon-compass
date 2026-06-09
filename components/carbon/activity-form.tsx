@@ -7,6 +7,7 @@ import {
   ACTIVITY_CATEGORY_META,
   getActivityType,
   getActivityTypesForCategory,
+  type ActivityTypeId,
 } from "@/lib/carbon/activity-types";
 import { makeActivityId, type ActivityLogEntry } from "@/lib/carbon/activity-log";
 import type { CarbonCategory } from "@/lib/carbon/types";
@@ -38,29 +39,16 @@ function parseDateInput(value: string): Date | null {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-export function ActivityForm({
-  initialEntry = null,
-  onSave,
-  onCancel,
-}: ActivityFormProps) {
-  const [category, setCategory] = useState<CarbonCategory>(
-    initialEntry?.category ?? "transport",
+export function ActivityForm({ initialEntry = null, onSave, onCancel }: ActivityFormProps) {
+  const [category, setCategory] = useState<CarbonCategory>(initialEntry?.category ?? "transport");
+  const [activityType, setActivityType] = useState<ActivityTypeId>(
+    initialEntry?.activityType ?? "two_wheeler"
   );
-  const [activityType, setActivityType] = useState(
-    initialEntry?.activityType ?? "two_wheeler",
-  );
-  const [value, setValue] = useState(
-    initialEntry ? String(initialEntry.value) : "",
-  );
-  const [dateValue, setDateValue] = useState(() =>
-    entryDateInputValue(initialEntry),
-  );
+  const [value, setValue] = useState(initialEntry ? String(initialEntry.value) : "");
+  const [dateValue, setDateValue] = useState(() => entryDateInputValue(initialEntry));
   const [feedback, setFeedback] = useState("");
 
-  const activityOptions = useMemo(
-    () => getActivityTypesForCategory(category),
-    [category],
-  );
+  const activityOptions = useMemo(() => getActivityTypesForCategory(category), [category]);
   const currentActivity = getActivityType(category, activityType);
   const numericValue = Number(value);
   const previewEmissions =
@@ -134,7 +122,7 @@ export function ActivityForm({
           onChange={(event) => {
             const nextCategory = event.target.value as CarbonCategory;
             setCategory(nextCategory);
-            setActivityType(getActivityTypesForCategory(nextCategory)[0]?.id ?? "");
+            setActivityType(getActivityTypesForCategory(nextCategory)[0]?.id ?? "two_wheeler");
             setFeedback("");
           }}
           className="mt-1 block min-h-10 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"
@@ -155,7 +143,7 @@ export function ActivityForm({
           id="log-type"
           value={activityType}
           onChange={(event) => {
-            setActivityType(event.target.value);
+            setActivityType(event.target.value as ActivityTypeId);
             setFeedback("");
           }}
           className="mt-1 block min-h-10 w-full rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500"

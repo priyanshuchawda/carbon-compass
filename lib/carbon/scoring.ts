@@ -5,7 +5,7 @@ import type { FootprintInput, UserProfile } from "@/lib/carbon/types";
 
 /**
  * Calculates the Eco Score (0 to 100) based on per-capita monthly footprint.
- * 
+ *
  * Calibration Logic:
  * - India's national average carbon footprint is ~1,900 kg CO2e/year per capita,
  *   which is ~158 kg CO2e/month per capita.
@@ -19,10 +19,9 @@ import type { FootprintInput, UserProfile } from "@/lib/carbon/types";
 export function calculateEcoScore(
   monthlyTotalKgCO2e: number,
   input: FootprintInput,
-  profile: UserProfile,
+  profile: UserProfile
 ): number {
-  const householdAdjustedTotal =
-    monthlyTotalKgCO2e / Math.max(profile.householdSize, 1);
+  const householdAdjustedTotal = monthlyTotalKgCO2e / Math.max(profile.householdSize, 1);
   const habitBonus =
     (input.energy.renewableEnergy ? 4 : 0) +
     (input.waste.recycles ? 3 : 0) +

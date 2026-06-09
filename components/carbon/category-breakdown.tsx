@@ -77,21 +77,15 @@ export function CategoryBreakdown({ breakdown }: CategoryBreakdownProps) {
                 <Cell key={item.category} fill={COLORS[item.category]} />
               ))}
             </Pie>
-            <Tooltip
-              formatter={(value) =>
-                typeof value === "number" ? formatKg(value) : value
-              }
-            />
+            <Tooltip formatter={(value) => (typeof value === "number" ? formatKg(value) : value)} />
           </PieChart>
         </div>
 
         <div className="flex-1">
-          <h2 className="text-2xl font-semibold text-slate-950">
-            Category breakdown
-          </h2>
+          <h2 className="text-2xl font-semibold text-slate-950">Category breakdown</h2>
           <p className="mt-2 text-sm leading-6 text-slate-700">
-            The chart mirrors this text summary so the result stays readable
-            without relying on visual color alone.
+            The chart mirrors this text summary so the result stays readable without relying on
+            visual color alone.
           </p>
           <ul
             aria-label="Category breakdown text summary"
@@ -100,16 +94,10 @@ export function CategoryBreakdown({ breakdown }: CategoryBreakdownProps) {
             {breakdown.map((item) => (
               <li key={item.category} className="rounded-md bg-slate-50 p-3">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="font-medium text-slate-950">
-                    {item.label}
-                  </span>
-                  <span className="text-sm text-slate-600">
-                    {item.percentage.toFixed(1)}%
-                  </span>
+                  <span className="font-medium text-slate-950">{item.label}</span>
+                  <span className="text-sm text-slate-600">{item.percentage.toFixed(1)}%</span>
                 </div>
-                <p className="mt-1 text-sm text-slate-700">
-                  {formatKg(item.kgCO2e)} per month
-                </p>
+                <p className="mt-1 text-sm text-slate-700">{formatKg(item.kgCO2e)} per month</p>
               </li>
             ))}
           </ul>

@@ -1,9 +1,7 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-const chunkDirCandidates = [
-  join(process.cwd(), ".next", "static", "chunks"),
-];
+const chunkDirCandidates = [join(process.cwd(), ".next", "static", "chunks")];
 const chunksDir = chunkDirCandidates.find((candidate) => existsSync(candidate));
 
 if (!chunksDir) {

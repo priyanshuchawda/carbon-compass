@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  footprintInputSchema,
-  userProfileSchema,
-} from "@/lib/validation/schemas";
+import { footprintInputSchema, userProfileSchema } from "@/lib/validation/schemas";
 
 const validProfile = {
   id: "demo-user",

@@ -11,8 +11,8 @@ export default function DashboardPage() {
               Your Carbon Compass dashboard
             </h1>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-700">
-              Footprint totals, category drivers, eco score, and your first
-              personalised actions — calculated from your inputs.
+              Footprint totals, category drivers, eco score, and your first personalised actions —
+              calculated from your inputs.
             </p>
           </div>
           <Link

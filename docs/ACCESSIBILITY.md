@@ -23,5 +23,6 @@ Carbon Compass is designed to be accessible to all users, conforming to WCAG 2.1
 ## Testing Verification
 
 Accessibility has been verified using two primary mechanisms:
+
 - **Unit Accessibility Tests**: In `tests/unit/accessibility.test.tsx`, we verify heading structures and chart text alternative listings programmatically.
 - **E2E Axe Accessibility Audits**: Integrated into Playwright E2E tests, the `@axe-core/playwright` engine automatically scans landing, calculator, dashboard, and report pages for contrast, label association, heading violations, and landmark structure.

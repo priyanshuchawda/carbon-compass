@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { buildAssistantPrompt, getFallbackResponse, buildChatPrompt, getFallbackChatResponse } from "../../lib/carbon/ai/prompt";
+import {
+  buildAssistantPrompt,
+  getFallbackResponse,
+  buildChatPrompt,
+  getFallbackChatResponse,
+} from "../../lib/carbon/ai/prompt";
 import type { AssistantRequestPayload } from "../../lib/validation/schemas";
 
 const mockPayload: AssistantRequestPayload = {
@@ -88,9 +93,15 @@ describe("AI prompt builder", () => {
     const fallback = getFallbackResponse(mockPayload);
     expect(fallback.isDemo).toBe(true);
     expect(fallback.costUSD).toBe(0);
-    expect(fallback.narrative).toContain("Home energy usage represents your primary carbon footprint opportunity");
-    expect(fallback.weeklyChallenge).toBe("Reduce daily AC usage by 1 hour or switch off idle appliances.");
-    expect(fallback.goalTip).toBe("Reducing electricity and gas consumption directly lowers your utility bill.");
+    expect(fallback.narrative).toContain(
+      "Home energy usage represents your primary carbon footprint opportunity"
+    );
+    expect(fallback.weeklyChallenge).toBe(
+      "Reduce daily AC usage by 1 hour or switch off idle appliances."
+    );
+    expect(fallback.goalTip).toBe(
+      "Reducing electricity and gas consumption directly lowers your utility bill."
+    );
   });
 });
 
@@ -104,9 +115,17 @@ describe("AI chat prompt builder & fallbacks", () => {
   });
 
   it("handles out of bounds/redirect conditions in fallback responses", () => {
-    expect(getFallbackChatResponse("give me medical advice")).toContain("cannot provide medical, legal, or professional advice");
-    expect(getFallbackChatResponse("give me legal advice")).toContain("cannot provide medical, legal, or professional advice");
-    expect(getFallbackChatResponse("hello there")).toContain("Hello! I am your Carbon Compass assistant");
-    expect(getFallbackChatResponse("what is my biggest source?")).toContain("top emission category");
+    expect(getFallbackChatResponse("give me medical advice")).toContain(
+      "cannot provide medical, legal, or professional advice"
+    );
+    expect(getFallbackChatResponse("give me legal advice")).toContain(
+      "cannot provide medical, legal, or professional advice"
+    );
+    expect(getFallbackChatResponse("hello there")).toContain(
+      "Hello! I am your Carbon Compass assistant"
+    );
+    expect(getFallbackChatResponse("what is my biggest source?")).toContain(
+      "top emission category"
+    );
   });
 });

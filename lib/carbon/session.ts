@@ -3,17 +3,15 @@
  *
  * Passes user-submitted FootprintInput and UserProfile from the calculator
  * form to the dashboard, actions, and report pages within the same browser
- * session. Data never leaves the browser.
+ * session. Calculator data stays in the browser unless a user opens AI
+ * assistant features, which send summarized context to server-side API routes.
  *
  * Keys are namespaced under "carbon-compass.session.*" to avoid collisions
  * with the progress localStorage keys ("carbon-compass:progress:v1").
  */
 
 import { z } from "zod";
-import {
-  footprintInputSchema,
-  userProfileSchema,
-} from "@/lib/validation/schemas";
+import { footprintInputSchema, userProfileSchema } from "@/lib/validation/schemas";
 import type { FootprintInput, UserProfile } from "@/lib/carbon/types";
 
 const SESSION_FOOTPRINT_KEY = "carbon-compass.session.footprint";
@@ -26,16 +24,40 @@ function safeSessionStorage(): Pick<Storage, "getItem" | "setItem" | "removeItem
 
 // ── write ─────────────────────────────────────────────────────────────────────
 
-export function saveSessionFootprint(input: FootprintInput): void {
+export function saveSessionFootprint(input: FootprintInput): { ok: boolean; reason?: string } {
+  const parsed = footprintInputSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, reason: "Validation failed: " + parsed.error.message };
+  }
   const storage = safeSessionStorage();
-  if (!storage) return;
-  storage.setItem(SESSION_FOOTPRINT_KEY, JSON.stringify(input));
+  if (!storage) {
+    return { ok: false, reason: "sessionStorage is not available" };
+  }
+  try {
+    storage.setItem(SESSION_FOOTPRINT_KEY, JSON.stringify(parsed.data));
+    return { ok: true };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Write failed";
+    return { ok: false, reason: msg };
+  }
 }
 
-export function saveSessionProfile(profile: UserProfile): void {
+export function saveSessionProfile(profile: UserProfile): { ok: boolean; reason?: string } {
+  const parsed = userProfileSchema.safeParse(profile);
+  if (!parsed.success) {
+    return { ok: false, reason: "Validation failed: " + parsed.error.message };
+  }
   const storage = safeSessionStorage();
-  if (!storage) return;
-  storage.setItem(SESSION_PROFILE_KEY, JSON.stringify(profile));
+  if (!storage) {
+    return { ok: false, reason: "sessionStorage is not available" };
+  }
+  try {
+    storage.setItem(SESSION_PROFILE_KEY, JSON.stringify(parsed.data));
+    return { ok: true };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Write failed";
+    return { ok: false, reason: msg };
+  }
 }
 
 // ── read ──────────────────────────────────────────────────────────────────────

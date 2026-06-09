@@ -47,7 +47,7 @@ const baseInput: FootprintInput = {
 
 function recommendationsFor(
   input: FootprintInput,
-  profile: UserProfile = baseProfile,
+  profile: UserProfile = baseProfile
 ): Recommendation[] {
   return getRecommendations(input, calculateFootprint(input, profile), profile);
 }
@@ -102,9 +102,7 @@ describe("Compass Assistant recommendations", () => {
 
     const recommendations = recommendationsFor(input);
 
-    expect(
-      recommendations.some((item) => /food waste/i.test(item.title)),
-    ).toBe(true);
+    expect(recommendations.some((item) => /food waste/i.test(item.title))).toBe(true);
   });
 
   it("ranks money-saving actions higher when the goal is save_money", () => {

@@ -34,13 +34,7 @@ export type SimulationResult = {
   appliedActions: SimulationAction[];
 };
 
-const CATEGORY_KEYS: CarbonCategory[] = [
-  "transport",
-  "energy",
-  "food",
-  "shopping",
-  "waste",
-];
+const CATEGORY_KEYS: CarbonCategory[] = ["transport", "energy", "food", "shopping", "waste"];
 
 export const SIMULATION_ACTIONS: SimulationAction[] = [
   {
@@ -55,8 +49,7 @@ export const SIMULATION_ACTIONS: SimulationAction[] = [
     id: "reduce_ac_one_hour_daily",
     title: "Reduce AC by 1 hour per day",
     category: "energy",
-    description:
-      "Reduce daily AC time and monthly electricity use by a deterministic 30 kWh.",
+    description: "Reduce daily AC time and monthly electricity use by a deterministic 30 kWh.",
     factorNote: `Uses ${EMISSION_FACTORS.energy.acKWhPerHour} kWh per AC hour and ${EMISSION_FACTORS.energy.electricityKgPerKWh} kg CO2/kWh.`,
   },
   {
@@ -89,9 +82,7 @@ export const SIMULATION_ACTIONS: SimulationAction[] = [
   },
 ];
 
-const ACTION_BY_ID = new Map(
-  SIMULATION_ACTIONS.map((action) => [action.id, action]),
-);
+const ACTION_BY_ID = new Map(SIMULATION_ACTIONS.map((action) => [action.id, action]));
 
 // round() is provided by @/lib/carbon/utils
 
@@ -107,16 +98,12 @@ function cloneInput(input: FootprintInput): FootprintInput {
 
 function categorySavings(
   beforeResult: FootprintResult,
-  afterResult: FootprintResult,
+  afterResult: FootprintResult
 ): Record<CarbonCategory, number> {
   return CATEGORY_KEYS.reduce(
     (savings, category) => {
-      const before =
-        beforeResult.breakdown.find((item) => item.category === category)
-          ?.kgCO2e ?? 0;
-      const after =
-        afterResult.breakdown.find((item) => item.category === category)
-          ?.kgCO2e ?? 0;
+      const before = beforeResult.breakdown.find((item) => item.category === category)?.kgCO2e ?? 0;
+      const after = afterResult.breakdown.find((item) => item.category === category)?.kgCO2e ?? 0;
 
       return {
         ...savings,
@@ -129,17 +116,14 @@ function categorySavings(
       food: 0,
       shopping: 0,
       waste: 0,
-    } satisfies Record<CarbonCategory, number>,
+    } satisfies Record<CarbonCategory, number>
   );
 }
 
 function applyAction(input: FootprintInput, actionId: SimulationActionId): void {
   if (actionId === "metro_bus_substitution") {
     let remainingFuelKm = 40;
-    const twoWheelerReduction = Math.min(
-      input.transport.twoWheelerKmPerWeek,
-      remainingFuelKm,
-    );
+    const twoWheelerReduction = Math.min(input.transport.twoWheelerKmPerWeek, remainingFuelKm);
     input.transport.twoWheelerKmPerWeek -= twoWheelerReduction;
     remainingFuelKm -= twoWheelerReduction;
 
@@ -159,7 +143,7 @@ function applyAction(input: FootprintInput, actionId: SimulationActionId): void 
     input.energy.monthlyElectricityKWh = Math.max(
       input.energy.monthlyElectricityKWh -
         dailyReduction * 30 * EMISSION_FACTORS.energy.acKWhPerHour,
-      0,
+      0
     );
     return;
   }
@@ -173,10 +157,7 @@ function applyAction(input: FootprintInput, actionId: SimulationActionId): void 
   }
 
   if (actionId === "reduce_delivery") {
-    input.food.foodDeliveryPerWeek = Math.max(
-      input.food.foodDeliveryPerWeek - 2,
-      0,
-    );
+    input.food.foodDeliveryPerWeek = Math.max(input.food.foodDeliveryPerWeek - 2, 0);
     return;
   }
 
@@ -191,7 +172,7 @@ function applyAction(input: FootprintInput, actionId: SimulationActionId): void 
 export function simulateActions(
   input: FootprintInput,
   profile: UserProfile,
-  actionIds: SimulationActionId[],
+  actionIds: SimulationActionId[]
 ): SimulationResult {
   const beforeInput = cloneInput(input);
   const afterInput = cloneInput(input);
@@ -214,10 +195,7 @@ export function simulateActions(
     beforeResult,
     afterResult,
     savingKgCO2e: round(
-      Math.max(
-        beforeResult.monthlyTotalKgCO2e - afterResult.monthlyTotalKgCO2e,
-        0,
-      ),
+      Math.max(beforeResult.monthlyTotalKgCO2e - afterResult.monthlyTotalKgCO2e, 0)
     ),
     categorySavings: categorySavings(beforeResult, afterResult),
     appliedActions,
@@ -227,7 +205,7 @@ export function simulateActions(
 export function simulateAction(
   input: FootprintInput,
   profile: UserProfile,
-  actionId: SimulationActionId,
+  actionId: SimulationActionId
 ): SimulationResult {
   return simulateActions(input, profile, [actionId]);
 }

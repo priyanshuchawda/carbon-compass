@@ -10,13 +10,15 @@ describe("landing page", () => {
       screen.getByRole("heading", {
         level: 1,
         name: /track your lifestyle carbon footprint/i,
-      }),
+      })
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: /calculate my footprint/i }),
-    ).toHaveAttribute("href", "/calculator");
-    expect(
-      screen.getByRole("link", { name: /view demo dashboard/i }),
-    ).toHaveAttribute("href", "/dashboard");
+    expect(screen.getByRole("link", { name: /calculate my footprint/i })).toHaveAttribute(
+      "href",
+      "/calculator"
+    );
+    expect(screen.getByRole("link", { name: /view demo dashboard/i })).toHaveAttribute(
+      "href",
+      "/dashboard"
+    );
   });
 });

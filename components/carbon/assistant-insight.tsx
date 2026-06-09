@@ -1,12 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { logError } from "@/lib/carbon/logger";
+import { aiNarratorResponseSchema } from "@/lib/validation/schemas";
 import type {
   FootprintInput,
   FootprintResult,
   Recommendation,
   UserProfile,
 } from "@/lib/carbon/types";
+import type { z } from "zod";
 
 type AssistantInsightProps = {
   result: FootprintResult;
@@ -28,14 +31,11 @@ const GOAL_CONTEXT: Record<UserProfile["mainGoal"], string> = {
   habit_building: "and build a lasting habit",
 };
 
-interface AINarratorResponse {
-  narrative: string;
-  weeklyChallenge: string;
-  goalTip: string;
-  costUSD: number;
-  isDemo: boolean;
-  error?: string;
-}
+type AINarratorResponse = z.infer<typeof aiNarratorResponseSchema>;
+type NarrationState = {
+  key: string;
+  data: AINarratorResponse | null;
+};
 
 export function AssistantInsight({
   result,
@@ -43,18 +43,15 @@ export function AssistantInsight({
   profile,
   footprint,
 }: AssistantInsightProps) {
-  const [prevRecId, setPrevRecId] = useState(recommendation.id);
-  const [aiData, setAiData] = useState<AINarratorResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  if (recommendation.id !== prevRecId) {
-    setPrevRecId(recommendation.id);
-    setAiData(null);
-    setLoading(true);
-  }
+  const requestKey = `${recommendation.id}:${result.monthlyTotalKgCO2e}:${profile.id}`;
+  const [narrationState, setNarrationState] = useState<NarrationState | null>(null);
+  const currentNarration =
+    narrationState?.key === requestKey ? narrationState : { key: requestKey, data: null };
+  const aiData = currentNarration.data;
+  const loading = narrationState?.key !== requestKey;
 
   useEffect(() => {
-    let active = true;
+    const controller = new AbortController();
 
     fetch("/api/assistant/narrate", {
       method: "POST",
@@ -65,32 +62,30 @@ export function AssistantInsight({
         recommendations: [recommendation],
         footprint,
       }),
+      signal: controller.signal,
     })
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP error ${res.status}`);
         return res.json();
       })
-      .then((data: AINarratorResponse) => {
-        if (active) {
-          setAiData(data);
-          setLoading(false);
-        }
+      .then((data) => {
+        const parsedData = aiNarratorResponseSchema.parse(data);
+        setNarrationState({ key: requestKey, data: parsedData });
       })
-      .catch((err) => {
-        console.error("Failed to load assistant narration:", err);
-        if (active) {
-          setLoading(false);
+      .catch((err: unknown) => {
+        if (err instanceof Error && err.name === "AbortError") {
+          return;
         }
+        logError("Failed to load assistant narration", err);
+        setNarrationState({ key: requestKey, data: null });
       });
 
     return () => {
-      active = false;
+      controller.abort();
     };
-  }, [profile, result, recommendation, footprint]);
+  }, [profile, result, recommendation, footprint, requestKey]);
 
-  const topCategory = result.breakdown.find(
-    (item) => item.category === result.topCategory,
-  );
+  const topCategory = result.breakdown.find((item) => item.category === result.topCategory);
 
   const personaPrefix = PERSONA_CONTEXT[profile.persona];
   const goalSuffix = GOAL_CONTEXT[profile.mainGoal];
@@ -120,30 +115,28 @@ export function AssistantInsight({
         {aiData ? (
           // Progressive Gemini-Narrated summary
           <div className="transition-all duration-300">
-            <p className="mt-3 text-sm leading-6 text-emerald-100">
-              {aiData.narrative}
-            </p>
-            <p className="mt-3 text-sm leading-6 text-emerald-50">
-              {aiData.goalTip}
-            </p>
+            <p className="mt-3 text-sm leading-6 text-emerald-100">{aiData.narrative}</p>
+            <p className="mt-3 text-sm leading-6 text-emerald-50">{aiData.goalTip}</p>
           </div>
         ) : (
           // Default Grounded Recommendation (visible on mount and as fallback)
           <div className="transition-all duration-300">
             {loading && (
-              <p role="status" aria-live="polite" className="text-[11px] font-mono text-emerald-300/80 animate-pulse mb-3">
+              <p
+                role="status"
+                aria-live="polite"
+                className="text-[11px] font-mono text-emerald-300/80 animate-pulse mb-3"
+              >
                 &gt; Personalising guidance with AI...
               </p>
             )}
             <p className="mt-3 text-sm leading-6 text-emerald-100">
-              {recommendation.reason} It contributes{" "}
-              {topCategory?.percentage.toFixed(1) ?? "0.0"}% of your monthly
-              footprint ({Math.round(topCategory?.kgCO2e ?? 0)} kg CO₂e).
+              {recommendation.reason} It contributes {topCategory?.percentage.toFixed(1) ?? "0.0"}%
+              of your monthly footprint ({Math.round(topCategory?.kgCO2e ?? 0)} kg CO₂e).
             </p>
             <p className="mt-3 text-sm leading-6 text-emerald-50">
               {personaPrefix}the best first step {goalSuffix} is:{" "}
-              <strong className="text-white">{recommendation.title}</strong>.
-              Estimated saving:{" "}
+              <strong className="text-white">{recommendation.title}</strong>. Estimated saving:{" "}
               {recommendation.estimatedSavingKgCO2ePerMonth} kg CO₂e/month.
             </p>
           </div>

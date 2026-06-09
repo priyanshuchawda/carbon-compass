@@ -18,8 +18,8 @@ vi.mock("next/navigation", () => ({
 
 vi.mock("@/lib/carbon/session", () => ({
   loadSessionPayload: () => null,
-  saveSessionFootprint: vi.fn(),
-  saveSessionProfile: vi.fn(),
+  saveSessionFootprint: vi.fn(() => ({ ok: true })),
+  saveSessionProfile: vi.fn(() => ({ ok: true })),
   loadSessionFootprint: () => null,
   loadSessionProfile: () => null,
   clearSessionData: vi.fn(),
@@ -38,17 +38,13 @@ describe("input flow UI", () => {
   it("renders calculator sections with labeled inputs", () => {
     render(<CalculatorPage />);
 
-    expect(screen.getByLabelText(/two-wheeler km per week/i))
-      .toBeInTheDocument();
-    expect(screen.getByLabelText(/monthly electricity/i))
-      .toBeInTheDocument();
+    expect(screen.getByLabelText(/two-wheeler km per week/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/monthly electricity/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/diet type/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/clothes bought per month/i))
-      .toBeInTheDocument();
-    expect(screen.getByLabelText(/separates and recycles dry waste/i))
-      .toBeInTheDocument();
+    expect(screen.getByLabelText(/clothes bought per month/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/separates and recycles dry waste/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /calculate and view dashboard/i }),
+      screen.getByRole("button", { name: /calculate and view dashboard/i })
     ).toBeInTheDocument();
   });
 
@@ -56,12 +52,9 @@ describe("input flow UI", () => {
     const user = userEvent.setup();
     render(<CalculatorPage />);
 
-    await user.click(
-      screen.getByRole("button", { name: /use pune student demo data/i }),
-    );
+    await user.click(screen.getByRole("button", { name: /use pune student demo data/i }));
 
-    expect(screen.getByLabelText(/two-wheeler km per week/i))
-      .toHaveValue(120);
+    expect(screen.getByLabelText(/two-wheeler km per week/i)).toHaveValue(120);
     expect(screen.getByLabelText(/monthly electricity/i)).toHaveValue(100);
     expect(screen.getByLabelText(/diet type/i)).toHaveValue("mixed");
   });

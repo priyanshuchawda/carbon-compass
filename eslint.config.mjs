@@ -19,6 +19,18 @@ const eslintConfig = defineConfig([
     // Generated coverage output:
     "coverage/**",
   ]),
+  {
+    rules: {
+      "no-console": ["error", { allow: ["error", "warn"] }],
+      "@typescript-eslint/no-explicit-any": "error",
+    },
+  },
+  {
+    files: ["scripts/**/*", "tests/**/*"],
+    rules: {
+      "no-console": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

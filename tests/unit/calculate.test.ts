@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  calculateEnergy,
-  calculateFootprint,
-  getTopCategory,
-} from "@/lib/carbon/calculate";
+import { calculateEnergy, calculateFootprint, getTopCategory } from "@/lib/carbon/calculate";
 import { INDIA_GRID_ELECTRICITY_FACTOR } from "@/lib/carbon/factors";
 import type { FootprintInput, UserProfile } from "@/lib/carbon/types";
 
@@ -99,24 +95,15 @@ describe("carbon calculation engine", () => {
 
   it("calculates monthly and annual totals from category totals", () => {
     const result = calculateFootprint(highTransportInput, profile);
-    const categorySum = result.breakdown.reduce(
-      (sum, item) => sum + item.kgCO2e,
-      0,
-    );
+    const categorySum = result.breakdown.reduce((sum, item) => sum + item.kgCO2e, 0);
 
     expect(result.monthlyTotalKgCO2e).toBeCloseTo(categorySum, 2);
-    expect(result.annualTotalKgCO2e).toBeCloseTo(
-      result.monthlyTotalKgCO2e * 12,
-      2,
-    );
+    expect(result.annualTotalKgCO2e).toBeCloseTo(result.monthlyTotalKgCO2e * 12, 2);
   });
 
   it("returns percentages that sum approximately to 100", () => {
     const result = calculateFootprint(highTransportInput, profile);
-    const percentageSum = result.breakdown.reduce(
-      (sum, item) => sum + item.percentage,
-      0,
-    );
+    const percentageSum = result.breakdown.reduce((sum, item) => sum + item.percentage, 0);
 
     expect(percentageSum).toBeCloseTo(100, 1);
   });
@@ -145,7 +132,7 @@ describe("carbon calculation engine", () => {
       expect.arrayContaining([
         expect.stringMatching(/educational estimate/i),
         expect.stringMatching(/0.710 kg CO2\/kWh/i),
-      ]),
+      ])
     );
     expect(result.potentialMonthlySavingKgCO2e).toBeGreaterThan(0);
   });
@@ -155,18 +142,21 @@ describe("carbon calculation engine", () => {
     // 0 flights, 0 other trips
     // Weekly emissions = 100 * 0.12 = 12 kg CO2e
     // Monthly emissions = 12 * (52 / 12) = 52 kg CO2e
-    const result = calculateFootprint({
-      ...lowInput,
-      transport: {
-        twoWheelerKmPerWeek: 100,
-        carKmPerWeek: 0,
-        publicTransportTripsPerWeek: 0,
-        cabAutoTripsPerWeek: 0,
-        flightsPerYear: 0,
-      }
-    }, profile);
+    const result = calculateFootprint(
+      {
+        ...lowInput,
+        transport: {
+          twoWheelerKmPerWeek: 100,
+          carKmPerWeek: 0,
+          publicTransportTripsPerWeek: 0,
+          cabAutoTripsPerWeek: 0,
+          flightsPerYear: 0,
+        },
+      },
+      profile
+    );
 
-    const transportCategory = result.breakdown.find(b => b.category === "transport");
+    const transportCategory = result.breakdown.find((b) => b.category === "transport");
     expect(transportCategory?.kgCO2e).toBe(52);
   });
 
@@ -176,48 +166,51 @@ describe("carbon calculation engine", () => {
     // their score before habit bonuses should be exactly round(100 - 158 / 5.25) = round(100 - 30.09) = 70.
     // If they have all habit bonuses (+10 points total: recycle +3, compost +3, solar +4),
     // their score should be exactly 80.
-    
+
     // We mock a profile and inputs that give exactly 158 kg CO2e footprint.
     const averageProfile: UserProfile = {
       ...profile,
-      householdSize: 1
+      householdSize: 1,
     };
 
     // Calculate eco score with 158 kg emissions, no habit bonuses:
-    const resultNoBonus = calculateFootprint({
-      ...lowInput,
-      energy: {
-        monthlyElectricityKWh: 0,
-        lpgCylindersPerMonth: 0,
-        acHoursPerDay: 0,
-        renewableEnergy: false
+    const resultNoBonus = calculateFootprint(
+      {
+        ...lowInput,
+        energy: {
+          monthlyElectricityKWh: 0,
+          lpgCylindersPerMonth: 0,
+          acHoursPerDay: 0,
+          renewableEnergy: false,
+        },
+        waste: {
+          recycles: false,
+          composts: false,
+          plasticUsage: "low", // waste baseline is 8 + plastic low 2 = 10
+        },
+        food: {
+          dietType: "vegetarian", // base is 45
+          meatMealsPerWeek: 0,
+          dairyFrequency: "low",
+          foodDeliveryPerWeek: 0,
+          foodWasteLevel: "low", // waste is 4. Total food = 45+4 = 49
+        },
+        shopping: {
+          clothesPerMonth: 0,
+          onlineOrdersPerMonth: 0,
+          electronicsPerYear: 0, // shopping is 0
+        },
+        transport: {
+          twoWheelerKmPerWeek: 22.846, // weekly: 22.846 * 0.12 = 2.7415. Monthly: 2.7415 * WEEKS_PER_MONTH = 11.88
+          carKmPerWeek: 100, // weekly: 100 * 0.18 = 18. Monthly: 18 * WEEKS_PER_MONTH = 78
+          publicTransportTripsPerWeek: 3, // weekly: 3 * 0.3 = 0.9. Monthly: 0.9 * WEEKS_PER_MONTH = 3.9
+          cabAutoTripsPerWeek: 1, // weekly: 1 * 1.2 = 1.2. Monthly: 1.2 * WEEKS_PER_MONTH = 5.2
+          flightsPerYear: 0,
+        },
+        // Total monthly footprint = 99 + 49 + 10 = 158 kg.
       },
-      waste: {
-        recycles: false,
-        composts: false,
-        plasticUsage: "low" // waste baseline is 8 + plastic low 2 = 10
-      },
-      food: {
-        dietType: "vegetarian", // base is 45
-        meatMealsPerWeek: 0,
-        dairyFrequency: "low",
-        foodDeliveryPerWeek: 0,
-        foodWasteLevel: "low" // waste is 4. Total food = 45+4 = 49
-      },
-      shopping: {
-        clothesPerMonth: 0,
-        onlineOrdersPerMonth: 0,
-        electronicsPerYear: 0 // shopping is 0
-      },
-      transport: {
-        twoWheelerKmPerWeek: 22.846, // weekly: 22.846 * 0.12 = 2.7415. Monthly: 2.7415 * WEEKS_PER_MONTH = 11.88
-        carKmPerWeek: 100, // weekly: 100 * 0.18 = 18. Monthly: 18 * WEEKS_PER_MONTH = 78
-        publicTransportTripsPerWeek: 3, // weekly: 3 * 0.3 = 0.9. Monthly: 0.9 * WEEKS_PER_MONTH = 3.9
-        cabAutoTripsPerWeek: 1, // weekly: 1 * 1.2 = 1.2. Monthly: 1.2 * WEEKS_PER_MONTH = 5.2
-        flightsPerYear: 0
-      }
-      // Total monthly footprint = 99 + 49 + 10 = 158 kg.
-    }, averageProfile);
+      averageProfile
+    );
     expect(resultNoBonus.monthlyTotalKgCO2e).toBe(157.98);
     expect(resultNoBonus.ecoScore).toBe(70);
 
@@ -225,36 +218,39 @@ describe("carbon calculation engine", () => {
     // We adjust energy factor to offset solar reduction so emissions remain exactly 158 kg.
     // solar renewableEnergy: true halves electricity factor, so we keep electricity at 0.
     // recycle/compost reduce waste by 3 and 4 kg respectively, so we increase transport/food to offset by 7 kg.
-    const resultWithBonus = calculateFootprint({
-      ...lowInput,
-      energy: {
-        monthlyElectricityKWh: 0,
-        lpgCylindersPerMonth: 0,
-        acHoursPerDay: 0,
-        renewableEnergy: true // +4 habit bonus
+    const resultWithBonus = calculateFootprint(
+      {
+        ...lowInput,
+        energy: {
+          monthlyElectricityKWh: 0,
+          lpgCylindersPerMonth: 0,
+          acHoursPerDay: 0,
+          renewableEnergy: true, // +4 habit bonus
+        },
+        waste: {
+          recycles: true, // +3 habit bonus, reduces waste by 3 kg
+          composts: true, // +3 habit bonus, reduces waste by 4 kg
+          plasticUsage: "low", // Waste baseline: 8 + plastic 2 - 3 - 4 = 3 kg
+        },
+        food: {
+          dietType: "vegetarian", // 45
+          meatMealsPerWeek: 0,
+          dairyFrequency: "low",
+          foodDeliveryPerWeek: 0,
+          foodWasteLevel: "low", // 4. Total food = 49 kg
+        },
+        transport: {
+          twoWheelerKmPerWeek: 24.4615, // weekly: 24.4615 * 0.12 = 2.935. Monthly: 2.935 * WEEKS_PER_MONTH = 12.72
+          carKmPerWeek: 100, // 78
+          publicTransportTripsPerWeek: 3, // 3.9
+          cabAutoTripsPerWeek: 2.169, // weekly: 2.169 * 1.2 = 2.603. Monthly: 2.603 * WEEKS_PER_MONTH = 11.28
+          // Total transport = 12.72 + 78 + 3.9 + 11.28 = 105.9 -> rounded 105.9 kg (offsetting the -7 waste reduction)
+          flightsPerYear: 0,
+        },
+        // Total monthly footprint = 105.9 + 49 + 3 = 157.9 kg.
       },
-      waste: {
-        recycles: true, // +3 habit bonus, reduces waste by 3 kg
-        composts: true, // +3 habit bonus, reduces waste by 4 kg
-        plasticUsage: "low" // Waste baseline: 8 + plastic 2 - 3 - 4 = 3 kg
-      },
-      food: {
-        dietType: "vegetarian", // 45
-        meatMealsPerWeek: 0,
-        dairyFrequency: "low",
-        foodDeliveryPerWeek: 0,
-        foodWasteLevel: "low" // 4. Total food = 49 kg
-      },
-      transport: {
-        twoWheelerKmPerWeek: 24.4615, // weekly: 24.4615 * 0.12 = 2.935. Monthly: 2.935 * WEEKS_PER_MONTH = 12.72
-        carKmPerWeek: 100, // 78
-        publicTransportTripsPerWeek: 3, // 3.9
-        cabAutoTripsPerWeek: 2.169, // weekly: 2.169 * 1.2 = 2.603. Monthly: 2.603 * WEEKS_PER_MONTH = 11.28
-        // Total transport = 12.72 + 78 + 3.9 + 11.28 = 105.9 -> rounded 105.9 kg (offsetting the -7 waste reduction)
-        flightsPerYear: 0
-      }
-      // Total monthly footprint = 105.9 + 49 + 3 = 157.9 kg.
-    }, averageProfile);
+      averageProfile
+    );
 
     expect(resultWithBonus.monthlyTotalKgCO2e).toBe(157.9);
     expect(resultWithBonus.ecoScore).toBe(80); // 70 base + 10 habit bonuses
@@ -262,11 +258,9 @@ describe("carbon calculation engine", () => {
 
   it("calculates potential savings as exactly 18% of the top category emissions", () => {
     const result = calculateFootprint(highTransportInput, profile);
-    const transportBreakdown = result.breakdown.find(b => b.category === "transport");
+    const transportBreakdown = result.breakdown.find((b) => b.category === "transport");
     const topCategoryKg = transportBreakdown?.kgCO2e ?? 0;
-    
-    expect(result.potentialMonthlySavingKgCO2e).toBe(
-      Math.round(topCategoryKg * 0.18 * 100) / 100
-    );
+
+    expect(result.potentialMonthlySavingKgCO2e).toBe(Math.round(topCategoryKg * 0.18 * 100) / 100);
   });
 });

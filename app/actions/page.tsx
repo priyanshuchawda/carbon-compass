@@ -11,9 +11,8 @@ export default function ActionsPage() {
               Weekly action plan
             </h1>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-700">
-              Start with the highest-ranked actions from your top footprint
-              source. Each item includes one specific weekly challenge so the
-              plan stays executable.
+              Start with the highest-ranked actions from your top footprint source. Each item
+              includes one specific weekly challenge so the plan stays executable.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

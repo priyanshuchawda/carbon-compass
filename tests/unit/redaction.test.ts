@@ -1,14 +1,11 @@
 import { describe, expect, it } from "vitest";
-import {
-  redactSensitiveString,
-  redactObjectValue,
-  redactError,
-} from "../../lib/carbon/redaction";
+import { redactSensitiveString, redactObjectValue, redactError } from "../../lib/carbon/redaction";
 
 describe("Security redaction utilities", () => {
   describe("redactSensitiveString", () => {
     it("scrubs Google API keys", () => {
-      const input = "Failed to call endpoint with Google key AIzaSyA1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6";
+      const input =
+        "Failed to call endpoint with Google key AIzaSyA1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6";
       const result = redactSensitiveString(input);
       expect(result).not.toContain("AIzaSy");
       expect(result).toContain("[REDACTED_GOOGLE_API_KEY]");
@@ -36,8 +33,8 @@ describe("Security redaction utilities", () => {
         secret: "superSecretPassword",
         nested: {
           apiKey: "my-key-value",
-          token: "session-1234"
-        }
+          token: "session-1234",
+        },
       };
       const redacted = redactObjectValue(rawPayload) as typeof rawPayload;
       expect(redacted.secret).toBe("[REDACTED]");

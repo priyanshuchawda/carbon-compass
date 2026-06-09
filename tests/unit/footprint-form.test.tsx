@@ -22,8 +22,8 @@ vi.mock("next/navigation", () => ({
 
 // Mock session save (we test session separately)
 vi.mock("@/lib/carbon/session", () => ({
-  saveSessionFootprint: vi.fn(),
-  saveSessionProfile: vi.fn(),
+  saveSessionFootprint: vi.fn(() => ({ ok: true })),
+  saveSessionProfile: vi.fn(() => ({ ok: true })),
 }));
 
 describe("FootprintForm", () => {
@@ -109,18 +109,14 @@ describe("FootprintForm", () => {
 
     await user.click(screen.getByRole("button", { name: /use pune student demo data/i }));
 
-    expect(
-      (screen.getByLabelText(/two-wheeler km per week/i) as HTMLInputElement).value,
-    ).toBe("120");
-    expect(
-      (screen.getByLabelText(/monthly electricity/i) as HTMLInputElement).value,
-    ).toBe("100");
-    expect(
-      (screen.getByLabelText(/ac hours per day/i) as HTMLInputElement).value,
-    ).toBe("2");
-    expect(
-      (screen.getByLabelText(/domestic flights per year/i) as HTMLInputElement).value,
-    ).toBe("1");
+    expect((screen.getByLabelText(/two-wheeler km per week/i) as HTMLInputElement).value).toBe(
+      "120"
+    );
+    expect((screen.getByLabelText(/monthly electricity/i) as HTMLInputElement).value).toBe("100");
+    expect((screen.getByLabelText(/ac hours per day/i) as HTMLInputElement).value).toBe("2");
+    expect((screen.getByLabelText(/domestic flights per year/i) as HTMLInputElement).value).toBe(
+      "1"
+    );
   });
 
   it("clear button resets two-wheeler km to 0", async () => {
@@ -132,15 +128,13 @@ describe("FootprintForm", () => {
     // Then clear
     await user.click(screen.getByRole("button", { name: /clear/i }));
 
-    expect(
-      (screen.getByLabelText(/two-wheeler km per week/i) as HTMLInputElement).value,
-    ).toBe("0");
+    expect((screen.getByLabelText(/two-wheeler km per week/i) as HTMLInputElement).value).toBe("0");
   });
 
   it("has a submit button labelled 'Calculate and view dashboard'", () => {
     render(<FootprintForm />);
     expect(
-      screen.getByRole("button", { name: /calculate and view dashboard/i }),
+      screen.getByRole("button", { name: /calculate and view dashboard/i })
     ).toBeInTheDocument();
   });
 

@@ -11,18 +11,21 @@ export const GEMINI_RESPONSE_SCHEMA = {
   properties: {
     narrative: {
       type: "STRING",
-      description: "A short, encouraging 2-3 sentence summary explaining their top emissions driver, its percentage, and a dynamic local reference."
+      description:
+        "A short, encouraging 2-3 sentence summary explaining their top emissions driver, its percentage, and a dynamic local reference.",
     },
     weeklyChallenge: {
       type: "STRING",
-      description: "A practical weekly challenge customized to help reduce their highest impact category."
+      description:
+        "A practical weekly challenge customized to help reduce their highest impact category.",
     },
     goalTip: {
       type: "STRING",
-      description: "A personalized tip linking their carbon footprint reduction directly to their main goal."
-    }
+      description:
+        "A personalized tip linking their carbon footprint reduction directly to their main goal.",
+    },
   },
-  required: ["narrative", "weeklyChallenge", "goalTip"]
+  required: ["narrative", "weeklyChallenge", "goalTip"],
 };
 
 /**
@@ -31,9 +34,11 @@ export const GEMINI_RESPONSE_SCHEMA = {
 export function buildAssistantPrompt(data: AssistantRequestPayload): string {
   const { profile, result, recommendations } = data;
 
-  const topCategoryItem = result.breakdown.find(item => item.category === result.topCategory);
+  const topCategoryItem = result.breakdown.find((item) => item.category === result.topCategory);
   const topCategoryLabel = topCategoryItem?.label ?? result.topCategory;
-  const topCategoryPercentage = topCategoryItem ? Math.round((topCategoryItem.kgCO2e / result.monthlyTotalKgCO2e) * 100) : 0;
+  const topCategoryPercentage = topCategoryItem
+    ? Math.round((topCategoryItem.kgCO2e / result.monthlyTotalKgCO2e) * 100)
+    : 0;
   const leadingRec = recommendations[0];
   const leadingRecTitle = leadingRec ? leadingRec.title : "Reduce travel or energy consumption";
 
@@ -75,17 +80,19 @@ export function getFallbackResponse(data: AssistantRequestPayload): {
 } {
   const { result, recommendations } = data;
 
-  const topCategoryItem = result.breakdown.find(item => item.category === result.topCategory);
+  const topCategoryItem = result.breakdown.find((item) => item.category === result.topCategory);
   const topCategoryLabel = topCategoryItem?.label ?? result.topCategory;
-  const topCategoryPercentage = result.monthlyTotalKgCO2e > 0 && topCategoryItem
-    ? Math.round((topCategoryItem.kgCO2e / result.monthlyTotalKgCO2e) * 100)
-    : 0;
+  const topCategoryPercentage =
+    result.monthlyTotalKgCO2e > 0 && topCategoryItem
+      ? Math.round((topCategoryItem.kgCO2e / result.monthlyTotalKgCO2e) * 100)
+      : 0;
   const leadingRec = recommendations[0];
   const leadingRecTitle = leadingRec ? leadingRec.title : "Reduce travel or energy consumption";
 
   let narrative = `Your monthly carbon footprint is ${result.monthlyTotalKgCO2e} kg CO2e. ${topCategoryLabel} represents your primary emission driver at ${topCategoryPercentage}% of your total emissions.`;
   let weeklyChallenge = `Try implementing "${leadingRecTitle}" to start lowering your emissions this week.`;
-  let goalTip = "Reducing emissions in your top category yields the highest overall footprint reduction and financial savings.";
+  let goalTip =
+    "Reducing emissions in your top category yields the highest overall footprint reduction and financial savings.";
 
   if (result.topCategory === "transport") {
     narrative = `Based on your profile, transport is your largest emission source (${topCategoryPercentage}% of your total). Switching transport modes will yield the highest impact.`;
@@ -98,7 +105,8 @@ export function getFallbackResponse(data: AssistantRequestPayload): {
   } else if (result.topCategory === "food") {
     narrative = `Food choices and waste are your largest source of emissions, accounting for ${topCategoryPercentage}% of your footprint.`;
     weeklyChallenge = "Plan meals ahead to eliminate leftovers and food waste.";
-    goalTip = "Reducing food waste saves money on groceries and minimizes landfill methane emissions.";
+    goalTip =
+      "Reducing food waste saves money on groceries and minimizes landfill methane emissions.";
   } else if (result.topCategory === "shopping") {
     narrative = `Your consumption patterns are your largest carbon contributor, representing ${topCategoryPercentage}% of your footprint.`;
     weeklyChallenge = "Delay one non-essential purchase for a full week.";
@@ -106,7 +114,8 @@ export function getFallbackResponse(data: AssistantRequestPayload): {
   } else if (result.topCategory === "waste") {
     narrative = `Waste management is your biggest focus area, contributing ${topCategoryPercentage}% of your monthly emissions.`;
     weeklyChallenge = "Sort your dry and wet waste for recycling and composting.";
-    goalTip = "Sorting waste facilitates recycling, keeping organic material out of carbon-intensive dumps.";
+    goalTip =
+      "Sorting waste facilitates recycling, keeping organic material out of carbon-intensive dumps.";
   }
 
   return {
@@ -114,7 +123,7 @@ export function getFallbackResponse(data: AssistantRequestPayload): {
     weeklyChallenge,
     goalTip,
     costUSD: 0,
-    isDemo: true
+    isDemo: true,
   };
 }
 
@@ -150,15 +159,28 @@ export function getFallbackChatResponse(
   context?: { profile: UserProfile; result: FootprintResult; footprint: FootprintInput }
 ): string {
   const lowercase = userMessage.toLowerCase();
-  if (lowercase.includes("medical") || lowercase.includes("legal") || lowercase.includes("doctor") || lowercase.includes("lawyer")) {
+  if (
+    lowercase.includes("medical") ||
+    lowercase.includes("legal") ||
+    lowercase.includes("doctor") ||
+    lowercase.includes("lawyer")
+  ) {
     return "I am a carbon footprint assistant and cannot provide medical, legal, or professional advice. Please consult a qualified professional.";
   }
   if (lowercase.includes("hi") || lowercase.includes("hello") || lowercase.includes("hey")) {
     return "Hello! I am your Carbon Compass assistant. How can I help you understand or reduce your carbon footprint today?";
   }
-  if (lowercase.includes("biggest") || lowercase.includes("highest") || lowercase.includes("driver") || lowercase.includes("source") || lowercase.includes("driving")) {
+  if (
+    lowercase.includes("biggest") ||
+    lowercase.includes("highest") ||
+    lowercase.includes("driver") ||
+    lowercase.includes("source") ||
+    lowercase.includes("driving")
+  ) {
     if (context && context.result.monthlyTotalKgCO2e > 0) {
-      const topCat = context.result.breakdown.find(b => b.category === context.result.topCategory);
+      const topCat = context.result.breakdown.find(
+        (b) => b.category === context.result.topCategory
+      );
       const label = topCat?.label ?? context.result.topCategory;
       const amount = Math.round(topCat?.kgCO2e ?? 0);
       const pct = Math.round(((topCat?.kgCO2e ?? 0) / context.result.monthlyTotalKgCO2e) * 100);

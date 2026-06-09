@@ -47,7 +47,7 @@ describe("AI Client", () => {
 
   it("falls back to secondary model if primary model completely fails", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch");
-    
+
     // First model fails completely (client error or other)
     // Actually we handle 429/500 with retry, but other errors fail fast or retry.
     // If the server returns 400 Bad Request, it fails fast for that model.

@@ -1,8 +1,7 @@
 import { z } from "zod";
 
 const finiteNumber = z.number().finite();
-const boundedNumber = (min: number, max: number) =>
-  finiteNumber.min(min).max(max);
+const boundedNumber = (min: number, max: number) => finiteNumber.min(min).max(max);
 
 export const userProfileSchema = z
   .object({
@@ -11,12 +10,7 @@ export const userProfileSchema = z
     country: z.string().trim().min(1).max(80),
     householdSize: boundedNumber(1, 20),
     persona: z.enum(["student", "working", "family"]),
-    mainGoal: z.enum([
-      "save_money",
-      "reduce_carbon",
-      "learn",
-      "habit_building",
-    ]),
+    mainGoal: z.enum(["save_money", "reduce_carbon", "learn", "habit_building"]),
   })
   .strict();
 
@@ -148,3 +142,71 @@ export const assistantResponseContractSchema = z
   })
   .strict();
 
+export const geminiPartSchema = z
+  .object({
+    text: z.string().optional(),
+    functionCall: z
+      .object({
+        name: z.string(),
+        args: z.record(z.string(), z.unknown()),
+      })
+      .optional(),
+    functionResponse: z
+      .object({
+        name: z.string(),
+        response: z.object({ result: z.unknown() }),
+      })
+      .optional(),
+  })
+  .strict();
+
+export const geminiUsageMetadataSchema = z
+  .object({
+    promptTokenCount: z.number().nonnegative().optional(),
+    candidatesTokenCount: z.number().nonnegative().optional(),
+  })
+  .strict();
+
+export const geminiResponseBodySchema = z
+  .object({
+    candidates: z
+      .array(
+        z
+          .object({
+            content: z
+              .object({
+                parts: z.array(geminiPartSchema),
+              })
+              .optional(),
+          })
+          .strict()
+      )
+      .optional(),
+    usageMetadata: geminiUsageMetadataSchema.optional(),
+  })
+  .strict();
+
+export const chatResponseSchema = z
+  .object({
+    content: z.string().trim().min(1).max(8000),
+    costUSD: z.number().finite().nonnegative(),
+    isDemo: z.boolean(),
+  })
+  .strict();
+
+export const chatApiResponseSchema = chatResponseSchema
+  .extend({
+    error: z.string().optional(),
+  })
+  .strict();
+
+export const aiNarratorResponseSchema = z
+  .object({
+    narrative: z.string().trim().min(5).max(4000),
+    weeklyChallenge: z.string().trim().min(5).max(1000),
+    goalTip: z.string().trim().min(5).max(1000),
+    costUSD: z.number().finite().nonnegative(),
+    isDemo: z.boolean(),
+    error: z.string().optional(),
+  })
+  .strict();

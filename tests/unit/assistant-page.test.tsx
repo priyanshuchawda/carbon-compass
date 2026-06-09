@@ -29,11 +29,13 @@ describe("Assistant Page Component", () => {
     expect(screen.getByPlaceholderText(/ask about your emissions/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /send/i })).toBeInTheDocument();
     expect(
-      screen.getByRole("log", { name: /conversation with carbon compass assistant/i }),
+      screen.getByRole("log", { name: /conversation with carbon compass assistant/i })
     ).toBeInTheDocument();
 
     // suggestions
-    expect(screen.getByRole("button", { name: /what is driving my emissions/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /what is driving my emissions/i })
+    ).toBeInTheDocument();
   });
 
   it("calls fetch API when user submits a message", async () => {
