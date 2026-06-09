@@ -1,10 +1,33 @@
+/**
+ * Foundation route tests — verifies each page route has exactly one <h1>.
+ *
+ * Components that use next/navigation hooks (useRouter, useSearchParams) are
+ * tested with a vi.mock so they render without the Next.js App Router context.
+ */
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import ActionsPage from "@/app/actions/page";
 import CalculatorPage from "@/app/calculator/page";
 import DashboardPage from "@/app/dashboard/page";
 import OnboardingPage from "@/app/onboarding/page";
 import ReportPage from "@/app/report/page";
+
+// Provide a mock router so components using useRouter don't throw
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+// Mock session so DashboardClient and ActionsClient don't touch real storage
+vi.mock("@/lib/carbon/session", () => ({
+  loadSessionPayload: () => null,
+  saveSessionFootprint: vi.fn(),
+  saveSessionProfile: vi.fn(),
+  loadSessionFootprint: () => null,
+  loadSessionProfile: () => null,
+  clearSessionData: vi.fn(),
+}));
 
 const plannedRoutes = [
   {

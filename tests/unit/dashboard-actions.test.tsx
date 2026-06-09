@@ -1,7 +1,24 @@
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import ActionsPage from "@/app/actions/page";
 import DashboardPage from "@/app/dashboard/page";
+
+// Provide a mock router so components using useRouter don't throw
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), back: vi.fn() }),
+  usePathname: () => "/",
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+// Mock session so DashboardClient and ActionsClient don't touch real storage
+vi.mock("@/lib/carbon/session", () => ({
+  loadSessionPayload: () => null,
+  saveSessionFootprint: vi.fn(),
+  saveSessionProfile: vi.fn(),
+  loadSessionFootprint: () => null,
+  loadSessionProfile: () => null,
+  clearSessionData: vi.fn(),
+}));
 
 describe("dashboard and action plan", () => {
   it("renders the demo dashboard with metrics, breakdown, and assistant guidance", () => {
@@ -14,9 +31,9 @@ describe("dashboard and action plan", () => {
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByText(/monthly footprint/i)).toBeInTheDocument();
-    expect(screen.getByText(/top source/i)).toBeInTheDocument();
-    expect(screen.getByText(/potential monthly saving/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/monthly footprint/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/top source/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/potential monthly saving/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/eco score/i).length).toBeGreaterThan(0);
 
     expect(

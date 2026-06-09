@@ -131,18 +131,22 @@ All calculation logic lives in `lib/carbon/` as **pure functions with no side ef
 
 | Category | Factor | Source |
 |---|---|---|
-| Two-wheeler | 0.043 kg CO₂/km | IPCC AR6 + India avg |
-| Car (petrol) | 0.192 kg CO₂/km | IPCC AR6 |
-| Grid electricity | 0.82 kg CO₂/kWh | CEA India 2023 |
-| LPG | 2.98 kg CO₂/cylinder | IPCC |
-| Flights (domestic) | 255 kg CO₂/flight | ICAO Carbon Calculator |
-| Vegetarian diet | 1.7 kg CO₂/day | Poore & Nemecek 2018 |
-| Mixed diet | 3.3 kg CO₂/day | Poore & Nemecek 2018 |
-| Meat-heavy diet | 7.2 kg CO₂/day | Poore & Nemecek 2018 |
+| Two-wheeler | 0.12 kg CO₂/km | IPCC AR6 (India petrol scooter avg) |
+| Car (petrol) | 0.18 kg CO₂/km | IPCC AR6 |
+| Public transport | 0.30 kg CO₂/trip | India urban bus avg |
+| Cab / auto | 1.20 kg CO₂/trip | India shared cab avg |
+| Grid electricity | 0.71 kg CO₂/kWh | CEA India Baseline Database |
+| LPG cylinder | 42.5 kg CO₂/cylinder | IPCC |
+| Domestic flight | 250 kg CO₂/flight | ICAO Carbon Calculator |
+| Vegetarian diet | 45 kg CO₂/month | Poore & Nemecek 2018 |
+| Mixed diet | 55 kg CO₂/month | Poore & Nemecek 2018 |
+| Meat-heavy diet | 80 kg CO₂/month | Poore & Nemecek 2018 |
 
 ### Eco-score
 
-A 0–100 composite score: `max(0, 100 - (totalKgCO2PerYear / 3000) * 100)`.
+A 0–100 composite score: `max(0, min(100, 100 - (monthlyTotal / householdSize / 4) + habitBonus))`.
+
+Bonus points: +4 for renewable energy, +3 for recycling, +3 for composting.
 
 India average ≈ 1.9 tCO₂/year per capita. A score above 70 indicates below-average footprint.
 
@@ -180,7 +184,7 @@ Response: Recommendation[] (sorted by impact)
 
 HTTP security headers applied to all routes via `next.config.ts`:
 
-- `Content-Security-Policy` – self-origin only, no third-party scripts
+- `Content-Security-Policy` – self-origin scripts; `'unsafe-inline'` retained for Next.js compatibility (nonce migration tracked in #67)
 - `X-Frame-Options: DENY` – clickjacking protection
 - `X-Content-Type-Options: nosniff`
 - `Referrer-Policy: strict-origin-when-cross-origin`
@@ -229,7 +233,7 @@ See [`RULES.md`](./RULES.md) for the full coding contract. Key points:
 |---|---|
 | `pnpm dev` | Next.js dev server on port 3000 |
 | `pnpm build` | Production build |
-| `pnpm test` | Vitest unit suite (50 tests) |
+| `pnpm test` | Vitest unit suite (89 tests) |
 | `pnpm test:e2e` | Playwright Chromium E2E flow |
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm lint` | ESLint |

@@ -1,13 +1,7 @@
+import { clamp, round } from "@/lib/carbon/utils";
+
 import type { FootprintInput, UserProfile } from "@/lib/carbon/types";
-
-function round(value: number, digits = 0): number {
-  const multiplier = 10 ** digits;
-  return Math.round((value + Number.EPSILON) * multiplier) / multiplier;
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
-}
+// round() and clamp() are provided by @/lib/carbon/utils
 
 export function calculateEcoScore(
   monthlyTotalKgCO2e: number,

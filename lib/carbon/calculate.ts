@@ -1,6 +1,7 @@
 import { CALCULATION_ASSUMPTIONS } from "@/lib/carbon/assumptions";
 import { EMISSION_FACTORS, WEEKS_PER_MONTH } from "@/lib/carbon/factors";
 import { calculateEcoScore } from "@/lib/carbon/scoring";
+import { round } from "@/lib/carbon/utils";
 import type {
   CarbonCategory,
   CategoryBreakdown,
@@ -23,10 +24,7 @@ const CATEGORY_LABELS: Record<CarbonCategory, string> = {
   waste: "Waste",
 };
 
-function round(value: number, digits = 2): number {
-  const multiplier = 10 ** digits;
-  return Math.round((value + Number.EPSILON) * multiplier) / multiplier;
-}
+// round() is provided by @/lib/carbon/utils
 
 function categoryResult(
   category: CarbonCategory,

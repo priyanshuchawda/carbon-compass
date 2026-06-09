@@ -1,5 +1,6 @@
 import { calculateFootprint } from "@/lib/carbon/calculate";
 import { EMISSION_FACTORS } from "@/lib/carbon/factors";
+import { round } from "@/lib/carbon/utils";
 import type {
   CarbonCategory,
   FootprintInput,
@@ -92,10 +93,7 @@ const ACTION_BY_ID = new Map(
   SIMULATION_ACTIONS.map((action) => [action.id, action]),
 );
 
-function round(value: number, digits = 2): number {
-  const multiplier = 10 ** digits;
-  return Math.round((value + Number.EPSILON) * multiplier) / multiplier;
-}
+// round() is provided by @/lib/carbon/utils
 
 function cloneInput(input: FootprintInput): FootprintInput {
   return {
