@@ -33,3 +33,5 @@ key.md
 Thumbs.db
 .vscode/
 .idea/
+
+.vercel
