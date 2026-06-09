@@ -7,6 +7,7 @@ import {
   saveSessionProfile,
 } from "@/lib/carbon/session";
 import type { FootprintInput, UserProfile } from "@/lib/carbon/types";
+import { footprintInputSchema } from "@/lib/validation/schemas";
 
 // ── default empty state ───────────────────────────────────────────────────────
 
@@ -104,16 +105,23 @@ function numberValue(value: number | boolean | string): number | string {
 export function FootprintForm() {
   const router = useRouter();
   const [input, setInput] = useState<FootprintInput>(emptyInput);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   function updateNumber(path: NumberPath, value: string) {
-    const parsed = Number(value);
-    const nextValue = Number.isFinite(parsed) ? parsed : 0;
+    const parsed = value === "" ? 0 : Number(value);
+    
+    const fieldName = path[1];
+    setErrors((current) => {
+      const next = { ...current };
+      delete next[fieldName];
+      return next;
+    });
 
     setInput((current) => ({
       ...current,
       [path[0]]: {
         ...current[path[0]],
-        [path[1]]: nextValue,
+        [path[1]]: parsed,
       },
     }));
   }
@@ -121,10 +129,32 @@ export function FootprintForm() {
   function handleDemoFill() {
     setInput(puneStudentDemo);
     saveSessionProfile(puneStudentProfile);
+    setErrors({});
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    
+    const parsed = footprintInputSchema.safeParse(input);
+    if (!parsed.success) {
+      const newErrors: Record<string, string> = {};
+      for (const issue of parsed.error.issues) {
+        const fieldName = issue.path[1] as string;
+        newErrors[fieldName] = issue.message;
+      }
+      setErrors(newErrors);
+
+      const firstErrorField = parsed.error.issues[0]?.path[1] as string;
+      if (firstErrorField) {
+        const element = document.getElementById(firstErrorField);
+        if (element) {
+          element.focus();
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
+      return;
+    }
+
     // Persist user input so dashboard/actions/report can use it.
     saveSessionFootprint(input);
     router.push("/dashboard");
@@ -170,6 +200,7 @@ export function FootprintForm() {
             onChange={(value) =>
               updateNumber(["transport", "twoWheelerKmPerWeek"], value)
             }
+            error={errors.twoWheelerKmPerWeek}
           />
           <NumberField
             label="Car km per week"
@@ -179,6 +210,7 @@ export function FootprintForm() {
             onChange={(value) =>
               updateNumber(["transport", "carKmPerWeek"], value)
             }
+            error={errors.carKmPerWeek}
           />
           <NumberField
             label="Public transport trips per week"
@@ -188,6 +220,7 @@ export function FootprintForm() {
             onChange={(value) =>
               updateNumber(["transport", "publicTransportTripsPerWeek"], value)
             }
+            error={errors.publicTransportTripsPerWeek}
           />
           <NumberField
             label="Cab or auto trips per week"
@@ -197,6 +230,7 @@ export function FootprintForm() {
             onChange={(value) =>
               updateNumber(["transport", "cabAutoTripsPerWeek"], value)
             }
+            error={errors.cabAutoTripsPerWeek}
           />
           <NumberField
             label="Domestic flights per year"
@@ -206,6 +240,7 @@ export function FootprintForm() {
             onChange={(value) =>
               updateNumber(["transport", "flightsPerYear"], value)
             }
+            error={errors.flightsPerYear}
           />
         </div>
       </fieldset>
@@ -224,6 +259,7 @@ export function FootprintForm() {
             onChange={(value) =>
               updateNumber(["energy", "monthlyElectricityKWh"], value)
             }
+            error={errors.monthlyElectricityKWh}
           />
           <NumberField
             label="LPG cylinders per month"
@@ -233,6 +269,7 @@ export function FootprintForm() {
             onChange={(value) =>
               updateNumber(["energy", "lpgCylindersPerMonth"], value)
             }
+            error={errors.lpgCylindersPerMonth}
           />
           <NumberField
             label="AC hours per day"
@@ -242,6 +279,7 @@ export function FootprintForm() {
             onChange={(value) =>
               updateNumber(["energy", "acHoursPerDay"], value)
             }
+            error={errors.acHoursPerDay}
           />
           <label className="flex items-center gap-3 self-end pb-1 text-sm font-medium text-slate-800">
             <input
@@ -305,6 +343,7 @@ export function FootprintForm() {
             onChange={(value) =>
               updateNumber(["food", "meatMealsPerWeek"], value)
             }
+            error={errors.meatMealsPerWeek}
           />
 
           <label className="grid gap-2 text-sm font-medium text-slate-800">
@@ -340,6 +379,7 @@ export function FootprintForm() {
             onChange={(value) =>
               updateNumber(["food", "foodDeliveryPerWeek"], value)
             }
+            error={errors.foodDeliveryPerWeek}
           />
 
           <label className="grid gap-2 text-sm font-medium text-slate-800">
@@ -383,6 +423,7 @@ export function FootprintForm() {
             onChange={(value) =>
               updateNumber(["shopping", "clothesPerMonth"], value)
             }
+            error={errors.clothesPerMonth}
           />
           <NumberField
             label="Online orders per month"
@@ -392,6 +433,7 @@ export function FootprintForm() {
             onChange={(value) =>
               updateNumber(["shopping", "onlineOrdersPerMonth"], value)
             }
+            error={errors.onlineOrdersPerMonth}
           />
           <NumberField
             label="Electronics per year"
@@ -401,6 +443,7 @@ export function FootprintForm() {
             onChange={(value) =>
               updateNumber(["shopping", "electronicsPerYear"], value)
             }
+            error={errors.electronicsPerYear}
           />
         </div>
       </fieldset>
@@ -492,9 +535,10 @@ type NumberFieldProps = {
   hint?: string;
   value: number;
   onChange: (value: string) => void;
+  error?: string;
 };
 
-function NumberField({ label, name, hint, value, onChange }: NumberFieldProps) {
+function NumberField({ label, name, hint, value, onChange, error }: NumberFieldProps) {
   return (
     <label className="grid gap-1 text-sm font-medium text-slate-800">
       {label}
@@ -510,8 +554,17 @@ function NumberField({ label, name, hint, value, onChange }: NumberFieldProps) {
         step="any"
         value={numberValue(value)}
         onChange={(event) => onChange(event.target.value)}
-        className="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-base text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+        className={`min-h-11 rounded-md border px-3 py-2 text-base text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 ${
+          error
+            ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+            : "border-slate-300 focus:border-emerald-500"
+        }`}
       />
+      {error && (
+        <span className="text-xs font-medium text-red-600" role="alert">
+          {error}
+        </span>
+      )}
     </label>
   );
 }

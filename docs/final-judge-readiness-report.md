@@ -51,10 +51,12 @@ To evaluate the application, we recommend following this 5-minute walk-through s
 
 During this readiness phase, we implemented several major improvements based on the reference architectures of `carbon-footprint-assistant` and `election-clarity-india`:
 
+- **Activity Tracker Log (`/log`)**: Added a persistent, local-first manual tracker log page where users can manually log carbon check-ins with top drivers, footprint amounts, and eco scores, or delete/clear history.
 - **Real-World Report Page**: Removed mock dashboard data on `/report`. It now loads actual user session inputs and progress history.
 - **Monthly Goal Tracker UI**: Integrated goal persistence and visualization directly on the dashboard.
-- **Conversational Assistant Workspace**: Added `/assistant` chat page with grounded rule checks.
-- **API Zod Argument Validation**: Hardened `/api/assistant/chat` and `/api/assistant/narrate` by validating AI tool call arguments with strict schemas before execution.
+- **Conversational Assistant Workspace**: Added `/assistant` chat page with grounded rule checks and bounded history limit (`min(1).max(12)`).
+- **API Zod Argument Validation & Payload Limits**: Hardened `/api/assistant/chat` and `/api/assistant/narrate` by validating AI tool call arguments with strict schemas, and streaming request payloads with a strict 64KB body read boundary helper.
+- **System Health Status (`/api/health`)**: Exposed a dedicated system availability route returning basic health checks.
 - **Secure middleware checks**: Malformed headers are caught to fail closed with 403. Removed `X-Powered-By` header in Next.js.
 - **Production-Build E2E Testing**: Playwright E2E now builds the application in production mode (`next build`) and runs tests against a live server (`next start`), simulating exactly what a production judge will experience.
 
@@ -64,5 +66,5 @@ During this readiness phase, we implemented several major improvements based on 
 
 - **TypeScript Typecheck**: Successfully passes (`tsc --noEmit`).
 - **ESLint Checks**: Successfully passes with no errors.
-- **Unit Tests**: **188 tests passed** across 34 files in Vitest.
-- **E2E Tests**: **3 browser flows passed** in Playwright (covering navigation, goal setting, assistant chat, and accessibility checks).
+- **Unit Tests**: **201 tests passed** across 36 files in Vitest (latest known verification snapshot).
+- **E2E Tests**: **7 browser flows passed** in Playwright (latest known verification snapshot, covering navigation, goal setting, assistant chat, accessibility checks, skip-link focus, reduced-motion behavior, and 390px mobile viewport overflow checks).

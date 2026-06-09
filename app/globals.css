@@ -36,3 +36,7 @@ html {
   }
 }
 
+fieldset {
+  min-width: 0;
+}
+

@@ -8,6 +8,7 @@ import { getGeminiApiKey } from "@/lib/carbon/ai/config";
 import { buildChatPrompt, getFallbackChatResponse } from "@/lib/carbon/ai/prompt";
 import { callGeminiWithFallback } from "@/lib/carbon/ai/client";
 import type { GeminiContent, GeminiPart } from "@/lib/carbon/ai/client";
+import { readBoundedBody } from "@/lib/carbon/utils";
 
 export async function POST(request: Request) {
   // 1. Rate Limiting
@@ -23,7 +24,8 @@ export async function POST(request: Request) {
   // 2. Validate request payload
   let validatedData;
   try {
-    const rawPayload = await request.json();
+    const rawText = await readBoundedBody(request);
+    const rawPayload = JSON.parse(rawText);
     const result = assistantChatRequestSchema.safeParse(rawPayload);
     if (!result.success) {
       return NextResponse.json(
@@ -32,9 +34,10 @@ export async function POST(request: Request) {
       );
     }
     validatedData = result.data;
-  } catch {
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Invalid JSON request payload";
     return NextResponse.json(
-      { error: "Invalid JSON request payload" },
+      { error: msg },
       { status: 400 }
     );
   }
@@ -46,7 +49,7 @@ export async function POST(request: Request) {
   profile.country = sanitizeText(profile.country, 80);
 
   const lastUserMsg = messages[messages.length - 1]?.content ?? "";
-  const fallbackText = getFallbackChatResponse(lastUserMsg);
+  const fallbackText = getFallbackChatResponse(lastUserMsg, { profile, result, footprint });
 
   // 3. API Key check
   const apiKey = getGeminiApiKey();

@@ -145,7 +145,10 @@ export function buildChatPrompt(data: {
   `;
 }
 
-export function getFallbackChatResponse(userMessage: string): string {
+export function getFallbackChatResponse(
+  userMessage: string,
+  context?: { profile: UserProfile; result: FootprintResult; footprint: FootprintInput }
+): string {
   const lowercase = userMessage.toLowerCase();
   if (lowercase.includes("medical") || lowercase.includes("legal") || lowercase.includes("doctor") || lowercase.includes("lawyer")) {
     return "I am a carbon footprint assistant and cannot provide medical, legal, or professional advice. Please consult a qualified professional.";
@@ -154,12 +157,30 @@ export function getFallbackChatResponse(userMessage: string): string {
     return "Hello! I am your Carbon Compass assistant. How can I help you understand or reduce your carbon footprint today?";
   }
   if (lowercase.includes("biggest") || lowercase.includes("highest") || lowercase.includes("driver") || lowercase.includes("source") || lowercase.includes("driving")) {
+    if (context && context.result.monthlyTotalKgCO2e > 0) {
+      const topCat = context.result.breakdown.find(b => b.category === context.result.topCategory);
+      const label = topCat?.label ?? context.result.topCategory;
+      const amount = Math.round(topCat?.kgCO2e ?? 0);
+      const pct = Math.round(((topCat?.kgCO2e ?? 0) / context.result.monthlyTotalKgCO2e) * 100);
+      return `Your top emission category is ${label}, contributing ${amount} kg CO2e/month (${pct}% of your total). You can see a detailed breakdown on the Dashboard.`;
+    }
     return "Based on your inputs, your top emission category is estimated to be your transport or energy consumption. You can see a detailed breakdown on the Dashboard.";
   }
   if (lowercase.includes("reduce") || lowercase.includes("cut") || lowercase.includes("lower")) {
+    if (context) {
+      const saving = Math.round(context.result.potentialMonthlySavingKgCO2e);
+      return `To lower your footprint, you can save up to ${saving} kg CO2e/month by focusing on reducing private vehicle trips, conserving home energy (especially air conditioning), planning meals to minimize food waste, and recycling dry waste.`;
+    }
     return "To lower your footprint, focus on reducing private vehicle trips, conserving home energy (especially air conditioning), planning meals to minimize food waste, and recycling dry waste.";
   }
   if (lowercase.includes("average") || lowercase.includes("compare")) {
+    if (context && context.result.monthlyTotalKgCO2e > 0) {
+      const householdSize = Math.max(context.profile.householdSize, 1);
+      const perCapitaKg = Math.round(context.result.monthlyTotalKgCO2e / householdSize);
+      const diffPct = Math.round(((perCapitaKg - 158) / 158) * 100);
+      const statusWord = perCapitaKg > 158 ? `${diffPct}% above` : `${Math.abs(diffPct)}% below`;
+      return `The national Indian average per-capita carbon footprint is ~158 kg CO2e/month. Your per-capita emissions are ${perCapitaKg} kg CO2e/month, which is ${statusWord} the national average.`;
+    }
     return "The average Indian citizen's carbon footprint is estimated to be about 158 kg CO2e per month. You can compare your results on the Dashboard or see your breakdown.";
   }
   return "I am here to help you understand your carbon footprint and suggest practical ways to reduce it. Feel free to ask about your emissions breakdown or ways to save energy and transportation footprint.";

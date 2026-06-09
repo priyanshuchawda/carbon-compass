@@ -3,6 +3,7 @@ import Link from "next/link";
 const primaryLinks = [
   { href: "/calculator", label: "Calculator" },
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/log", label: "Tracker" },
   { href: "/actions", label: "Actions" },
   { href: "/assistant", label: "AI Assistant" },
   { href: "/report", label: "Report" },

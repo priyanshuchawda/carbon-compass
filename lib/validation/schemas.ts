@@ -129,7 +129,7 @@ export const assistantChatRequestSchema = z
     profile: userProfileSchema,
     result: footprintResultSchema,
     footprint: footprintInputSchema,
-    messages: z.array(chatMessageSchema),
+    messages: z.array(chatMessageSchema).min(1).max(12),
   })
   .strict();
 

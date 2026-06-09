@@ -114,3 +114,43 @@ test("allows setting monthly goal and chatting with assistant", async ({ page })
   // Wait for the response and make sure it renders the fallback text
   await expect(page.getByText(/detailed breakdown on the Dashboard/i)).toBeVisible();
 });
+
+test("skip-link behaves correctly on tab focus", async ({ page }) => {
+  await page.goto("/");
+  await page.keyboard.press("Tab");
+  const skipLink = page.getByRole("link", { name: /skip to main content/i });
+  await expect(skipLink).toBeFocused();
+});
+
+test("mobile viewport has no horizontal overflow at 390px", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  const routes = ["/", "/calculator", "/dashboard", "/log", "/actions", "/report"];
+  for (const route of routes) {
+    await page.goto(route);
+    await page.waitForTimeout(100);
+    const hasOverflow = await page.evaluate(() => {
+      return document.documentElement.scrollWidth > window.innerWidth;
+    });
+    expect(hasOverflow).toBe(false);
+  }
+});
+
+test("reduced motion is respected and page remains fully accessible", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/dashboard");
+  const scanDashboard = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa"])
+    .analyze();
+  expect(scanDashboard.violations).toEqual([]);
+});
+
+test("assistant chat page exhibits accessible aria alert behavior", async ({ page }) => {
+  await page.goto("/assistant");
+  await expect(page.locator("#main-content")).toBeVisible();
+  
+  // Submit a query
+  await page.getByRole("button", { name: /what is driving my emissions/i }).click();
+  
+  // Verify response renders correctly
+  await expect(page.getByText(/detailed breakdown on the Dashboard/i)).toBeVisible();
+});

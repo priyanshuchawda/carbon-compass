@@ -18,6 +18,7 @@ import {
   demoProfile,
   demoRecommendations,
 } from "@/lib/carbon/demo";
+import { appendProgressEntry } from "@/lib/carbon/progress";
 
 function kg(value: number): string {
   return `${Math.round(value)} kg CO₂e`;
@@ -52,6 +53,19 @@ export function DashboardClient() {
   });
 
   const { result, recommendations, profile, isDemo, footprintInput } = state;
+  const [checkInSaved, setCheckInSaved] = useState(false);
+
+  function handleSaveCheckIn() {
+    const entry = {
+      id: `checkin-${Date.now()}`,
+      recordedAt: new Date().toISOString(),
+      monthlyTotalKgCO2e: result.monthlyTotalKgCO2e,
+      ecoScore: result.ecoScore,
+      topCategory: result.topCategory,
+    };
+    appendProgressEntry(entry);
+    setCheckInSaved(true);
+  }
 
   const topCategory = result.breakdown.find(
     (item) => item.category === result.topCategory,
@@ -69,9 +83,24 @@ export function DashboardClient() {
   return (
     <>
       {/* ── header badge ─────────────────────────────────────────── */}
-      <p className="w-fit rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-medium text-emerald-800">
-        {isDemo ? `Demo profile — ${profile.city} · ${profile.persona}` : `${profile.city} · ${profile.persona}`}
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <p className="w-fit rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-medium text-emerald-800">
+          {isDemo ? `Demo profile — ${profile.city} · ${profile.persona}` : `${profile.city} · ${profile.persona}`}
+        </p>
+        {!isDemo && (
+          <button
+            onClick={handleSaveCheckIn}
+            disabled={checkInSaved}
+            className={`inline-flex min-h-10 items-center justify-center rounded-md px-4 py-2 text-sm font-semibold shadow-sm transition ${
+              checkInSaved
+                ? "bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed"
+                : "bg-emerald-700 text-white hover:bg-emerald-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700"
+            }`}
+          >
+            {checkInSaved ? "✓ Footprint saved to history" : "Save this check-in to progress history"}
+          </button>
+        )}
+      </div>
       {isDemo && (
         <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           Showing demo data. Complete the{" "}

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { POST as calculatePost } from "@/app/api/calculate/route";
 import { POST as recommendationsPost } from "@/app/api/recommendations/route";
+import { GET as healthGet } from "@/app/api/health/route";
 
 const profile = {
   id: "api-demo",
@@ -89,5 +90,14 @@ describe("carbon API route handlers", () => {
     expect(response.status).toBe(200);
     expect(body.result.monthlyTotalKgCO2e).toBeGreaterThan(0);
     expect(body.recommendations.length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("returns status ok from the health API", async () => {
+    const response = await healthGet();
+    const body = await response.json();
+    expect(response.status).toBe(200);
+    expect(body.status).toBe("ok");
+    expect(body.version).toBe("0.1.0");
+    expect(body.timestamp).toBeDefined();
   });
 });

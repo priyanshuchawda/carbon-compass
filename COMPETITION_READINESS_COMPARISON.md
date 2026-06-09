@@ -6,18 +6,20 @@ Code-reading-only review of:
 - Reference 1: `C:\Users\Admin\Desktop\carbon-footprint-assistant`
 - Reference 2: `C:\Users\Admin\Desktop\election-clarity-india`
 
-No tests were run. Test strength is inferred from source files, configs, README claims, CI workflows, and test file contents.
+Review updated after current `main` commit `16880dd` (`Configure eslint override, add a11y, quality checklist, readiness docs and verify assistant evals`).
+
+Primary basis: code reading and comparison of important source, docs, configs, and tests. Test strength is inferred from files and docs unless explicitly stated in the repository.
 
 ## Executive Verdict
 
-The current project, Carbon Compass, is already a real working challenge product. It has a focused carbon calculator, India-oriented emission factors, deterministic recommendations, a dashboard, a what-if simulator, a report page, a Gemini narration route, Zod validation, security headers, CI, Vitest tests, Playwright + axe coverage, and judge-facing docs.
+The current project, Carbon Compass, is now a much stronger challenge submission than the earlier state. It has a focused carbon calculator, India-oriented emission factors, deterministic recommendations, a dashboard, a goal setter, a what-if simulator, a real report client, a dedicated assistant page, Gemini narration/chat routes, Zod validation, AI tool-argument validation, security headers, CI, Vitest tests, Playwright + axe coverage, and judge-facing docs.
 
-Against the judging criteria, the main weakness is not "missing app." The weakness is that the strongest competition signals are not as visible, continuous, and evidence-backed as the two references:
+Against the judging criteria, the project is credible. The main remaining weakness is not basic functionality; it is depth and evidence. The two references still show stronger patterns in different ways:
 
 - `carbon-footprint-assistant` is better at feeling like a daily-use product: activity log, persisted store, trend chart, goal progress, empty states, skeletons, toast feedback, assistant chat, safe Markdown, dark/light design system.
 - `election-clarity-india` is better at judge confidence: requirement mapping, evidence maps, evals, behavior baselines, performance baselines, production smoke checks, App Check-style route hardening, audit telemetry, source-confidence metadata, docs as tested artifacts, release-readiness reports.
 
-Best direction: keep Carbon Compass's guided calculator and India-specific carbon logic, but borrow the persistent activity tracking and evidence discipline from the references.
+Best direction: keep Carbon Compass's guided calculator and India-specific carbon logic, keep the new assistant/report/goal improvements, and next borrow persistent activity tracking plus evidence discipline from the references.
 
 ## Scorecard
 
@@ -25,16 +27,16 @@ Scores are source-reading estimates for judging readiness, not measured test res
 
 | Area | Current Project | Carbon Reference | Election Reference | What this means |
 | --- | ---: | ---: | ---: | --- |
-| Product fit | 8/10 | 9/10 | 9/10 | Current project fits the carbon challenge well, but tracking over time is weaker than the carbon reference. |
-| Smart assistant | 7.5/10 | 8.5/10 | 9.5/10 | Current has Gemini function calling and fallback narration, but lacks full conversational assistant UX and strict assistant contracts. |
-| Logical decisions | 8/10 | 8.5/10 | 9.5/10 | Current recommendations are deterministic and ranked, but explanations and traceability can be deeper. |
-| Real-world usability | 7/10 | 9/10 | 9/10 | Current is a good demo flow; carbon reference is better for daily recurring use. |
-| Code quality | 8/10 | 8/10 | 9/10 | Current has strict TS and focused modules; election reference adds stricter lint and import boundaries. |
-| Security | 7.5/10 | 8/10 | 9.5/10 | Current has validation, headers, redaction, rate limiting; still has unsafe-inline CSP and unvalidated AI tool args. |
-| Efficiency | 7/10 | 8/10 | 9/10 | Current is simple and lightweight; references add production build E2E, bundle/perf checks, caching and smoke gates. |
-| Testing | 8/10 | 8/10 | 9.5/10 | Current has around 162 test blocks and coverage thresholds. Election reference has evals, behavior, perf, evidence-doc tests. |
-| Accessibility | 7.5/10 | 9/10 | 9/10 | Current has skip link, labels, chart text fallback, axe E2E; references cover reduced motion, mobile overflow, focus movement, status regions more deeply. |
-| Documentation | 7.5/10 | 8.5/10 | 10/10 | Current docs are good but should become more judge-mapped, current, and limitation-aware. |
+| Product fit | 8.5/10 | 9/10 | 9/10 | Current project fits the carbon challenge well. The missing daily activity log is the biggest product gap. |
+| Smart assistant | 8.5/10 | 8.5/10 | 9.5/10 | Current now has a dedicated assistant page plus Gemini chat/narration routes and fallback logic. Strict contracts can still improve. |
+| Logical decisions | 8.5/10 | 8.5/10 | 9.5/10 | Current recommendations, simulations, scoring, and tool calls are deterministic. Traceability can still be deeper. |
+| Real-world usability | 8/10 | 9/10 | 9/10 | Goal setter and real report client help. Daily recurring use is still weaker than the carbon reference. |
+| Code quality | 8/10 | 8/10 | 9/10 | Current has strict TS and focused modules; election reference adds stricter lint, import boundaries, and wrappers. |
+| Security | 8.2/10 | 8/10 | 9.5/10 | Current now validates AI tool args, disables X-Powered-By, catches malformed Origin, and has redaction/rate limiting. CSP remains weaker. |
+| Efficiency | 7.8/10 | 8/10 | 9/10 | Production-mode Playwright config helps. Still missing bundle/perf baselines and health/smoke checks. |
+| Testing | 8.3/10 | 8/10 | 9.5/10 | Current now includes assistant chat, assistant eval, goal setter, and report tests. Election reference still has broader eval/perf/evidence lanes. |
+| Accessibility | 8/10 | 9/10 | 9/10 | Current has a11y docs, skip link, labels, chart text fallback, axe E2E. Still needs mobile overflow and focus-flow checks. |
+| Documentation | 8.5/10 | 8.5/10 | 10/10 | New quality/accessibility/readiness docs are strong. Some claims should be kept tightly aligned with actual verification. |
 
 ## Current Project Strengths
 
@@ -44,30 +46,35 @@ Scores are source-reading estimates for judging readiness, not measured test res
 4. Zod schemas validate profiles, footprint inputs, results, recommendations, and assistant payloads.
 5. Recommendation logic is deterministic and ranked by top category, goal, estimated saving, impact, and difficulty.
 6. The simulator is useful for judges because it shows before/after impact without relying on AI.
-7. Assistant route has real Gemini calls, model fallback, tool calls, cost calculation, and deterministic fallback.
+7. Assistant routes now include both dashboard narration and a dedicated chat endpoint/page.
 8. Security redaction exists for API keys, Bearer tokens, URL secret params, sensitive object fields, and stack details.
 9. The project has CI for lint, typecheck, tests, build, client-bundle secret scan, and Playwright + axe.
 10. `tsconfig.json` is stricter than the carbon reference: `allowJs: false`, `noUncheckedIndexedAccess`, `noImplicitOverride`, `noFallthroughCasesInSwitch`.
 11. Accessibility basics are present: skip link, labels, semantic headings, chart text summary, axe smoke checks.
-12. Docs already include README, SECURITY, CONTRIBUTING, formulas, and an AI judge evidence map.
+12. Docs now include README, SECURITY, CONTRIBUTING, formulas, AI judge evidence map, accessibility doc, quality checklist, and final judge readiness report.
+13. `lib/carbon/assistant-tools.ts` now validates tool arguments with Zod before executing model-requested tools.
+14. `next.config.ts` disables `poweredByHeader`.
+15. Middleware now fails closed on malformed `Origin` headers.
+16. `components/carbon/report-client.tsx` now reads real session/progress data and falls back to demo only when needed.
+17. `components/carbon/goal-setter.tsx` adds persistent monthly goal tracking.
 
 ## Biggest Gaps
 
-1. Tracking is not strong enough for a "track and reduce" platform. The current calculator persists one session payload, while the carbon reference has a persistent activity log and dashboard trend.
-2. The report page uses demo data instead of the user's real session/progress history.
-3. The AI assistant is only a dashboard narration panel, not a real assistant workspace users can ask questions in.
-4. AI tool call arguments are trusted with TypeScript assertions instead of being validated at the tool boundary.
-5. CSP still uses `script-src 'self' 'unsafe-inline'`, but docs sometimes imply the policy disallows unsafe script execution.
-6. Middleware `new URL(origin)` can throw for malformed Origin headers; the carbon reference catches this in the route-level same-origin helper.
-7. `next.config.ts` does not set `poweredByHeader: false`, unlike the carbon reference.
-8. E2E currently runs `pnpm dev`, while the carbon reference runs a production build/start for E2E. Production-like E2E is stronger for judging.
-9. Accessibility coverage is route-flow based but does not yet test mobile overflow, focus movement after actions, reduced-motion computed behavior, status/alert semantics, or keyboard tab flows as deeply as references.
-10. Documentation is good but not judge-complete: it lacks a single final readiness report, a quality checklist, a demo script, known limitations, and evidence freshness.
-11. Form validation exists in schemas and APIs, but the client calculator mostly coerces invalid numeric input to `0`; inline errors would be more trustworthy.
-12. There is no persistent goal setting UI like the carbon reference.
-13. There are no assistant evals or behavior baselines for hallucination, fallback, and advice quality.
-14. There is no performance baseline, bundle report, dependency audit script, or production smoke route.
-15. The product uses a one-note green-heavy visual system; references have richer category color distinction and stronger UI primitives.
+1. Tracking is still not strong enough for a "track and reduce" platform. The current calculator/session model is better than before, but the carbon reference still has a proper persistent dated activity log.
+2. The report creates a one-entry synthetic history when real progress history is empty. Good fallback, but real check-ins should be explicit user actions.
+3. The assistant chat exists, but fallback answers are generic. Example: "biggest driver" fallback says transport or energy instead of using `result.topCategory`.
+4. The assistant request schema allows unlimited message count with `z.array(chatMessageSchema)` and no `.max(...)`. A malicious or accidental large message history can waste memory/tokens.
+5. CSP still uses `script-src 'self' 'unsafe-inline'`, so docs should avoid implying strict nonce CSP until implemented.
+6. `/api/assistant/chat` and `/api/assistant/narrate` rely on `request.json()` after middleware `content-length` checks. Requests without or with false `content-length` are not stream-bounded at the route level.
+7. Rate limiting is in-memory and IP-header based; acceptable for a demo, weaker than distributed/edge-backed limits.
+8. Production E2E config now uses `pnpm build && pnpm start`, but `webServer.url` is `http://localhost:3000`; if another app is already running and `reuseExistingServer` is true locally, tests may attach to the wrong server.
+9. Accessibility coverage is route-flow based but still does not deeply test mobile overflow, skip-link focus movement, reduced-motion computed behavior, or assistant chat ARIA transcript semantics.
+10. Some docs claim exact verification numbers, such as "188 tests passed" and "3 browser flows passed." Keep those updated automatically or phrase them as latest known local evidence.
+11. Form validation exists in schemas and APIs, but the client calculator still mostly coerces invalid numeric input to `0`; inline errors would be more trustworthy.
+12. There is no dependency audit script in `package.json`.
+13. There is no health endpoint or production smoke script.
+14. There is no bundle/performance baseline.
+15. The product still uses a green-heavy visual system; references have richer category color distinction and stronger UI primitives.
 
 ## What To Borrow From `carbon-footprint-assistant`
 
@@ -117,179 +124,161 @@ Scores are source-reading estimates for judging readiness, not measured test res
 
 ### P0 - Highest Impact Before Submission
 
-1. Replace the report page's demo-only data with real user data.
-   - Current: `app/report/page.tsx` uses `demoFootprintResult`, `demoProfile`, `demoRecommendations`, and `demoProgressHistory`.
-   - Improve: create a client report component that loads session/progress data. If missing, show a clear empty/demo state.
-
-2. Add persistent activity tracking.
+1. Add persistent activity tracking.
    - Borrow from `carbon-footprint-assistant/src/lib/store/carbon-store.ts`.
    - Keep current calculator for quick estimate, but add `/log` or `/tracker` where users add transport, energy, food, shopping, and waste activities over time.
 
-3. Add goal setting and progress tracking UI.
-   - Current has progress utilities but not a strong user workflow.
-   - Add "Set monthly reduction target" or "Set daily kg CO2e target" and show progress on dashboard/report.
+2. Make progress history a real user workflow.
+   - Current report builds a one-entry fallback if no progress history exists.
+   - Add explicit "Save check-in" after calculation and show a dated progress log with remove/edit.
 
-4. Add a real assistant chat route/page.
-   - Keep `AssistantInsight` as a summary panel.
-   - Add `/assistant` where users ask questions grounded in their current footprint/log.
-   - Use streamed text or at least normal chat history.
+3. Make fallback assistant responses truly context-aware.
+   - Current `getFallbackChatResponse()` returns generic text for biggest-source and reduction questions.
+   - Pass the computed `FootprintResult` into fallback generation so offline mode can say the actual top category and saving opportunity.
 
-5. Validate Gemini tool-call args with Zod.
-   - Current `executeTool()` casts `args["category"] as CarbonCategory` and `args["actionId"] as SimulationActionId`.
-   - Add strict schemas per tool. Unknown category/action should return a safe tool error instead of running.
+4. Bound assistant chat history.
+   - Add `.min(1).max(12)` or similar to `assistantChatRequestSchema.messages`.
+   - Limit total payload/tokens before sending to Gemini.
 
-6. Fix docs/security mismatch around CSP.
+5. Fix docs/security mismatch around CSP.
    - Current CSP includes `script-src 'self' 'unsafe-inline'`.
    - README/SECURITY should say this honestly, or implement nonce CSP and then claim stronger protection.
 
-7. Set `poweredByHeader: false` in `next.config.ts`.
-   - Simple security/readiness win copied from the carbon reference.
+6. Add route-level bounded JSON parsing.
+   - Middleware checks `content-length`, but route handlers still call `request.json()`.
+   - Borrow the bounded reader idea from `election-clarity-india` for assistant endpoints.
 
-8. Make malformed Origin handling fail closed.
-   - Current middleware parses `new URL(origin)` without try/catch.
-   - Wrap it so malformed Origin returns 403, not a possible middleware error.
-
-9. Upgrade E2E to production-like mode.
-   - Build first, then run Playwright against `next start`, similar to the carbon reference.
-   - Judges care because production builds catch different issues than dev mode.
-
-10. Expand README with a judge demo path.
+7. Expand README with a judge demo path.
    - Add a 5-minute demo route sequence: calculator, dashboard, simulator, assistant, actions, report, docs evidence.
 
 ### P1 - Strong Judging Signal
 
-11. Add a "Challenge Requirement Mapping" table to README.
+8. Add a "Challenge Requirement Mapping" table to README.
    - Columns: requirement, implemented feature, source files, tests/evidence, limitation.
 
-12. Rewrite `evidence/ai-judge-evidence-map.md` to be as complete as the election reference.
+9. Rewrite `evidence/ai-judge-evidence-map.md` to be as complete as the election reference.
    - Include Testing, Security, Accessibility, Efficiency, Code Quality, Smart Assistant, Logical Decisions, Real Usability.
 
-13. Add `docs/final-judge-readiness-report.md`.
-   - Summarize current state, strongest demo flow, latest verification evidence, residual risks.
+10. Keep `docs/final-judge-readiness-report.md` strict and current.
+   - It now exists, but claims like exact pass counts must be kept synchronized with real current test output.
+   - Add residual risks and known limitations so the doc reads credible, not inflated.
 
-14. Add `docs/quality-checklist.md`.
-   - Include automated checks and manual checks: desktop, mobile, keyboard, reduced motion, report print, assistant fallback.
+11. Expand `docs/quality-checklist.md` with release gates.
+   - It now exists. Add dependency audit, mobile overflow, reduced motion, assistant fallback, and print checks as explicit gates.
 
-15. Add `docs/ACCESSIBILITY.md`.
-   - Include semantic HTML, keyboard flow, focus handling, forms, charts, status regions, mobile, known gaps.
+12. Expand `docs/ACCESSIBILITY.md`.
+   - It now exists. Add route-level notes, tested files, known gaps, and manual screen-reader checklist.
 
-16. Add assistant evals.
-   - Example cases: "what is my biggest source?", "how to reduce transport?", "unrelated question", "give medical/legal advice", "invent exact savings", "compare to India average".
-   - Verify mode, citations/assumptions, refusal or redirect, no invented data.
+13. Upgrade assistant evals beyond fallback string checks.
+   - Current evals test `getFallbackChatResponse()`.
+   - Add route-level and prompt-level cases for hallucination, unsafe requests, off-topic questions, and provider fallback.
 
-17. Add assistant response contract validation.
+14. Add assistant response contract validation.
    - Current Gemini JSON is parsed directly after model output.
    - Add Zod schema for `narrative`, `weeklyChallenge`, `goalTip` with length limits.
 
-18. Add API body streaming bounds.
-   - Current middleware rejects by `content-length`, but missing or wrong headers can bypass early size checks until `request.json()`.
-   - Borrow the bounded reader idea from election reference.
-
-19. Return rate limit headers.
+15. Return rate limit headers.
    - Add remaining/reset data to 429 and successful assistant responses.
    - Useful for security and transparency.
 
-20. Add production dependency audit script.
+16. Add production dependency audit script.
    - Add `audit:prod`: `pnpm audit --prod`.
    - Add it to CI or a separate quality gate.
 
-21. Add import-boundary check.
+17. Add import-boundary check.
    - Prevent client components from importing server-only AI/config files.
    - Keep `server-only` tests and add a simple script if full tooling is too much.
 
-22. Add route-level metadata and SEO artifacts.
+18. Add route-level metadata and SEO artifacts.
    - Add page metadata for dashboard/actions/report/calculator.
    - Add sitemap/robots if useful for production polish.
 
-23. Add health endpoint.
+19. Add health endpoint.
    - `/api/health` returning `{ status: "ok" }`, app version, feature flags without secrets.
    - Useful for smoke checks.
 
-24. Add `pnpm verify`.
+20. Add `pnpm verify`.
    - Current has `quality`; election has `verify`.
    - Either add alias or use one consistently in README/CI.
 
-25. Add PR template and issue templates.
+21. Add PR template and issue templates.
    - Judge signal for maintainability.
 
 ### P2 - Product Polish And Accessibility
 
-26. Add client-side inline validation errors to onboarding and calculator.
+22. Add client-side inline validation errors to onboarding and calculator.
    - Current numeric parsing silently turns invalid text into `0`.
    - Show errors near fields and focus first invalid field on submit.
 
-27. Add `aria-live` for calculator result transitions, saved-progress actions, and assistant loading/error states.
+23. Add `aria-live` for calculator result transitions, saved-progress actions, and assistant loading/error states.
 
-28. Add mobile overflow Playwright checks for every primary route.
+24. Add mobile overflow Playwright checks for every primary route.
    - Borrow election's `390px` viewport route loop.
 
-29. Add skip-link E2E test.
+25. Add skip-link E2E test.
    - Current layout has skip link, but E2E should prove it works.
 
-30. Add reduced-motion browser check.
+26. Add reduced-motion browser check.
    - Current CSS has `prefers-reduced-motion`; verify computed behavior in Playwright.
 
-31. Improve chart semantics.
+27. Improve chart semantics.
    - Current chart has a text list, which is good.
    - Consider a semantic table like the carbon reference for category breakdown, because tables are clearer for screen readers and judges.
 
-32. Add table/tabular numbers for all numeric metric comparisons.
+28. Add table/tabular numbers for all numeric metric comparisons.
    - Use `font-variant-numeric: tabular-nums`.
 
-33. Add `color-scheme` to `html`.
+29. Add `color-scheme` to `html`.
    - Helps native controls and scrollbars in dark/light contexts.
 
-34. Add `overflow-x: hidden` or route-level overflow checks only after ensuring no content is clipped.
+30. Add `overflow-x: hidden` or route-level overflow checks only after ensuring no content is clipped.
 
-35. Add `touch-action: manipulation` globally or on controls.
+31. Add `touch-action: manipulation` globally or on controls.
 
-36. Replace text-only action buttons with icon + text where useful.
+32. Replace text-only action buttons with icon + text where useful.
    - Use `lucide-react` if adding dependency.
    - Useful for calculator, report print, dashboard actions.
 
-37. Add empty states for actions/report when no user data exists.
+33. Add empty states for actions/report when no user data exists.
    - Current fallback-to-demo is good for judges, but users should understand what is real.
 
-38. Add "save this check-in" action.
-   - Use `appendProgressEntry()` after calculation to build real progress history.
-
-39. Add edit/remove for saved check-ins.
+34. Add edit/remove for saved check-ins.
    - Makes progress tracking credible.
 
-40. Add print-specific polishing for report.
+35. Add print-specific polishing for report.
    - Current report has print-hidden controls and print-friendly article. Add tested print styles and real user data.
 
 ### P3 - Efficiency And Maintainability
 
-41. Add bundle inspection script.
+36. Add bundle inspection script.
    - Election reference has `perf:bundle-report`.
    - For current project, inspect Recharts and AI client boundaries.
 
-42. Lazy-load chart-heavy dashboard parts if bundle grows.
+37. Lazy-load chart-heavy dashboard parts if bundle grows.
    - Recharts can be client-heavy; keep it isolated to chart components.
 
-43. Memoize expensive derived calculations from activity logs.
+38. Memoize expensive derived calculations from activity logs.
    - Current single questionnaire does not need much optimization. Activity log will.
 
-44. Add local source freshness for emission factors.
+39. Add local source freshness for emission factors.
    - `data/emission-factors.json` plus `docs/FORMULAS.md` should include checked date, source URL, confidence, and limitation.
 
-45. Add factor provenance to UI.
+40. Add factor provenance to UI.
    - Show "source: CEA India grid factor" or "educational estimate" in dashboard/report.
 
-46. Make constants consistent between README and code.
+41. Make constants consistent between README and code.
    - `docs/FORMULAS.md` lists some factors that differ from `lib/carbon/factors.ts`. Align or explain.
 
-47. Add rule IDs and explanation text to recommendation output.
+42. Add rule IDs and explanation text to recommendation output.
    - Helps tests and judge evidence show why a recommendation fired.
 
-48. Add no-data and corrupted-storage tests for progress/report.
+43. Add no-data and corrupted-storage tests for progress/report.
    - Current session/progress helpers already validate storage; extend UI coverage.
 
-49. Add logs/audit for assistant provider failures.
+44. Add logs/audit for assistant provider failures.
    - Log redacted reason, model attempted, fallback source, request ID.
 
-50. Add explicit known limitations section to README.
+45. Add explicit known limitations section to README.
    - Not a certified carbon audit.
    - Static factors.
    - No exact location.
