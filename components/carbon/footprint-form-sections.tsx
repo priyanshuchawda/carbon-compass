@@ -1,6 +1,7 @@
 "use client";
 
 import type { Dispatch, SetStateAction } from "react";
+import { CheckboxField, SelectField } from "@/components/carbon/form-controls";
 import { NumberField } from "@/components/carbon/number-field";
 import {
   parseDairyFrequency,
@@ -21,6 +22,31 @@ type SectionProps = {
   updateNumber: UpdateNumber;
   setInput: SetFootprintInput;
 };
+
+const DIET_OPTIONS = [
+  { value: "vegan", label: "Vegan" },
+  { value: "vegetarian", label: "Vegetarian" },
+  { value: "mixed", label: "Mixed (occasional meat)" },
+  { value: "meat_heavy", label: "Meat-heavy (daily meat)" },
+] as const;
+
+const DAIRY_OPTIONS = [
+  { value: "low", label: "Low (rarely)" },
+  { value: "medium", label: "Medium (daily chai / curd)" },
+  { value: "high", label: "High (multiple times daily)" },
+] as const;
+
+const WASTE_LEVEL_OPTIONS = [
+  { value: "low", label: "Low (rarely waste food)" },
+  { value: "medium", label: "Medium (some waste weekly)" },
+  { value: "high", label: "High (frequent spoilage)" },
+] as const;
+
+const PLASTIC_USAGE_OPTIONS = [
+  { value: "low", label: "Low (reusable bags, minimal packaging)" },
+  { value: "medium", label: "Medium (some single-use plastic)" },
+  { value: "high", label: "High (frequent single-use plastic)" },
+] as const;
 
 export function TransportFields({ input, errors, updateNumber }: SectionProps) {
   return (
@@ -101,25 +127,22 @@ export function EnergyFields({ input, errors, updateNumber, setInput }: SectionP
           onChange={(value) => updateNumber(["energy", "acHoursPerDay"], value)}
           error={errors.acHoursPerDay}
         />
-        <label className="flex items-center gap-3 self-end pb-1 text-sm font-medium text-slate-800">
-          <input
-            type="checkbox"
-            name="renewableEnergy"
-            id="renewableEnergy"
-            checked={input.energy.renewableEnergy}
-            onChange={(event) =>
-              setInput((current) => ({
-                ...current,
-                energy: {
-                  ...current.energy,
-                  renewableEnergy: event.target.checked,
-                },
-              }))
-            }
-            className="size-5 rounded border-slate-300 text-emerald-700"
-          />
+        <CheckboxField
+          id="renewableEnergy"
+          checked={input.energy.renewableEnergy}
+          onChange={(checked) =>
+            setInput((current) => ({
+              ...current,
+              energy: {
+                ...current.energy,
+                renewableEnergy: checked,
+              },
+            }))
+          }
+          className="self-end pb-1"
+        >
           Using rooftop solar or green tariff
-        </label>
+        </CheckboxField>
       </div>
     </fieldset>
   );
@@ -130,30 +153,21 @@ export function FoodFields({ input, errors, updateNumber, setInput }: SectionPro
     <fieldset className="grid gap-4 rounded-lg border border-slate-200 bg-white p-5">
       <legend className="px-1 text-lg font-semibold text-slate-950">Food</legend>
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="grid gap-2 text-sm font-medium text-slate-800">
-          Diet type
-          <select
-            name="dietType"
-            id="dietType"
-            autoComplete="off"
-            value={input.food.dietType}
-            onChange={(event) =>
-              setInput((current) => ({
-                ...current,
-                food: {
-                  ...current.food,
-                  dietType: parseDietType(event.target.value),
-                },
-              }))
-            }
-            className="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-base text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
-          >
-            <option value="vegan">Vegan</option>
-            <option value="vegetarian">Vegetarian</option>
-            <option value="mixed">Mixed (occasional meat)</option>
-            <option value="meat_heavy">Meat-heavy (daily meat)</option>
-          </select>
-        </label>
+        <SelectField
+          id="dietType"
+          label="Diet type"
+          value={input.food.dietType}
+          options={DIET_OPTIONS}
+          onChange={(value) =>
+            setInput((current) => ({
+              ...current,
+              food: {
+                ...current.food,
+                dietType: parseDietType(value),
+              },
+            }))
+          }
+        />
 
         <NumberField
           label="Meat meals per week"
@@ -164,29 +178,21 @@ export function FoodFields({ input, errors, updateNumber, setInput }: SectionPro
           error={errors.meatMealsPerWeek}
         />
 
-        <label className="grid gap-2 text-sm font-medium text-slate-800">
-          Dairy frequency
-          <select
-            name="dairyFrequency"
-            id="dairyFrequency"
-            autoComplete="off"
-            value={input.food.dairyFrequency}
-            onChange={(event) =>
-              setInput((current) => ({
-                ...current,
-                food: {
-                  ...current.food,
-                  dairyFrequency: parseDairyFrequency(event.target.value),
-                },
-              }))
-            }
-            className="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-base text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
-          >
-            <option value="low">Low (rarely)</option>
-            <option value="medium">Medium (daily chai / curd)</option>
-            <option value="high">High (multiple times daily)</option>
-          </select>
-        </label>
+        <SelectField
+          id="dairyFrequency"
+          label="Dairy frequency"
+          value={input.food.dairyFrequency}
+          options={DAIRY_OPTIONS}
+          onChange={(value) =>
+            setInput((current) => ({
+              ...current,
+              food: {
+                ...current.food,
+                dairyFrequency: parseDairyFrequency(value),
+              },
+            }))
+          }
+        />
 
         <NumberField
           label="Food delivery orders per week"
@@ -197,29 +203,21 @@ export function FoodFields({ input, errors, updateNumber, setInput }: SectionPro
           error={errors.foodDeliveryPerWeek}
         />
 
-        <label className="grid gap-2 text-sm font-medium text-slate-800">
-          Food waste level
-          <select
-            name="foodWasteLevel"
-            id="foodWasteLevel"
-            autoComplete="off"
-            value={input.food.foodWasteLevel}
-            onChange={(event) =>
-              setInput((current) => ({
-                ...current,
-                food: {
-                  ...current.food,
-                  foodWasteLevel: parseWasteLevel(event.target.value),
-                },
-              }))
-            }
-            className="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-base text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
-          >
-            <option value="low">Low (rarely waste food)</option>
-            <option value="medium">Medium (some waste weekly)</option>
-            <option value="high">High (frequent spoilage)</option>
-          </select>
-        </label>
+        <SelectField
+          id="foodWasteLevel"
+          label="Food waste level"
+          value={input.food.foodWasteLevel}
+          options={WASTE_LEVEL_OPTIONS}
+          onChange={(value) =>
+            setInput((current) => ({
+              ...current,
+              food: {
+                ...current.food,
+                foodWasteLevel: parseWasteLevel(value),
+              },
+            }))
+          }
+        />
       </div>
     </fieldset>
   );
@@ -263,62 +261,46 @@ export function WasteFields({ input, setInput }: SectionProps) {
   return (
     <fieldset className="grid gap-4 rounded-lg border border-slate-200 bg-white p-5">
       <legend className="px-1 text-lg font-semibold text-slate-950">Waste habits</legend>
-      <label className="grid gap-2 text-sm font-medium text-slate-800">
-        Plastic usage level
-        <select
-          name="plasticUsage"
-          id="plasticUsage"
-          autoComplete="off"
-          value={input.waste.plasticUsage}
-          onChange={(event) =>
+      <SelectField
+        id="plasticUsage"
+        label="Plastic usage level"
+        value={input.waste.plasticUsage}
+        options={PLASTIC_USAGE_OPTIONS}
+        onChange={(value) =>
+          setInput((current) => ({
+            ...current,
+            waste: {
+              ...current.waste,
+              plasticUsage: parsePlasticUsage(value),
+            },
+          }))
+        }
+      />
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <CheckboxField
+          id="recycles"
+          checked={input.waste.recycles}
+          onChange={(checked) =>
             setInput((current) => ({
               ...current,
-              waste: {
-                ...current.waste,
-                plasticUsage: parsePlasticUsage(event.target.value),
-              },
+              waste: { ...current.waste, recycles: checked },
             }))
           }
-          className="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-base text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
         >
-          <option value="low">Low (reusable bags, minimal packaging)</option>
-          <option value="medium">Medium (some single-use plastic)</option>
-          <option value="high">High (frequent single-use plastic)</option>
-        </select>
-      </label>
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <label className="flex items-center gap-3 text-sm font-medium text-slate-800">
-          <input
-            type="checkbox"
-            name="recycles"
-            id="recycles"
-            checked={input.waste.recycles}
-            onChange={(event) =>
-              setInput((current) => ({
-                ...current,
-                waste: { ...current.waste, recycles: event.target.checked },
-              }))
-            }
-            className="size-5 rounded border-slate-300 text-emerald-700"
-          />
           Separates and recycles dry waste
-        </label>
-        <label className="flex items-center gap-3 text-sm font-medium text-slate-800">
-          <input
-            type="checkbox"
-            name="composts"
-            id="composts"
-            checked={input.waste.composts}
-            onChange={(event) =>
-              setInput((current) => ({
-                ...current,
-                waste: { ...current.waste, composts: event.target.checked },
-              }))
-            }
-            className="size-5 rounded border-slate-300 text-emerald-700"
-          />
+        </CheckboxField>
+        <CheckboxField
+          id="composts"
+          checked={input.waste.composts}
+          onChange={(checked) =>
+            setInput((current) => ({
+              ...current,
+              waste: { ...current.waste, composts: checked },
+            }))
+          }
+        >
           Composts food scraps
-        </label>
+        </CheckboxField>
       </div>
     </fieldset>
   );

@@ -103,16 +103,22 @@ export function saveProgressHistory(
   }
 }
 
+export type ProgressMutationResult = {
+  ok: boolean;
+  reason?: string;
+  entries: ProgressEntry[];
+};
+
 export function appendProgressEntry(
   entry: ProgressEntry,
   storage = safeStorage()
-): ProgressEntry[] {
+): ProgressMutationResult {
   const history = [...loadProgressHistory(storage), entry];
   const latest = sortHistory(history).slice(-12);
 
-  saveProgressHistory(latest, storage);
+  const saveResult = saveProgressHistory(latest, storage);
 
-  return latest;
+  return { ...saveResult, entries: latest };
 }
 
 export function progressHistoryTextSummary(entries: ProgressEntry[]): string {

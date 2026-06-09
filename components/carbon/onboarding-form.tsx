@@ -2,7 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { SelectField } from "@/components/carbon/form-controls";
 import { saveSessionProfile } from "@/lib/carbon/session";
+import { zodIssuesToFieldErrors } from "@/lib/carbon/form-errors";
+import { makeClientId } from "@/lib/carbon/ids";
 import { userProfileSchema } from "@/lib/validation/schemas";
 import type { UserProfile } from "@/lib/carbon/types";
 
@@ -14,21 +17,24 @@ const DEFAULT_PROFILE: Omit<UserProfile, "id"> = {
   mainGoal: "reduce_carbon",
 };
 
-function generateId(): string {
-  return `user-${Date.now().toString(36)}`;
-}
+const PERSONA_OPTIONS = [
+  { value: "student", label: "Student" },
+  { value: "working", label: "Working professional" },
+  { value: "family", label: "Family" },
+] as const;
 
-const PERSONAS = [
-  "student",
-  "working",
-  "family",
-] as const satisfies readonly UserProfile["persona"][];
-const MAIN_GOALS = [
-  "reduce_carbon",
-  "save_money",
-  "learn",
-  "habit_building",
-] as const satisfies readonly UserProfile["mainGoal"][];
+// Derived from PERSONA_OPTIONS to prevent the two from drifting apart.
+const PERSONAS = PERSONA_OPTIONS.map((o) => o.value) as unknown as readonly UserProfile["persona"][];
+
+const MAIN_GOAL_OPTIONS = [
+  { value: "reduce_carbon", label: "Reduce my carbon footprint" },
+  { value: "save_money", label: "Save money on energy and travel" },
+  { value: "learn", label: "Learn about my climate impact" },
+  { value: "habit_building", label: "Build sustainable habits" },
+] as const;
+
+// Derived from MAIN_GOAL_OPTIONS to prevent the two from drifting apart.
+const MAIN_GOALS = MAIN_GOAL_OPTIONS.map((o) => o.value) as unknown as readonly UserProfile["mainGoal"][];
 
 function parseOption<T extends string>(value: string, options: readonly T[], fallback: T): T {
   return options.includes(value as T) ? (value as T) : fallback;
@@ -47,7 +53,7 @@ export function OnboardingForm() {
     event.preventDefault();
 
     const parsed = userProfileSchema.safeParse({
-      id: generateId(),
+      id: makeClientId("user"),
       city: city.trim() || DEFAULT_PROFILE.city,
       country: country.trim() || DEFAULT_PROFILE.country,
       householdSize: Number(householdSize),
@@ -56,12 +62,7 @@ export function OnboardingForm() {
     });
 
     if (!parsed.success) {
-      const nextErrors: Record<string, string> = {};
-      for (const issue of parsed.error.issues) {
-        const fieldName = issue.path.join(".");
-        nextErrors[fieldName] = issue.message;
-      }
-      setErrors(nextErrors);
+      setErrors(zodIssuesToFieldErrors(parsed.error.issues));
       return;
     }
 
@@ -142,38 +143,22 @@ export function OnboardingForm() {
           )}
         </label>
 
-        <label className="grid gap-2 text-sm font-medium text-slate-800">
-          Persona
-          <select
-            name="persona"
-            id="persona"
-            autoComplete="off"
-            value={persona}
-            onChange={(e) => setPersona(parseOption(e.target.value, PERSONAS, "student"))}
-            className="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-base text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
-          >
-            <option value="student">Student</option>
-            <option value="working">Working professional</option>
-            <option value="family">Family</option>
-          </select>
-        </label>
+        <SelectField
+          id="persona"
+          label="Persona"
+          value={persona}
+          options={PERSONA_OPTIONS}
+          onChange={(value) => setPersona(parseOption(value, PERSONAS, "student"))}
+        />
 
-        <label className="grid gap-2 text-sm font-medium text-slate-800 sm:col-span-2">
-          Main goal
-          <select
-            name="mainGoal"
-            id="mainGoal"
-            autoComplete="off"
-            value={mainGoal}
-            onChange={(e) => setMainGoal(parseOption(e.target.value, MAIN_GOALS, "reduce_carbon"))}
-            className="min-h-11 rounded-md border border-slate-300 px-3 py-2 text-base text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
-          >
-            <option value="reduce_carbon">Reduce my carbon footprint</option>
-            <option value="save_money">Save money on energy and travel</option>
-            <option value="learn">Learn about my climate impact</option>
-            <option value="habit_building">Build sustainable habits</option>
-          </select>
-        </label>
+        <SelectField
+          id="mainGoal"
+          label="Main goal"
+          value={mainGoal}
+          options={MAIN_GOAL_OPTIONS}
+          onChange={(value) => setMainGoal(parseOption(value, MAIN_GOALS, "reduce_carbon"))}
+          className="sm:col-span-2"
+        />
       </div>
 
       <p className="text-sm leading-6 text-slate-600">

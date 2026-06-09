@@ -1,12 +1,9 @@
 import type { SimulationResult } from "@/lib/carbon/simulator";
+import { formatKgCO2e } from "@/lib/carbon/format";
 
 type WhatIfSimulatorProps = {
   simulations: SimulationResult[];
 };
-
-function kg(value: number): string {
-  return `${Math.round(value)} kg CO2e`;
-}
 
 export function WhatIfSimulator({ simulations }: WhatIfSimulatorProps) {
   return (
@@ -42,19 +39,19 @@ export function WhatIfSimulator({ simulations }: WhatIfSimulatorProps) {
                 <div>
                   <dt className="text-slate-500">Before</dt>
                   <dd className="mt-1 font-semibold text-slate-950">
-                    {kg(simulation.beforeResult.monthlyTotalKgCO2e)}
+                    {formatKgCO2e(simulation.beforeResult.monthlyTotalKgCO2e)}
                   </dd>
                 </div>
                 <div>
                   <dt className="text-slate-500">After</dt>
                   <dd className="mt-1 font-semibold text-slate-950">
-                    {kg(simulation.afterResult.monthlyTotalKgCO2e)}
+                    {formatKgCO2e(simulation.afterResult.monthlyTotalKgCO2e)}
                   </dd>
                 </div>
                 <div>
                   <dt className="text-slate-500">Estimated saving</dt>
                   <dd className="mt-1 font-semibold text-slate-950">
-                    {kg(simulation.savingKgCO2e)}
+                    {formatKgCO2e(simulation.savingKgCO2e)}
                   </dd>
                 </div>
               </dl>

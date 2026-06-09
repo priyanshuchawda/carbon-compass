@@ -14,6 +14,16 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],
+      // Explicit include list keeps coverage reporting honest: only production
+      // source files count toward thresholds, not test helpers or type stubs.
+      include: ["app/**", "components/**", "lib/**"],
+      exclude: [
+        "**/*.d.ts",
+        "**/*.test.*",
+        "**/*.spec.*",
+        "**/node_modules/**",
+        "tests/**",
+      ],
       thresholds: {
         lines: 75,
         functions: 75,

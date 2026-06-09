@@ -102,6 +102,15 @@ tests/
   e2e/                Playwright demo-flow spec
 ```
 
+### Architecture boundaries
+
+- `app/` owns routes, metadata, layouts, and thin API handlers.
+- `components/` owns rendering and interaction; shared UI controls live beside domain components when they are app-specific.
+- `lib/carbon/` owns calculation, scoring, recommendation, storage, AI, ID, and form-helper logic.
+- `lib/validation/` owns runtime request/response contracts with Zod.
+- API routes stay schema-backed and do not import UI modules.
+- Client components do not import server-only AI config, tool-loop, or security modules; `pnpm lint:boundaries` enforces this.
+
 ---
 
 ## Getting started
@@ -351,6 +360,7 @@ Key engineering rules for this codebase:
 | `pnpm verify`             | Alias for `pnpm quality`                                                        |
 
 ---
+
 ## License
 
 MIT

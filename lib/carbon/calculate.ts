@@ -29,8 +29,6 @@ const CATEGORY_LABELS: Record<CarbonCategory, string> = {
   waste: "Waste",
 };
 
-// round() is provided by @/lib/carbon/utils
-
 function categoryResult(category: CarbonCategory, kgCO2e: number): CategoryResult {
   return {
     category,

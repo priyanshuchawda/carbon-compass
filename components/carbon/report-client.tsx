@@ -7,10 +7,7 @@ import { ProgressTrend } from "@/components/carbon/progress-trend";
 import { useCarbonSessionState } from "@/lib/carbon/use-carbon-session-state";
 import { loadProgressHistory } from "@/lib/carbon/progress";
 import { demoProgressHistory } from "@/lib/carbon/demo-progress";
-
-function kg(value: number): string {
-  return `${Math.round(value)} kg CO2e`;
-}
+import { formatKgCO2e } from "@/lib/carbon/format";
 
 export function ReportClient() {
   const state = useCarbonSessionState();
@@ -23,7 +20,7 @@ export function ReportClient() {
       history = [
         {
           id: "initial-checkin",
-          recordedAt: "2026-06-09T00:00:00.000Z",
+          recordedAt: new Date().toISOString(),
           monthlyTotalKgCO2e: result.monthlyTotalKgCO2e,
           ecoScore: result.ecoScore,
           topCategory: result.topCategory,
@@ -91,26 +88,26 @@ export function ReportClient() {
         >
           <ReportMetric
             label="Monthly footprint"
-            value={kg(result.monthlyTotalKgCO2e)}
-            detail={`${kg(result.annualTotalKgCO2e)} per year`}
+            value={formatKgCO2e(result.monthlyTotalKgCO2e)}
+            detail={`${formatKgCO2e(result.annualTotalKgCO2e)} per year`}
           />
           <ReportMetric
             label="Top source"
             value={topCategory?.label ?? "Unknown"}
-            detail={`${kg(topCategory?.kgCO2e ?? 0)} per month`}
+            detail={`${formatKgCO2e(topCategory?.kgCO2e ?? 0)} per month`}
           />
           <ReportMetric
             label="Best action"
             value={bestAction?.title ?? "Review habits"}
             detail={
               bestAction
-                ? `${kg(bestAction.estimatedSavingKgCO2ePerMonth)} estimated saving`
+                ? `${formatKgCO2e(bestAction.estimatedSavingKgCO2ePerMonth)} estimated saving`
                 : "No action available"
             }
           />
           <ReportMetric
             label="Potential saving"
-            value={kg(result.potentialMonthlySavingKgCO2e)}
+            value={formatKgCO2e(result.potentialMonthlySavingKgCO2e)}
             detail="Based on reducing the top source by 18%"
           />
         </section>

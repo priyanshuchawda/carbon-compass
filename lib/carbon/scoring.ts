@@ -1,7 +1,6 @@
 import { clamp, round } from "@/lib/carbon/utils";
 
 import type { FootprintInput, UserProfile } from "@/lib/carbon/types";
-// round() and clamp() are provided by @/lib/carbon/utils
 
 /**
  * Calculates the Eco Score (0 to 100) based on per-capita monthly footprint.

@@ -116,7 +116,7 @@ export function GoalSetter({ currentMonthlyKg, isDemo = false }: GoalSetterProps
       </form>
 
       {feedback && (
-        <p className="mt-2 text-xs font-medium text-emerald-800" role="alert">
+        <p className="mt-2 text-xs font-medium text-emerald-800" aria-live="polite">
           {feedback}
         </p>
       )}
@@ -140,7 +140,7 @@ export function GoalSetter({ currentMonthlyKg, isDemo = false }: GoalSetterProps
               className={`h-full rounded-full transition-all duration-500 ${
                 isGoalMet ? "bg-emerald-600" : "bg-amber-500"
               }`}
-              style={{ width: `${goal > 0 ? Math.min((currentMonthlyKg / goal) * 100, 100) : 0}%` }}
+              style={{ width: `${progressPercent}%` }}
             />
           </div>
 

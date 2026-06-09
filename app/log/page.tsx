@@ -18,6 +18,7 @@ export default function LogPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingEntry, setEditingEntry] = useState<ActivityLogEntry | null>(null);
   const [feedback, setFeedback] = useState("");
+  const [feedbackIsError, setFeedbackIsError] = useState(false);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   function handleShowForm() {
@@ -32,13 +33,25 @@ export default function LogPage() {
 
   function handleSave(entry: ActivityLogEntry) {
     if (editingEntry) {
-      const updated = updateActivityLogEntry(editingEntry.id, entry);
-      setHistory(updated);
+      const result = updateActivityLogEntry(editingEntry.id, entry);
+      if (!result.ok) {
+        setFeedbackIsError(true);
+        setFeedback(result.reason ?? "Failed to save changes. Storage may be full.");
+        return;
+      }
+      setHistory(result.entries);
+      setFeedbackIsError(false);
       setFeedback("Entry updated successfully!");
       setEditingEntry(null);
     } else {
-      const updated = addActivityLogEntry(entry);
-      setHistory(updated);
+      const result = addActivityLogEntry(entry);
+      if (!result.ok) {
+        setFeedbackIsError(true);
+        setFeedback(result.reason ?? "Failed to log activity. Storage may be full.");
+        return;
+      }
+      setHistory(result.entries);
+      setFeedbackIsError(false);
       setFeedback("Activity logged successfully!");
     }
 
@@ -110,7 +123,11 @@ export default function LogPage() {
 
         {feedback && (
           <p
-            className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800"
+            className={`mt-4 rounded-md border p-3 text-sm ${
+              feedbackIsError
+                ? "border-red-200 bg-red-50 text-red-800"
+                : "border-emerald-200 bg-emerald-50 text-emerald-800"
+            }`}
             aria-live="polite"
           >
             {feedback}

@@ -10,28 +10,29 @@ import { GoalSetter } from "@/components/carbon/goal-setter";
 import { useCarbonSessionState } from "@/lib/carbon/use-carbon-session-state";
 import { SIMULATION_ACTIONS, simulateAction } from "@/lib/carbon/simulator";
 import { appendProgressEntry } from "@/lib/carbon/progress";
-
-function kg(value: number): string {
-  return `${Math.round(value)} kg CO₂e`;
-}
+import { makeClientId } from "@/lib/carbon/ids";
+import { formatKgCO2e } from "@/lib/carbon/format";
 
 export function DashboardClient() {
   const state = useCarbonSessionState();
   const { result, recommendations, profile, isDemo, footprintInput } = state;
   const [checkInSaved, setCheckInSaved] = useState(false);
+  const [checkInError, setCheckInError] = useState<string | null>(null);
 
   function handleSaveCheckIn() {
     const entry = {
-      id:
-        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-          ? crypto.randomUUID()
-          : `checkin-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      id: makeClientId("checkin"),
       recordedAt: new Date().toISOString(),
       monthlyTotalKgCO2e: result.monthlyTotalKgCO2e,
       ecoScore: result.ecoScore,
       topCategory: result.topCategory,
     };
-    appendProgressEntry(entry);
+    const saveResult = appendProgressEntry(entry);
+    if (!saveResult.ok) {
+      setCheckInError(saveResult.reason ?? "Failed to save check-in.");
+      return;
+    }
+    setCheckInError(null);
     setCheckInSaved(true);
   }
 
@@ -76,22 +77,26 @@ export function DashboardClient() {
           to see your personalised results.
         </p>
       )}
+      {checkInError && (
+        <p className="mt-2 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
+          {checkInError}
+        </p>
+      )}
 
-      {/* ── metric cards ─────────────────────────────────────────── */}
       <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           label="Monthly footprint"
-          value={kg(result.monthlyTotalKgCO2e)}
-          detail={`${kg(result.annualTotalKgCO2e)} estimated per year.`}
+          value={formatKgCO2e(result.monthlyTotalKgCO2e)}
+          detail={`${formatKgCO2e(result.annualTotalKgCO2e)} estimated per year.`}
         />
         <MetricCard
           label="Top source"
           value={topCategory?.label ?? "Unknown"}
-          detail={`${kg(topCategory?.kgCO2e ?? 0)} per month from the largest category.`}
+          detail={`${formatKgCO2e(topCategory?.kgCO2e ?? 0)} per month from the largest category.`}
         />
         <MetricCard
           label="Potential monthly saving"
-          value={kg(result.potentialMonthlySavingKgCO2e)}
+          value={formatKgCO2e(result.potentialMonthlySavingKgCO2e)}
           detail="Estimated from reducing the top category by 18%."
         />
         <MetricCard
@@ -101,7 +106,6 @@ export function DashboardClient() {
         />
       </div>
 
-      {/* ── chart + assistant ─────────────────────────────────────── */}
       <div className="mt-8 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <CategoryBreakdown breakdown={result.breakdown} />
         {leadingRecommendation && (
@@ -114,7 +118,6 @@ export function DashboardClient() {
         )}
       </div>
 
-      {/* ── recommendation cards ──────────────────────────────────── */}
       <section aria-labelledby="dashboard-recommendations-heading" className="mt-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -146,7 +149,6 @@ export function DashboardClient() {
         </div>
       </section>
 
-      {/* ── goal tracker & simulator ───────────────────────────────── */}
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.5fr]">
         <GoalSetter currentMonthlyKg={result.monthlyTotalKgCO2e} isDemo={isDemo} />
         <WhatIfSimulator simulations={simulations} />

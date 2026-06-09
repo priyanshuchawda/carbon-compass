@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { CarbonCategory } from "@/lib/carbon/types";
 import type { ActivityTypeId } from "@/lib/carbon/activity-types";
 import { ACTIVITY_TYPES } from "@/lib/carbon/activity-types";
+import { makeClientId } from "@/lib/carbon/ids";
 
 export const ACTIVITY_LOG_SCHEMA_VERSION = 1;
 export const ACTIVITY_LOG_STORAGE_KEY = "carbon-compass:activities:v1";
@@ -52,14 +53,7 @@ function sortEntries(entries: ActivityLogEntry[]): ActivityLogEntry[] {
 }
 
 export function makeActivityId(): string {
-  if (
-    typeof globalThis.crypto !== "undefined" &&
-    typeof globalThis.crypto.randomUUID === "function"
-  ) {
-    return globalThis.crypto.randomUUID();
-  }
-
-  return `activity-${Date.now().toString(36)}-${Math.floor(Math.random() * 1e9).toString(36)}`;
+  return makeClientId("activity");
 }
 
 export function loadActivityLog(storage = safeStorage()): ActivityLogEntry[] {
@@ -108,23 +102,33 @@ export function saveActivityLog(
   }
 }
 
+export type ActivityLogMutationResult = {
+  ok: boolean;
+  reason?: string;
+  entries: ActivityLogEntry[];
+};
+
 export function addActivityLogEntry(
   entry: ActivityLogEntry,
   storage = safeStorage()
-): ActivityLogEntry[] {
+): ActivityLogMutationResult {
   const entries = sortEntries([...loadActivityLog(storage), entry]);
-  saveActivityLog(entries, storage);
-  return entries;
+  const saveResult = saveActivityLog(entries, storage);
+  return { ...saveResult, entries };
 }
 
 export function updateActivityLogEntry(
   id: string,
   nextEntry: ActivityLogEntry,
   storage = safeStorage()
-): ActivityLogEntry[] {
-  const entries = loadActivityLog(storage).map((entry) => (entry.id === id ? nextEntry : entry));
-  saveActivityLog(entries, storage);
-  return loadActivityLog(storage);
+): ActivityLogMutationResult {
+  // Map in-memory and return the mapped array directly — avoids a second
+  // localStorage read after saving.
+  const entries = loadActivityLog(storage).map((existing) =>
+    existing.id === id ? nextEntry : existing
+  );
+  const saveResult = saveActivityLog(entries, storage);
+  return { ...saveResult, entries };
 }
 
 export function deleteActivityLogEntry(id: string, storage = safeStorage()): ActivityLogEntry[] {

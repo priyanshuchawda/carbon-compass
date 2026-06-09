@@ -54,7 +54,7 @@ describe("LogPage Activity Tracker Page", () => {
 
   it("allows adding a new manual activity", () => {
     vi.mocked(activityLog.loadActivityLog).mockReturnValue([]);
-    vi.mocked(activityLog.addActivityLogEntry).mockImplementation((entry) => [entry]);
+    vi.mocked(activityLog.addActivityLogEntry).mockImplementation((entry) => ({ ok: true, entries: [entry] }));
 
     const { container } = render(<LogPage />);
 
@@ -106,7 +106,7 @@ describe("LogPage Activity Tracker Page", () => {
       },
     ];
     vi.mocked(activityLog.loadActivityLog).mockReturnValue(mockEntries);
-    vi.mocked(activityLog.updateActivityLogEntry).mockImplementation((_id, entry) => [entry]);
+    vi.mocked(activityLog.updateActivityLogEntry).mockImplementation((_id, entry) => ({ ok: true, entries: [entry] }));
 
     const { container } = render(<LogPage />);
 

@@ -92,14 +92,14 @@ describe("activity log storage", () => {
     const storage = mockStorage();
     const entry = makeEntry("entry-1", "2026-06-01T00:00:00.000Z", 5);
 
-    expect(addActivityLogEntry(entry, storage)).toHaveLength(1);
+    expect(addActivityLogEntry(entry, storage).entries).toHaveLength(1);
 
     const updated = updateActivityLogEntry(
       "entry-1",
       { ...entry, value: 12, kgCO2e: 2.16 },
       storage
     );
-    expect(updated[0]).toMatchObject({ value: 12, kgCO2e: 2.16 });
+    expect(updated.entries[0]).toMatchObject({ value: 12, kgCO2e: 2.16 });
 
     expect(deleteActivityLogEntry("entry-1", storage)).toEqual([]);
 

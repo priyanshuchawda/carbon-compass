@@ -84,8 +84,6 @@ export const SIMULATION_ACTIONS: SimulationAction[] = [
 
 const ACTION_BY_ID = new Map(SIMULATION_ACTIONS.map((action) => [action.id, action]));
 
-// round() is provided by @/lib/carbon/utils
-
 function cloneInput(input: FootprintInput): FootprintInput {
   return {
     transport: { ...input.transport },

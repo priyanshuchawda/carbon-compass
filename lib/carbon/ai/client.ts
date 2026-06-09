@@ -48,11 +48,11 @@ const JITTER_RATIO = 0.25;
 function parseRetryAfter(headerValue: string | null): number | null {
   if (!headerValue) return null;
   const seconds = Number(headerValue);
-  if (!isNaN(seconds) && seconds > 0) {
+  if (!Number.isNaN(seconds) && seconds > 0) {
     return seconds * 1000;
   }
   const dateMs = Date.parse(headerValue);
-  if (!isNaN(dateMs)) {
+  if (!Number.isNaN(dateMs)) {
     const diff = dateMs - Date.now();
     return diff > 0 ? diff : null;
   }

@@ -110,24 +110,22 @@ export async function executeTool(
       }
       const category = parsed.data.category;
       const detail = context.result.breakdown.find((b) => b.category === category);
-      let inputs: Record<string, unknown> | undefined = {};
-      if (category === "transport") {
-        inputs = context.footprintInput.transport;
-      } else if (category === "energy") {
-        inputs = context.footprintInput.energy;
-      } else if (category === "food") {
-        inputs = context.footprintInput.food;
-      } else if (category === "shopping") {
-        inputs = context.footprintInput.shopping;
-      } else if (category === "waste") {
-        inputs = context.footprintInput.waste;
-      }
+
+      // Use a dispatch map so TypeScript enforces completeness when new categories are added.
+      const categoryInputMap: Record<string, unknown> = {
+        transport: context.footprintInput.transport,
+        energy: context.footprintInput.energy,
+        food: context.footprintInput.food,
+        shopping: context.footprintInput.shopping,
+        waste: context.footprintInput.waste,
+      };
+
       return {
         category,
         label: detail?.label ?? category,
         kgCO2e: detail?.kgCO2e ?? 0,
         percentage: detail?.percentage ?? 0,
-        inputs,
+        inputs: categoryInputMap[category] ?? {},
       };
     }
     case "compare_to_india_average": {

@@ -15,13 +15,18 @@ import {
   PUNE_STUDENT_PROFILE,
   type NumberPath,
 } from "@/components/carbon/footprint-form-data";
+import {
+  focusFirstIssueField,
+  zodIssuesToFieldErrors,
+  type FormErrors,
+} from "@/lib/carbon/form-errors";
 import { saveSessionFootprint, saveSessionProfile } from "@/lib/carbon/session";
 import type { FootprintInput } from "@/lib/carbon/types";
 import { footprintInputSchema } from "@/lib/validation/schemas";
 
 export function FootprintForm() {
   const router = useRouter();
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [input, setInput] = useState<FootprintInput>(EMPTY_FOOTPRINT_INPUT);
 
   function updateNumber(path: NumberPath, value: string) {
@@ -53,23 +58,8 @@ export function FootprintForm() {
 
     const parsed = footprintInputSchema.safeParse(input);
     if (!parsed.success) {
-      const nextErrors: Record<string, string> = {};
-      for (const issue of parsed.error.issues) {
-        const fieldName = issue.path[issue.path.length - 1] as string;
-        nextErrors[fieldName] = issue.message;
-      }
-      setErrors(nextErrors);
-
-      const firstErrorField = parsed.error.issues[0]?.path[
-        parsed.error.issues[0].path.length - 1
-      ] as string;
-      if (firstErrorField) {
-        document.getElementById(firstErrorField)?.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-        document.getElementById(firstErrorField)?.focus();
-      }
+      setErrors(zodIssuesToFieldErrors(parsed.error.issues));
+      focusFirstIssueField(parsed.error.issues);
       return;
     }
 
