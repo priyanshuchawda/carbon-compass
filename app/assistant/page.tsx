@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable react-hooks/set-state-in-effect */
+
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { loadSessionPayload } from "@/lib/carbon/session";
@@ -81,8 +83,9 @@ export default function AssistantPage() {
       } else {
         throw new Error("Empty response from assistant.");
       }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "An unexpected error occurred.";
+      setError(msg);
     } finally {
       setLoading(false);
     }

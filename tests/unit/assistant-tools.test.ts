@@ -78,7 +78,7 @@ describe("Assistant Tools executeTool Validation", () => {
       mockContext
     );
     expect(result).toHaveProperty("error");
-    expect((result as any).error).toContain("Invalid parameters");
+    expect((result as { error?: string }).error).toContain("Invalid parameters");
   });
 
   it("successfully runs compare_to_india_average with valid monthlyKg", async () => {
@@ -96,11 +96,11 @@ describe("Assistant Tools executeTool Validation", () => {
   it("returns error message for compare_to_india_average with invalid monthlyKg", async () => {
     const result = await executeTool(
       "compare_to_india_average",
-      { monthlyKg: "not-a-number" as any },
+      { monthlyKg: "not-a-number" as unknown as number },
       mockContext
     );
     expect(result).toHaveProperty("error");
-    expect((result as any).error).toContain("Invalid parameters");
+    expect((result as { error?: string }).error).toContain("Invalid parameters");
   });
 
   it("successfully runs simulate_action with valid actionId", async () => {
@@ -120,6 +120,6 @@ describe("Assistant Tools executeTool Validation", () => {
       mockContext
     );
     expect(result).toHaveProperty("error");
-    expect((result as any).error).toContain("Invalid parameters");
+    expect((result as { error?: string }).error).toContain("Invalid parameters");
   });
 });

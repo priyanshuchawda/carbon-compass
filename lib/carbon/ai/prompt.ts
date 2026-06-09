@@ -1,5 +1,6 @@
 import "server-only";
 import type { AssistantRequestPayload } from "../../validation/schemas";
+import type { UserProfile, FootprintResult, FootprintInput, CategoryBreakdown } from "../types";
 
 /**
  * System prompt definition and context grounding for the Gemini Assistant.
@@ -118,9 +119,9 @@ export function getFallbackResponse(data: AssistantRequestPayload): {
 }
 
 export function buildChatPrompt(data: {
-  profile: any;
-  result: any;
-  footprint: any;
+  profile: UserProfile;
+  result: FootprintResult;
+  footprint: FootprintInput;
 }): string {
   const { profile, result } = data;
   return `
@@ -133,7 +134,7 @@ export function buildChatPrompt(data: {
     - Top Category: ${result.topCategory}
     
     Breakdown:
-    ${result.breakdown.map((b: any) => `- ${b.label}: ${b.kgCO2e} kg CO2e (${b.percentage}%)`).join("\n")}
+    ${result.breakdown.map((b: CategoryBreakdown) => `- ${b.label}: ${b.kgCO2e} kg CO2e (${b.percentage}%)`).join("\n")}
     
     Guiding Rules:
     1. Answer questions concisely and professionally in under 4 sentences.
@@ -157,6 +158,9 @@ export function getFallbackChatResponse(userMessage: string): string {
   }
   if (lowercase.includes("reduce") || lowercase.includes("cut") || lowercase.includes("lower")) {
     return "To lower your footprint, focus on reducing private vehicle trips, conserving home energy (especially air conditioning), planning meals to minimize food waste, and recycling dry waste.";
+  }
+  if (lowercase.includes("average") || lowercase.includes("compare")) {
+    return "The average Indian citizen's carbon footprint is estimated to be about 158 kg CO2e per month. You can compare your results on the Dashboard or see your breakdown.";
   }
   return "I am here to help you understand your carbon footprint and suggest practical ways to reduce it. Feel free to ask about your emissions breakdown or ways to save energy and transportation footprint.";
 }

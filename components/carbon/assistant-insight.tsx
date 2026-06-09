@@ -86,7 +86,7 @@ export function AssistantInsight({
     return () => {
       active = false;
     };
-  }, [profile, result, recommendation]);
+  }, [profile, result, recommendation, footprint]);
 
   const topCategory = result.breakdown.find(
     (item) => item.category === result.topCategory,

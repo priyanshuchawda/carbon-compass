@@ -1,6 +1,5 @@
 import { simulateAction } from "@/lib/carbon/simulator";
-import type { SimulationActionId } from "@/lib/carbon/simulator";
-import type { FootprintInput, UserProfile, FootprintResult, CarbonCategory } from "@/lib/carbon/types";
+import type { FootprintInput, UserProfile, FootprintResult } from "@/lib/carbon/types";
 import { z } from "zod";
 
 export interface ToolContext {
