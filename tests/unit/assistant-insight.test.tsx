@@ -12,7 +12,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { AssistantInsight } from "@/components/carbon/assistant-insight";
-import { demoFootprintResult, demoRecommendations } from "@/lib/carbon/demo";
+import { demoFootprintResult, demoRecommendations, demoFootprintInput } from "@/lib/carbon/demo";
 import type { UserProfile } from "@/lib/carbon/types";
 
 const studentProfile: UserProfile = {
@@ -39,6 +39,7 @@ describe("AssistantInsight", () => {
         result={demoFootprintResult}
         recommendation={recommendation}
         profile={studentProfile}
+        footprint={demoFootprintInput}
       />,
     );
 
@@ -52,6 +53,7 @@ describe("AssistantInsight", () => {
         result={demoFootprintResult}
         recommendation={recommendation}
         profile={studentProfile}
+        footprint={demoFootprintInput}
       />,
     );
 
@@ -66,6 +68,7 @@ describe("AssistantInsight", () => {
         result={demoFootprintResult}
         recommendation={recommendation}
         profile={studentProfile}
+        footprint={demoFootprintInput}
       />,
     );
 
@@ -78,6 +81,7 @@ describe("AssistantInsight", () => {
         result={demoFootprintResult}
         recommendation={recommendation}
         profile={studentProfile}
+        footprint={demoFootprintInput}
       />,
     );
 
@@ -90,6 +94,7 @@ describe("AssistantInsight", () => {
         result={demoFootprintResult}
         recommendation={recommendation}
         profile={studentProfile}
+        footprint={demoFootprintInput}
       />,
     );
 
@@ -102,6 +107,7 @@ describe("AssistantInsight", () => {
         result={demoFootprintResult}
         recommendation={recommendation}
         profile={workingProfile}
+        footprint={demoFootprintInput}
       />,
     );
 
@@ -114,6 +120,7 @@ describe("AssistantInsight", () => {
         result={demoFootprintResult}
         recommendation={recommendation}
         profile={workingProfile}
+        footprint={demoFootprintInput}
       />,
     );
 
@@ -126,6 +133,7 @@ describe("AssistantInsight", () => {
         result={demoFootprintResult}
         recommendation={recommendation}
         profile={studentProfile}
+        footprint={demoFootprintInput}
       />,
     );
 
@@ -140,6 +148,7 @@ describe("AssistantInsight", () => {
         result={demoFootprintResult}
         recommendation={recommendation}
         profile={studentProfile}
+        footprint={demoFootprintInput}
       />,
     );
 

@@ -8,6 +8,7 @@ import type {
   Recommendation,
   UserProfile,
 } from "@/lib/carbon/types";
+import { POTENTIAL_SAVINGS_TARGET_FACTOR } from "@/lib/carbon/factors";
 
 type RecommendationDraft = Omit<Recommendation, "estimatedSavingKgCO2ePerMonth"> & {
   baseSavingKgCO2ePerMonth: number;
@@ -48,7 +49,7 @@ function saving(
   category: CarbonCategory,
   fallback: number,
 ): number {
-  const fromCategory = categoryKg(result, category) * 0.18;
+  const fromCategory = categoryKg(result, category) * POTENTIAL_SAVINGS_TARGET_FACTOR;
   return Math.round(Math.max(fromCategory, fallback));
 }
 
@@ -252,7 +253,7 @@ function wasteRules(
   ];
 }
 
-function goalScore(goal: MainGoal, recommendation: Recommendation): number {
+export function goalScore(goal: MainGoal, recommendation: Recommendation): number {
   if (goal === "save_money") {
     return MONEY_SCORE[recommendation.moneySavingPotential] * 140;
   }
@@ -263,7 +264,16 @@ function goalScore(goal: MainGoal, recommendation: Recommendation): number {
     return recommendation.estimatedSavingKgCO2ePerMonth * 8;
   }
 
-  return recommendation.reason.length > 40 ? 40 : 0;
+  if (goal === "learn") {
+    // Prioritise tracking/planning actions and weight by difficulty so it is accessible but informative
+    const isTrackingOrPlanning = /track|plan|separate|measure/i.test(
+      recommendation.title + " " + recommendation.reason
+    );
+    const trackingBonus = isTrackingOrPlanning ? 100 : 0;
+    return DIFFICULTY_SCORE[recommendation.difficulty] * 40 + trackingBonus;
+  }
+
+  return 0;
 }
 
 function rankRecommendations(

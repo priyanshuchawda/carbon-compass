@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type {
+  FootprintInput,
   FootprintResult,
   Recommendation,
   UserProfile,
@@ -11,6 +12,7 @@ type AssistantInsightProps = {
   result: FootprintResult;
   recommendation: Recommendation;
   profile: UserProfile;
+  footprint: FootprintInput;
 };
 
 const PERSONA_CONTEXT: Record<UserProfile["persona"], string> = {
@@ -39,6 +41,7 @@ export function AssistantInsight({
   result,
   recommendation,
   profile,
+  footprint,
 }: AssistantInsightProps) {
   const [prevRecId, setPrevRecId] = useState(recommendation.id);
   const [aiData, setAiData] = useState<AINarratorResponse | null>(null);
@@ -60,6 +63,7 @@ export function AssistantInsight({
         profile,
         result,
         recommendations: [recommendation],
+        footprint,
       }),
     })
       .then((res) => {
@@ -127,7 +131,7 @@ export function AssistantInsight({
           // Default Grounded Recommendation (visible on mount and as fallback)
           <div className="transition-all duration-300">
             {loading && (
-              <p className="text-[11px] font-mono text-emerald-300/80 animate-pulse mb-3">
+              <p role="status" aria-live="polite" className="text-[11px] font-mono text-emerald-300/80 animate-pulse mb-3">
                 &gt; Personalising guidance with AI...
               </p>
             )}

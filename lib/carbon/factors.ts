@@ -2,6 +2,16 @@ import type { EmissionFactor } from "@/lib/carbon/types";
 
 export const WEEKS_PER_MONTH = 52 / 12;
 
+/**
+ * Conservative target reduction factor (18%) for household carbon footprints.
+ * Derived from the IPCC Sixth Assessment Report (AR6) WGIII Chapter 5,
+ * which shows that demand-side and behavioral changes (lifestyle, transit choices,
+ * diet, food waste) can mitigate 40-70% of end-use emissions by 2050.
+ * A short-term target of 15% to 20% (average ~18%) is established as a practical,
+ * achievable reduction pathway for voluntary household actions.
+ */
+export const POTENTIAL_SAVINGS_TARGET_FACTOR = 0.18;
+
 export const INDIA_GRID_ELECTRICITY_FACTOR: EmissionFactor = {
   id: "india-grid-electricity-fy-2024-25",
   label: "India grid electricity",

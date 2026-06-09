@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { CarbonCategory } from "@/lib/carbon/types";
+import { round } from "@/lib/carbon/utils";
 
 export const PROGRESS_SCHEMA_VERSION = 1;
 export const PROGRESS_STORAGE_KEY = "carbon-compass:progress:v1";
@@ -42,9 +43,7 @@ function sortHistory(entries: ProgressEntry[]): ProgressEntry[] {
   );
 }
 
-function round(value: number): number {
-  return Math.round(value + Number.EPSILON);
-}
+
 
 export function loadProgressHistory(
   storage = safeStorage(),
@@ -117,8 +116,8 @@ export function progressHistoryTextSummary(entries: ProgressEntry[]): string {
     return "Progress history is unavailable.";
   }
 
-  const reduction = round(first.monthlyTotalKgCO2e - last.monthlyTotalKgCO2e);
-  const scoreImprovement = round(last.ecoScore - first.ecoScore);
+  const reduction = round(first.monthlyTotalKgCO2e - last.monthlyTotalKgCO2e, 0);
+  const scoreImprovement = round(last.ecoScore - first.ecoScore, 0);
   const footprintPhrase =
     reduction >= 0
       ? `reduced by ${reduction} kg CO2e`
@@ -147,5 +146,5 @@ export function bestMonthlyImprovement(entries: ProgressEntry[]): number {
     }
   }
 
-  return round(best);
+  return round(best, 0);
 }

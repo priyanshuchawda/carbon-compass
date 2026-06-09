@@ -1,5 +1,5 @@
 import { CALCULATION_ASSUMPTIONS } from "@/lib/carbon/assumptions";
-import { EMISSION_FACTORS, WEEKS_PER_MONTH } from "@/lib/carbon/factors";
+import { EMISSION_FACTORS, WEEKS_PER_MONTH, POTENTIAL_SAVINGS_TARGET_FACTOR } from "@/lib/carbon/factors";
 import { calculateEcoScore } from "@/lib/carbon/scoring";
 import { round } from "@/lib/carbon/utils";
 import type {
@@ -139,7 +139,7 @@ export function calculateFootprint(
     breakdown,
     topCategory,
     ecoScore: calculateEcoScore(monthlyTotalKgCO2e, input, profile),
-    potentialMonthlySavingKgCO2e: round(Math.max(topCategoryKg * 0.18, 0)),
+    potentialMonthlySavingKgCO2e: round(Math.max(topCategoryKg * POTENTIAL_SAVINGS_TARGET_FACTOR, 0)),
     assumptions: [...CALCULATION_ASSUMPTIONS],
   };
 }

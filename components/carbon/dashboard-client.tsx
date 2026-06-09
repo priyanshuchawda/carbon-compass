@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { AssistantInsight } from "@/components/carbon/assistant-insight";
 import { CategoryBreakdown } from "@/components/carbon/category-breakdown";
 import { MetricCard } from "@/components/carbon/metric-card";
@@ -56,8 +56,12 @@ export function DashboardClient() {
     (item) => item.category === result.topCategory,
   );
   const leadingRecommendation = recommendations[0];
-  const simulations = SIMULATION_ACTIONS.map((action) =>
-    simulateAction(footprintInput, profile, action.id),
+  const simulations = useMemo(
+    () =>
+      SIMULATION_ACTIONS.map((action) =>
+        simulateAction(footprintInput, profile, action.id),
+      ),
+    [footprintInput, profile],
   );
 
 
@@ -65,7 +69,7 @@ export function DashboardClient() {
     <>
       {/* ── header badge ─────────────────────────────────────────── */}
       <p className="w-fit rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-medium text-emerald-800">
-        {isDemo ? `Demo profile — ${profile.city}` : `${profile.city} · ${profile.persona}`}
+        {isDemo ? `Demo profile — ${profile.city} · ${profile.persona}` : `${profile.city} · ${profile.persona}`}
       </p>
       {isDemo && (
         <p className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
@@ -109,6 +113,7 @@ export function DashboardClient() {
             result={result}
             recommendation={leadingRecommendation}
             profile={profile}
+            footprint={footprintInput}
           />
         )}
       </div>

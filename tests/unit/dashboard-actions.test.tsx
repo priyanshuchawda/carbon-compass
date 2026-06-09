@@ -1,5 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import ActionsPage from "@/app/actions/page";
 import DashboardPage from "@/app/dashboard/page";
 
@@ -21,6 +21,27 @@ vi.mock("@/lib/carbon/session", () => ({
 }));
 
 describe("dashboard and action plan", () => {
+  beforeEach(() => {
+    vi.spyOn(globalThis, "fetch").mockImplementation(() =>
+      Promise.resolve({
+        ok: true,
+        status: 200,
+        json: () =>
+          Promise.resolve({
+            narrative: "Mock narrative",
+            weeklyChallenge: "Mock challenge",
+            goalTip: "Mock tip",
+            costUSD: 0.0001,
+            isDemo: false,
+          }),
+      } as Response)
+    );
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("renders the demo dashboard with metrics, breakdown, and assistant guidance", () => {
     render(<DashboardPage />);
 

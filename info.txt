@@ -1,0 +1,825 @@
+## Project idea: **Carbon Compass — Personal Carbon Footprint Awareness Platform**
+
+Build a **real working website** where users can calculate their carbon footprint, understand which habits create the most emissions, and get small personalized actions to reduce it.
+
+The winning angle should be: **not just a calculator — a smart assistant that explains, compares, and gives action plans.**
+
+Reliable grounding matters. EPA’s household carbon calculator focuses on household emissions estimation and reduction actions, while GHG Protocol is widely used for emissions accounting methods and calculation guidance. For accessibility, use WCAG 2.2 as your target standard. ([US EPA][1])
+
+---
+
+# 1. Chosen vertical
+
+Choose this vertical/persona:
+
+**Urban student / young professional in India**
+
+Why this is strong:
+
+Most hackathon projects become generic. This one becomes specific and practical.
+
+Persona example:
+
+> “A student or young working person living in a city like Pune, using bike/metro/cab, ordering food, using electricity, buying gadgets/clothes, and wanting simple climate-friendly choices without complex environmental jargon.”
+
+This fits the challenge because the product helps individuals **understand, track, and reduce** their footprint through small actions.
+
+For India-specific electricity calculations, you can keep an emission factor source table. India’s Central Electricity Authority baseline database reports grid electricity emission factors, including a weighted average factor of about **0.710 tCO₂/MWh for FY 2024–25**, which can be converted to **0.710 kg CO₂/kWh** for simple app calculations. ([Central Electricity Authority][2])
+
+---
+
+# 2. Product name options
+
+Best names:
+
+**Carbon Compass**
+Simple, serious, easy to explain.
+
+Other options:
+
+**EcoPulse**
+**Footprint Friend**
+**CarbonWise**
+**GreenRoutine**
+
+I would use **Carbon Compass**.
+
+Tagline:
+
+> “Understand your carbon footprint. Reduce it one simple action at a time.”
+
+---
+
+# 3. Core website pages
+
+## 1. Landing page
+
+Sections:
+
+Hero:
+
+> “Track your lifestyle carbon footprint and get personalized ways to reduce it.”
+
+Buttons:
+
+**Calculate My Footprint**
+**View Demo Dashboard**
+
+Show 3 cards:
+
+* Track commute, electricity, food, shopping, and waste.
+* Get personalized weekly reduction suggestions.
+* See progress with simple charts and streaks.
+
+---
+
+## 2. Onboarding page
+
+Ask basic questions:
+
+* City / country
+* Household size
+* Student / working professional / family
+* Main transport mode
+* Diet type
+* Electricity usage style
+* Goal: save money / reduce carbon / build habits / learn climate impact
+
+This gives user context for smart recommendations.
+
+---
+
+## 3. Carbon calculator page
+
+Input sections:
+
+### Transport
+
+Ask:
+
+* Bike/scooter km per week
+* Car km per week
+* Bus/metro trips
+* Cab/auto trips
+* Flights per year
+
+### Home energy
+
+Ask:
+
+* Monthly electricity bill or kWh
+* LPG cylinders per month
+* AC usage hours
+* Renewable energy yes/no
+
+### Food
+
+Ask:
+
+* Veg / non-veg / vegan / mixed
+* Meat frequency
+* Dairy frequency
+* Food delivery frequency
+* Food waste level
+
+### Shopping
+
+Ask:
+
+* Clothes bought per month
+* Electronics/gadgets per year
+* Online orders per month
+
+### Waste
+
+Ask:
+
+* Recycling yes/no
+* Composting yes/no
+* Plastic usage level
+
+---
+
+# 4. Carbon calculation logic
+
+Use simple activity-based calculation.
+
+\text{Emissions}_{kgCO_2e}=\text{Activity Amount}\times\text{Emission Factor}
+
+Example:
+
+```txt
+monthlyElectricityCO2 = electricityKWh * electricityEmissionFactor
+weeklyBikeCO2 = bikeKm * petrolTwoWheelerFactor
+foodCO2 = dietTypeBaseFactor + deliveryFrequencyFactor + wasteFactor
+```
+
+Important: do not pretend calculations are perfect. In README, write:
+
+> “This is an educational estimate, not an audited carbon inventory. Emission factors are stored with source names and can be updated.”
+
+This makes the project honest and professional.
+
+---
+
+# 5. Smart assistant feature
+
+This is where your project becomes “dynamic assistant,” not just forms.
+
+## Assistant name
+
+**Compass Assistant**
+
+## What it does
+
+After user enters data, assistant explains:
+
+* Your biggest emission source
+* Why it is high
+* 3 easy actions
+* Expected monthly reduction
+* Difficulty level
+* Money-saving possibility
+* Weekly challenge
+
+Example output:
+
+> “Your biggest footprint source is transport because you travel 140 km/week by petrol scooter. Try replacing 2 short trips per week with walking, cycling, or metro. Estimated saving: 4–8 kg CO₂/month.”
+
+## Assistant logic
+
+Use rule-based logic first, AI second.
+
+Strong architecture:
+
+```txt
+User data
+   ↓
+Carbon calculation engine
+   ↓
+Ranking engine: highest emission categories
+   ↓
+Recommendation rules
+   ↓
+Optional AI explanation rewrite
+   ↓
+Personalized action plan
+```
+
+This is better than directly sending everything to AI because it is safer, testable, and explainable.
+
+---
+
+# 6. Main product features
+
+## Must-have MVP features
+
+Build these first:
+
+1. **User onboarding**
+2. **Carbon footprint calculator**
+3. **Dashboard with category breakdown**
+4. **Personalized recommendations**
+5. **Weekly action plan**
+6. **Progress tracker**
+7. **README with assumptions and logic**
+
+## Strong extra features
+
+Add these if time allows:
+
+### 1. “What-if simulator”
+
+User can test:
+
+* What if I use metro twice a week?
+* What if I reduce AC by 1 hour daily?
+* What if I eat meat one less day per week?
+* What if I recycle/compost?
+
+Show before/after footprint.
+
+### 2. Eco-score
+
+Score user from 0–100.
+
+Example:
+
+```txt
+0–40: High impact lifestyle
+41–70: Moderate footprint
+71–100: Low footprint habits
+```
+
+Do not shame the user. Use encouraging language.
+
+### 3. Weekly challenge
+
+Examples:
+
+* “No cab for short trips this week”
+* “Use fan instead of AC for 2 hours”
+* “Carry reusable bottle for 5 days”
+* “One low-carbon meal day”
+
+### 4. Badges
+
+Examples:
+
+* First Calculation
+* Transport Saver
+* Energy Reducer
+* 7-Day Green Streak
+* Low Waste Starter
+
+### 5. Shareable report
+
+Generate a clean downloadable summary:
+
+```txt
+Priyanshu’s Carbon Compass Report
+Monthly footprint: 182 kg CO₂e
+Top source: Transport
+Best action: Replace 2 scooter trips/week
+Potential saving: 8 kg CO₂e/month
+```
+
+---
+
+# 7. Best tech stack
+
+Use this stack for a clean hackathon website:
+
+## Frontend
+
+**Next.js + TypeScript + Tailwind CSS + shadcn/ui**
+
+Why:
+
+* Looks premium fast
+* Good routing
+* Easy deployment
+* Type-safe
+* Clean UI components
+
+## Backend
+
+For hackathon MVP:
+
+**Next.js API routes / server actions**
+
+For stronger version:
+
+**FastAPI + PostgreSQL**
+
+But keep it simple unless required.
+
+## Database
+
+Use:
+
+**some free sql**
+
+Best choice: **some free sql**
+
+Tables:
+
+```txt
+users
+profiles
+footprint_entries
+recommendations
+weekly_goals
+badges
+emission_factors
+```
+
+## Charts
+
+Use:
+
+**Recharts**
+
+Charts needed:
+
+* Pie chart: category breakdown
+* Bar chart: monthly comparison
+* Line chart: progress over time
+
+## Authentication
+
+Use:
+
+**something free tech stack**
+
+For hackathon, free Auth is enough.
+
+## Deployment
+
+Use:
+
+**Vercel**
+
+---
+
+# 8. Folder structure
+
+```txt
+carbon-compass/
+  app/
+    page.tsx
+    onboarding/page.tsx
+    calculator/page.tsx
+    dashboard/page.tsx
+    actions/page.tsx
+    report/page.tsx
+    api/
+      calculate/route.ts
+      recommendations/route.ts
+
+  components/
+    ui/
+    carbon/
+      FootprintForm.tsx
+      CategoryBreakdown.tsx
+      RecommendationCard.tsx
+      WhatIfSimulator.tsx
+      ProgressChart.tsx
+
+  lib/
+    carbon/
+      calculate.ts
+      factors.ts
+      recommendations.ts
+      scoring.ts
+      assumptions.ts
+    db/
+      something_free.ts
+    validation/
+      schemas.ts
+
+  data/
+    emission-factors.json
+
+  tests/
+    calculate.test.ts
+    recommendations.test.ts
+
+  README.md
+```
+
+This directly helps with **code quality** evaluation.
+
+---
+
+# 9. Data model
+
+## User profile
+
+```ts
+type UserProfile = {
+  id: string;
+  city: string;
+  country: string;
+  householdSize: number;
+  persona: "student" | "working" | "family";
+  mainGoal: "save_money" | "reduce_carbon" | "learn" | "habit_building";
+};
+```
+
+## Footprint input
+
+```ts
+type FootprintInput = {
+  transport: {
+    twoWheelerKmPerWeek: number;
+    carKmPerWeek: number;
+    publicTransportTripsPerWeek: number;
+    flightsPerYear: number;
+  };
+  energy: {
+    monthlyElectricityKWh: number;
+    lpgCylindersPerMonth: number;
+    acHoursPerDay: number;
+  };
+  food: {
+    dietType: "vegan" | "vegetarian" | "mixed" | "meat_heavy";
+    foodDeliveryPerWeek: number;
+    foodWasteLevel: "low" | "medium" | "high";
+  };
+  shopping: {
+    clothesPerMonth: number;
+    onlineOrdersPerMonth: number;
+    electronicsPerYear: number;
+  };
+  waste: {
+    recycles: boolean;
+    composts: boolean;
+    plasticUsage: "low" | "medium" | "high";
+  };
+};
+```
+
+---
+
+# 10. Recommendation engine logic
+
+Do not make random recommendations. Use deterministic rules.
+
+Example:
+
+```ts
+if (transportCO2 > totalCO2 * 0.35) {
+  recommend({
+    title: "Replace 2 short fuel trips per week",
+    category: "transport",
+    difficulty: "easy",
+    reason: "Transport is your largest footprint category.",
+    estimatedSavingKgPerMonth: 5,
+  });
+}
+```
+
+More rules:
+
+```txt
+If electricity is high:
+  suggest AC optimization, LED usage, unplugging idle devices.
+
+If food footprint is high:
+  suggest one low-carbon meal day, reduce food waste, plan meals.
+
+If shopping is high:
+  suggest monthly no-buy week, repair/reuse, combine deliveries.
+
+If waste is high:
+  suggest recycling, composting, reusable bottle/bag.
+```
+
+This satisfies **logical decision making based on user context**.
+
+---
+
+# 11. Dashboard design
+
+Dashboard sections:
+
+## Top cards
+
+```txt
+Monthly Footprint: 182 kg CO₂e
+Top Source: Transport
+Potential Monthly Saving: 24 kg CO₂e
+Eco Score: 68/100
+```
+
+## Category chart
+
+```txt
+Transport: 42%
+Energy: 28%
+Food: 18%
+Shopping: 8%
+Waste: 4%
+```
+
+## Insight card
+
+> “Your transport footprint is 1.5× higher than your other categories. Small changes in commute will give the biggest result.”
+
+## Action cards
+
+Each recommendation card should show:
+
+```txt
+Action: Use metro/bus twice this week
+Impact: Medium
+Difficulty: Easy
+Estimated saving: 6 kg CO₂e/month
+Why this matters: Transport is your largest category
+```
+
+---
+
+# 12. Security plan
+
+For evaluation, clearly mention:
+
+* Validate all inputs using Zod.
+* Never trust client-side calculation only.
+* Use server-side calculation for final results.
+* Add rate limiting to APIs.
+* Do not store unnecessary personal data.
+* Store only approximate lifestyle data.
+* No exact home address required.
+* Use environment variables for API keys.
+* If AI is used, do not send sensitive user data unnecessarily.
+* Add clear disclaimer: estimates are educational.
+
+Example:
+
+```txt
+We only ask for city-level location, not exact address.
+Carbon calculations are estimates and not used for legal/compliance reporting.
+```
+
+This will score well in **security**.
+
+---
+
+# 13. Efficiency plan
+
+Mention:
+
+* Carbon factors are loaded from local JSON.
+* Calculation is O(n) over categories.
+* Recommendations are rule-based and fast.
+* Charts render from already-calculated summary.
+* Cache static emission factor data.
+* Avoid unnecessary AI calls.
+* AI explanation is optional, not required for calculation.
+
+This shows resource awareness.
+
+---
+
+# 14. Testing plan
+
+Write tests for:
+
+## Calculation tests
+
+```txt
+Given 100 kWh electricity and factor 0.710 kg/kWh,
+result should be 71 kg CO₂.
+```
+
+## Recommendation tests
+
+```txt
+If transport is highest category,
+transport recommendation should appear first.
+```
+
+## Validation tests
+
+```txt
+Negative km should fail.
+Empty city should fail.
+Invalid diet type should fail.
+```
+
+## UI tests
+
+Use Playwright:
+
+```txt
+User can complete onboarding.
+User can enter calculator data.
+Dashboard shows total footprint.
+Recommendations are visible.
+```
+
+## Accessibility tests
+
+Use:
+
+* Keyboard navigation
+* Proper labels
+* Color contrast
+* Alt text
+* Screen reader friendly cards
+* Visible focus states
+
+WCAG 2.2 is the correct modern accessibility target for web content. ([W3C][3])
+
+---
+
+# 15. Accessibility plan
+
+Make this a strong scoring area.
+
+Include:
+
+* Full keyboard navigation
+* Labels for all form inputs
+* No chart-only information; always show text summary
+* Good color contrast
+* Dark mode
+* Large readable text
+* Mobile-first design
+* Avoid guilt/shaming language
+* Simple English explanations
+* Icons with text, not icons alone
+
+Example:
+
+Instead of:
+
+> “Your lifestyle is bad.”
+
+Use:
+
+> “Your biggest opportunity is transport. Small commute changes can reduce your footprint.”
+
+---
+
+# 16. README structure
+
+Your README should look like this:
+
+```md
+# Carbon Compass
+
+Carbon Compass is a personal carbon footprint awareness platform that helps urban students and young professionals understand, track, and reduce their lifestyle emissions through simple actions and personalized insights.
+
+## Chosen Vertical
+
+Urban students and young professionals in India.
+
+## Problem
+
+Most people want to reduce their environmental impact but do not know which daily habits matter most. Existing information is often too technical, generic, or guilt-driven.
+
+## Solution
+
+Carbon Compass calculates an estimated monthly carbon footprint across transport, energy, food, shopping, and waste. It identifies the user’s highest-impact category and gives simple personalized actions.
+
+## Key Features
+
+- Carbon footprint calculator
+- Personalized dashboard
+- Category-wise breakdown
+- Smart recommendation engine
+- Weekly action plan
+- What-if simulator
+- Progress tracking
+- Accessible and mobile-first UI
+
+## Approach and Logic
+
+The system uses activity-based estimation:
+
+Emissions = Activity Amount × Emission Factor
+
+The app ranks categories by impact and recommends actions based on the user's highest emission sources.
+
+## Assumptions
+
+- Calculations are educational estimates, not certified carbon accounting.
+- Emission factors are configurable and versioned.
+- Users provide approximate lifestyle data.
+- City-level location is enough; exact address is not required.
+
+## Tech Stack
+
+- Next.js
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- only free sources
+- Recharts
+- Zod
+- Vitest
+- Playwright
+
+## Security
+
+- Input validation using Zod
+- No exact address collection
+- Server-side calculation
+- Environment variables for secrets
+- Minimal user data storage
+
+## Testing
+
+- Unit tests for calculations
+- Unit tests for recommendations
+- Form validation tests
+- Playwright user-flow tests
+- Accessibility checks
+
+## Accessibility
+
+- WCAG 2.2 inspired design
+- Keyboard navigation
+- Proper labels
+- Text summaries for charts
+- High contrast UI
+- Mobile-first layout
+
+## Future Scope
+
+- Carbon budget goals
+- Community challenges
+- Localized emission factor database
+- Receipt-based shopping insights
+- Public leaderboard for voluntary challenges
+```
+
+---
+
+# 17. What to actually build first
+
+Build in this order:
+
+## Phase 1: Core working product
+
+1. Landing page
+2. Onboarding page
+3. Calculator form
+4. Calculation engine
+5. Dashboard
+6. Recommendation cards
+
+This alone is enough for a working submission.
+
+## Phase 2: Make it impressive
+
+7. What-if simulator
+8. Weekly challenge system
+9. Progress tracking
+10. Shareable report
+
+## Phase 3: Polish for judging
+
+11. README
+12. Test cases
+13. Accessibility improvements
+14. Security notes
+15. Demo data button
+
+---
+
+# 18. Best demo flow for judges
+
+When presenting:
+
+1. Open landing page.
+2. Click “Calculate My Footprint.”
+3. Select persona: Student in Pune.
+4. Enter sample lifestyle data.
+5. Show dashboard.
+6. Explain top source.
+7. Show personalized actions.
+8. Use what-if simulator.
+9. Show reduced footprint after action.
+10. Show README and tests.
+
+Judge should feel:
+
+> “This is actually usable, explainable, tested, and maintainable.”
+
+---
+
+# 19. Final winning concept
+
+Your project should be described like this:
+
+> **Carbon Compass is a smart carbon-footprint awareness platform for urban students and young professionals. It calculates lifestyle emissions across transport, energy, food, shopping, and waste, then uses rule-based logic to identify the user’s biggest impact area and generate simple personalized actions. The platform focuses on practical behavior change, accessibility, privacy, and testable carbon logic rather than vague climate advice.**
+
+This is a strong, real product idea for the challenge.
+
+[1]: https://www.epa.gov/ghgemissions/household-carbon-footprint-calculator?utm_source=chatgpt.com "Household Carbon Footprint Calculator"
+[2]: https://cea.nic.in/wp-content/uploads/baseline/2025/12/User_Guide_V_21.0.pdf?utm_source=chatgpt.com "CO2 Baseline Database for the Indian Power Sector User ..."
+[3]: https://www.w3.org/TR/WCAG22/?utm_source=chatgpt.com "Web Content Accessibility Guidelines (WCAG) 2.2"

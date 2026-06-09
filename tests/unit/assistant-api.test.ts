@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { POST } from "../../app/api/assistant/narrate/route";
-import type { FootprintResult, Recommendation, UserProfile } from "../../lib/carbon/types";
+import type { FootprintInput, FootprintResult, Recommendation, UserProfile } from "../../lib/carbon/types";
 
 const mockProfile: UserProfile = {
   id: "user-1",
@@ -11,18 +11,54 @@ const mockProfile: UserProfile = {
   mainGoal: "save_money",
 };
 
-const mockResult: FootprintResult = {
+const mockFootprint: FootprintInput = {
+  transport: {
+    twoWheelerKmPerWeek: 100,
+    carKmPerWeek: 0,
+    publicTransportTripsPerWeek: 2,
+    cabAutoTripsPerWeek: 0,
+    flightsPerYear: 0,
+  },
+  energy: {
+    monthlyElectricityKWh: 80,
+    lpgCylindersPerMonth: 0,
+    acHoursPerDay: 0,
+    renewableEnergy: false,
+  },
+  food: {
+    dietType: "vegetarian",
+    meatMealsPerWeek: 0,
+    dairyFrequency: "low",
+    foodDeliveryPerWeek: 1,
+    foodWasteLevel: "low",
+  },
+  shopping: {
+    clothesPerMonth: 1,
+    onlineOrdersPerMonth: 2,
+    electronicsPerYear: 0,
+  },
+  waste: {
+    recycles: true,
+    composts: false,
+    plasticUsage: "low",
+  },
+};
+
+const mockResult = (topCategory: "transport" | "energy" | "food" | "shopping" | "waste" = "transport"): FootprintResult => ({
   monthlyTotalKgCO2e: 100,
   annualTotalKgCO2e: 1200,
   potentialMonthlySavingKgCO2e: 18,
   ecoScore: 65,
-  topCategory: "transport",
+  topCategory,
   breakdown: [
-    { category: "transport", label: "Transport", kgCO2e: 40, percentage: 40 },
-    { category: "energy", label: "Home Energy", kgCO2e: 30, percentage: 30 },
+    { category: "transport", label: "Transport", kgCO2e: topCategory === "transport" ? 60 : 10, percentage: topCategory === "transport" ? 60 : 10 },
+    { category: "energy", label: "Home energy", kgCO2e: topCategory === "energy" ? 60 : 10, percentage: topCategory === "energy" ? 60 : 10 },
+    { category: "food", label: "Food", kgCO2e: topCategory === "food" ? 60 : 10, percentage: topCategory === "food" ? 60 : 10 },
+    { category: "shopping", label: "Shopping", kgCO2e: topCategory === "shopping" ? 60 : 10, percentage: topCategory === "shopping" ? 60 : 10 },
+    { category: "waste", label: "Waste", kgCO2e: topCategory === "waste" ? 60 : 10, percentage: topCategory === "waste" ? 60 : 10 },
   ],
   assumptions: [],
-};
+});
 
 const mockRecs: Recommendation[] = [
   {
@@ -60,8 +96,9 @@ describe("Assistant Narration API Route", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         profile: mockProfile,
-        result: mockResult,
+        result: mockResult("transport"),
         recommendations: mockRecs,
+        footprint: mockFootprint,
       }),
     });
 
@@ -70,8 +107,48 @@ describe("Assistant Narration API Route", () => {
 
     const json = await response.json();
     expect(json.isDemo).toBe(true);
-    expect(json.narrative).toContain("COMMUTE remains your primary leverage point");
+    expect(json.narrative).toContain("transport is your largest emission source");
+    expect(json.weeklyChallenge).toContain("Swap 2 private scooter/car trips");
     expect(json.costUSD).toBe(0);
+  });
+
+  it("uses appropriate category specific fallback details when offline", async () => {
+    delete process.env.GEMINI_API_KEY;
+
+    // Test energy category fallback
+    const requestEnergy = new Request("http://localhost/api/assistant/narrate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        profile: mockProfile,
+        result: mockResult("energy"),
+        recommendations: mockRecs,
+        footprint: mockFootprint,
+      }),
+    });
+
+    const responseEnergy = await POST(requestEnergy);
+    const jsonEnergy = await responseEnergy.json();
+    expect(jsonEnergy.narrative).toContain("Home energy usage represents your primary carbon footprint opportunity");
+    expect(jsonEnergy.weeklyChallenge).toContain("Reduce daily AC usage by 1 hour");
+  });
+
+  it("fails with 400 Bad Request on invalid Zod request body", async () => {
+    const request = new Request("http://localhost/api/assistant/narrate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        profile: { ...mockProfile, mainGoal: "invalid_goal" }, // Invalid enum
+        result: mockResult("transport"),
+        recommendations: mockRecs,
+        footprint: mockFootprint,
+      }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(400);
+    const json = await response.json();
+    expect(json.error).toContain("Validation failed");
   });
 
   it("calls Gemini API and calculates cost if GEMINI_API_KEY is defined", async () => {
@@ -110,8 +187,9 @@ describe("Assistant Narration API Route", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         profile: mockProfile,
-        result: mockResult,
+        result: mockResult("transport"),
         recommendations: mockRecs,
+        footprint: mockFootprint,
       }),
     });
 

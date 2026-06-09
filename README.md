@@ -73,8 +73,7 @@ lib/
     simulator.ts      immutable what-if action simulator
     progress.ts       schema-versioned localStorage helpers
     demo.ts           shared demo inputs and results
-data/
-  emission-factors.json  source-noted factor table
+
 tests/
   unit/               Vitest + Testing Library specs (50 tests)
   e2e/                Playwright demo-flow spec
@@ -144,11 +143,11 @@ All calculation logic lives in `lib/carbon/` as **pure functions with no side ef
 
 ### Eco-score
 
-A 0–100 composite score: `max(0, min(100, 100 - (monthlyTotal / householdSize / 4) + habitBonus))`.
+A 0–100 composite score: `max(0, min(100, 100 - (monthlyTotal / householdSize / 5.25) + habitBonus))`.
+
+We calibrate the scoring so that an average Indian citizen (monthly per-capita average footprint of ~158 kg CO2e) achieves a base score of exactly 70. This makes any score above 70 mathematically indicate a below-average footprint (before habit bonuses).
 
 Bonus points: +4 for renewable energy, +3 for recycling, +3 for composting.
-
-India average ≈ 1.9 tCO₂/year per capita. A score above 70 indicates below-average footprint.
 
 ---
 
@@ -166,7 +165,7 @@ Response:
   "percentages": { "transport": 32.4, ... },
   "topCategory": "transport",
   "ecoScore": 59,
-  "assumptions": ["India average grid emission factor 0.82 kg CO₂/kWh", ...]
+  "assumptions": ["India average grid emission factor 0.71 kg CO₂/kWh", ...]
 }
 ```
 

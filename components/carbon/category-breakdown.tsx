@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Cell, Pie, PieChart, Tooltip } from "recharts";
 import type { CategoryBreakdown as CategoryBreakdownItem } from "@/lib/carbon/types";
 
@@ -20,13 +21,47 @@ function formatKg(value: number): string {
 }
 
 export function CategoryBreakdown({ breakdown }: CategoryBreakdownProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const cleanup = () => {
+      if (containerRef.current) {
+        const elements = containerRef.current.querySelectorAll("[tabindex], svg, g");
+        elements.forEach((el) => {
+          if (el.getAttribute("tabindex") !== "-1") {
+            el.setAttribute("tabindex", "-1");
+          }
+        });
+      }
+    };
+
+    cleanup();
+
+    const observer = new MutationObserver(() => {
+      cleanup();
+    });
+
+    observer.observe(containerRef.current, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["tabindex"],
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [breakdown]);
+
   return (
     <section
       aria-label="Category breakdown"
       className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm"
     >
       <div className="flex flex-col gap-6 lg:flex-row lg:items-center">
-        <div aria-hidden="true" className="flex justify-center lg:w-72">
+        <div ref={containerRef} aria-hidden="true" className="flex justify-center lg:w-72">
           <PieChart width={260} height={220}>
             <Pie
               data={breakdown}

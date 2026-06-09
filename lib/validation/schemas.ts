@@ -72,6 +72,53 @@ export const footprintRequestSchema = z
   })
   .strict();
 
+export const categoryBreakdownSchema = z
+  .object({
+    category: z.enum(["transport", "energy", "food", "shopping", "waste"]),
+    label: z.string().trim().min(1).max(80),
+    kgCO2e: z.number().finite().nonnegative(),
+    percentage: z.number().finite().min(0).max(100),
+  })
+  .strict();
+
+export const footprintResultSchema = z
+  .object({
+    monthlyTotalKgCO2e: z.number().finite().nonnegative(),
+    annualTotalKgCO2e: z.number().finite().nonnegative(),
+    breakdown: z.array(categoryBreakdownSchema),
+    topCategory: z.enum(["transport", "energy", "food", "shopping", "waste"]),
+    ecoScore: z.number().finite().min(0).max(100),
+    potentialMonthlySavingKgCO2e: z.number().finite().nonnegative(),
+    assumptions: z.array(z.string().trim()),
+  })
+  .strict();
+
+export const recommendationSchema = z
+  .object({
+    id: z.string().trim().min(1).max(120),
+    category: z.enum(["transport", "energy", "food", "shopping", "waste"]),
+    title: z.string().trim().min(1).max(120),
+    reason: z.string().trim().min(1).max(500),
+    action: z.string().trim().min(1).max(500),
+    estimatedSavingKgCO2ePerMonth: z.number().finite().nonnegative(),
+    difficulty: z.enum(["easy", "medium", "hard"]),
+    impact: z.enum(["low", "medium", "high"]),
+    moneySavingPotential: z.enum(["none", "low", "medium", "high"]),
+    weeklyChallenge: z.string().trim().min(1).max(500),
+  })
+  .strict();
+
+export const assistantRequestSchema = z
+  .object({
+    profile: userProfileSchema,
+    result: footprintResultSchema,
+    recommendations: z.array(recommendationSchema),
+    footprint: footprintInputSchema,
+  })
+  .strict();
+
 export type UserProfileInput = z.infer<typeof userProfileSchema>;
 export type FootprintInputPayload = z.infer<typeof footprintInputSchema>;
 export type FootprintRequestPayload = z.infer<typeof footprintRequestSchema>;
+export type AssistantRequestPayload = z.infer<typeof assistantRequestSchema>;
+
