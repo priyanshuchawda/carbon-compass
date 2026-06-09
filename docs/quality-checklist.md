@@ -13,7 +13,7 @@ This quality checklist details the automated and manual verification gates requi
    - [x] **Eco-Score & Goals logic**: Tests validation bounds, targets, and bonuses.
    - [x] **Zod Schema validation**: Verifies request payloads, profiles, tool arguments, and session storage parsers.
    - [x] **UI Unit components**: Renders calculators, dashboards, reports, and AI helper alerts.
-   - [x] **Vitest Execution**: Running `pnpm test` successfully executes all 188 unit test blocks.
+   - [x] **Vitest Execution**: `pnpm test` is the current unit/component verification gate. Re-run it before final submission for the current test count.
 
 3. **End-to-End & Integration Coverage**
    - [x] **Playwright Browser Suite**: Running `pnpm test:e2e` spins up Next.js in production build mode (`next start`) and drives browser scenarios.

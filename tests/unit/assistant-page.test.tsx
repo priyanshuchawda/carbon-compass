@@ -28,6 +28,9 @@ describe("Assistant Page Component", () => {
     expect(screen.getByText(/how can i help you today/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/ask about your emissions/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /send/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("log", { name: /conversation with carbon compass assistant/i }),
+    ).toBeInTheDocument();
 
     // suggestions
     expect(screen.getByRole("button", { name: /what is driving my emissions/i })).toBeInTheDocument();

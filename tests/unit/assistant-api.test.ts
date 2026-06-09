@@ -110,6 +110,10 @@ describe("Assistant Narration API Route", () => {
     expect(json.narrative).toContain("transport is your largest emission source");
     expect(json.weeklyChallenge).toContain("Swap 2 private scooter/car trips");
     expect(json.costUSD).toBe(0);
+    expect(response.headers.get("Cache-Control")).toContain("no-store");
+    expect(response.headers.get("RateLimit-Limit")).toBe("10");
+    expect(response.headers.get("X-RateLimit-Limit")).toBe("10");
+    expect(response.headers.get("X-Request-ID")).toMatch(/^req_/);
   });
 
   it("uses appropriate category specific fallback details when offline", async () => {

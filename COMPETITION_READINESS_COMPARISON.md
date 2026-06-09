@@ -25,21 +25,16 @@ Best direction: keep Carbon Compass's guided calculator and India-specific carbo
 
 The biggest previous gaps are now mostly closed. Remaining work is narrower:
 
-1. Make the `/log` tracker more domain-specific. It currently logs monthly check-ins manually, not natural activities like "12 km bus", "80 kWh electricity", "2 meat meals", etc.
-2. Add edit support for log entries. Delete/clear exists, but edit is still missing.
-3. Connect calculator save/check-in and log UX more tightly so users clearly understand when progress history is created.
-4. Validate Gemini narrative JSON with Zod after `JSON.parse()` in `/api/assistant/narrate`.
-5. Return rate-limit headers such as `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`, and `Retry-After`.
-6. Improve CSP by moving away from `script-src 'unsafe-inline'` if time allows, or keep docs very explicit that it remains.
-7. Add stronger assistant evals beyond fallback string matching: route-level cases for hallucination, unsafe requests, off-topic handling, and provider failure.
-8. Add dependency/security audit to CI, not only `package.json`.
-9. Add a true production smoke script that checks `/api/health`, homepage, calculator, dashboard, assistant fallback, and report.
-10. Make README/project structure current; it still mentions older route/file names and older test counts in places.
-11. Align docs/formulas/source factors with the actual constants in `lib/carbon/factors.ts`.
-12. Improve UI polish: icons, richer category colors, table-like chart fallback, consistent tabular numbers, less one-note green.
-13. Add route-level metadata for app pages and optional sitemap/robots.
-14. Add request IDs / redacted audit logs for assistant failures.
-15. Add performance budgets or thresholds, not only a chunk-inspection script.
+1. Connect calculator save/check-in and log UX more tightly so users clearly understand when progress history is created.
+2. Improve CSP by moving away from `script-src 'unsafe-inline'` if time allows, or keep docs very explicit that it remains.
+3. Add stronger assistant evals beyond fallback string matching: route-level cases for hallucination, unsafe requests, off-topic handling, and provider failure.
+4. Add a true production smoke script that checks `/api/health`, homepage, calculator, dashboard, assistant fallback, and report.
+5. Make README/project structure current whenever routes or verification gates change.
+6. Align docs/formulas/source factors with the actual constants in `lib/carbon/factors.ts`.
+7. Improve UI polish: richer category colors, table-like chart fallback, consistent tabular numbers, less one-note green.
+8. Add route-level metadata for app pages and optional sitemap/robots.
+9. Add redacted audit logs for assistant failures.
+10. Add performance budgets or thresholds, not only a chunk-inspection script.
 
 ## Scorecard
 
@@ -52,7 +47,7 @@ Scores are source-reading estimates for judging readiness, not measured test res
 | Logical decisions | 8.5/10 | 8.5/10 | 9.5/10 | Current recommendations, simulations, scoring, and tool calls are deterministic. Traceability can still be deeper. |
 | Real-world usability | 8.5/10 | 9/10 | 9/10 | Goal setter, report client, save check-ins, and `/log` help. Natural activity logging remains weaker than the carbon reference. |
 | Code quality | 8/10 | 8/10 | 9/10 | Current has strict TS and focused modules; election reference adds stricter lint, import boundaries, and wrappers. |
-| Security | 8.5/10 | 8/10 | 9.5/10 | Current validates AI tool args, bounds assistant body reads, disables X-Powered-By, catches malformed Origin, and has redaction/rate limiting. CSP/rate-limit headers remain weaker. |
+| Security | 8.5/10 | 8/10 | 9.5/10 | Current validates AI tool args, bounds assistant body reads, disables X-Powered-By, catches malformed Origin, returns rate-limit headers, and has redaction/rate limiting. CSP and distributed rate limiting remain weaker. |
 | Efficiency | 8.2/10 | 8/10 | 9/10 | Production-mode Playwright config, health route, and bundle script help. Still missing enforced perf budgets and smoke script. |
 | Testing | 8.6/10 | 8/10 | 9.5/10 | Current now includes assistant chat/eval, goal setter, log page, report, accessibility E2E, health route coverage. Election reference still has broader eval/perf/evidence lanes. |
 | Accessibility | 8.5/10 | 9/10 | 9/10 | Current has a11y docs, skip link, labels, chart text fallback, axe E2E, mobile overflow, reduced-motion checks. Assistant transcript semantics can still improve. |
@@ -86,21 +81,15 @@ Scores are source-reading estimates for judging readiness, not measured test res
 
 ## Biggest Gaps
 
-1. `/log` is a progress check-in log, not a natural-unit activity logger. The carbon reference is still stronger for everyday repeated tracking.
-2. `/log` supports add/delete/clear but not edit.
-3. The report can still synthesize a one-entry history if progress history is empty; this is fine as fallback, but should be communicated clearly.
-4. Gemini narration output is parsed with `JSON.parse()` but not validated with a Zod response schema.
-5. CSP still uses `script-src 'self' 'unsafe-inline'`, so docs should avoid implying strict nonce CSP until implemented.
-6. Rate limiting is in-memory and IP-header based; acceptable for a demo, weaker than distributed/edge-backed limits.
-7. Rate-limit responses do not expose standard remaining/reset headers.
-8. Production E2E config uses `pnpm build && pnpm start`, but `webServer.url` is `http://localhost:3000`; if another app is already running and `reuseExistingServer` is true locally, tests may attach to the wrong server.
-9. Assistant chat UI has basic accessibility but not the richer `role="log"` transcript pattern from the carbon reference.
-10. Some README sections are stale: project structure omits `/assistant`, `/log`, `/api/assistant/chat`, `/api/health`; scripts mention older test counts.
-11. `docs/FORMULAS.md`, README factor table, and `lib/carbon/factors.ts` should be audited for exact consistency.
-12. `audit:prod` exists in `package.json`, but CI does not appear to run it yet.
-13. `/api/health` exists, but there is no production smoke script that checks it with core pages.
-14. Bundle inspection exists, but no threshold/budget fails builds.
-15. The product still uses a green-heavy visual system; references have richer category color distinction and stronger UI primitives.
+1. The report can still synthesize a one-entry history if progress history is empty; this is fine as fallback, but should be communicated clearly.
+2. CSP still uses `script-src 'self' 'unsafe-inline'`, so docs should avoid implying strict nonce CSP until implemented.
+3. Rate limiting is in-memory and IP-header based; acceptable for a demo, weaker than distributed/edge-backed limits.
+4. Production E2E config uses `pnpm build && pnpm start`, but `webServer.url` is `http://localhost:3000`; if another app is already running and `reuseExistingServer` is true locally, tests may attach to the wrong server.
+5. Some README sections should be kept synchronized as routes and tests evolve.
+6. `docs/FORMULAS.md`, README factor table, and `lib/carbon/factors.ts` should be audited for exact consistency.
+7. `/api/health` exists, but the smoke script should keep checking it with core pages.
+8. Bundle inspection exists, but no threshold/budget fails builds.
+9. The product still uses a green-heavy visual system; references have richer category color distinction and stronger UI primitives.
 
 ## What To Borrow From `carbon-footprint-assistant`
 
@@ -150,27 +139,11 @@ Scores are source-reading estimates for judging readiness, not measured test res
 
 ### P0 - Highest Impact Before Submission
 
-1. Upgrade `/log` from monthly check-ins to natural activity tracking.
-   - Current `/log` records monthly footprint, eco score, and top category.
-   - Borrow from `carbon-footprint-assistant/src/lib/store/carbon-store.ts`: log trips, meals, electricity, shopping, and waste in natural units.
-
-2. Add edit support to `/log`.
-   - Delete/clear exists.
-   - Edit makes it feel like a real tracker rather than a static evidence page.
-
-3. Add Zod validation for Gemini response JSON.
-   - `/api/assistant/narrate` still parses model output directly after `JSON.parse()`.
-   - Validate `narrative`, `weeklyChallenge`, and `goalTip` with string length limits before returning.
-
-4. Return rate-limit headers.
-   - Add remaining/reset data to 429 and successful assistant responses.
-   - Useful for security transparency and judging confidence.
-
-5. Fix docs/security mismatch around CSP.
+1. Fix docs/security mismatch around CSP.
    - Current CSP includes `script-src 'self' 'unsafe-inline'`.
    - README/SECURITY should say this honestly, or implement nonce CSP and then claim stronger protection.
 
-6. Clean stale README sections.
+2. Clean stale README sections.
    - Project structure and script/test-count sections are behind the current code.
    - Add `/assistant`, `/log`, `/api/assistant/chat`, `/api/health`, `audit:prod`, and `perf:bundle-report`.
 
@@ -284,12 +257,11 @@ Scores are source-reading estimates for judging readiness, not measured test res
 The best final shape is not to abandon the current app. Instead:
 
 1. Keep the guided monthly calculator as "Quick Estimate."
-2. Upgrade the existing `/log` page into natural-unit activity tracking.
-3. Make dashboard support both quick estimate and activity history.
-4. Keep the report grounded in saved progress, with clearly labelled fallback/demo state.
-5. Deepen the existing assistant page with stronger transcript semantics and route-level evals.
-6. Add a visible "Methodology" or "Assumptions" page with factor sources.
-7. Update evidence docs to map every judging criterion to code and tests.
+2. Keep dashboard support focused on quick estimates while exposing saved check-ins and activity history clearly.
+3. Keep the report grounded in saved progress, with clearly labelled fallback/demo state.
+4. Deepen the existing assistant page with stronger route-level evals and sample transcripts.
+5. Add a visible "Methodology" or "Assumptions" page with factor sources.
+6. Update evidence docs to map every judging criterion to code and tests.
 
 This gives judges both:
 
@@ -298,16 +270,13 @@ This gives judges both:
 
 ## Recommended Remaining Implementation Order
 
-1. Upgrade `/log` to natural-unit activity tracking and add edit support.
-2. Add Zod validation for Gemini narration response JSON.
-3. Add rate-limit headers and request IDs to assistant route responses/logs.
-4. Clean README stale structure, route list, script list, and test-count claims.
-5. Audit formula docs and README factor tables against `lib/carbon/factors.ts`.
-6. Add `audit:prod` to CI and create a production smoke script around `/api/health` plus core pages.
-7. Add stronger assistant evals for unsafe, off-topic, hallucination-prone, and provider-failure cases.
-8. Decide CSP path: implement nonce-based CSP or document the current `unsafe-inline` limitation plainly.
-9. Add performance budgets/thresholds on top of the existing bundle chunk report.
-10. Polish UI: icons, richer category colors, table fallbacks, tabular numbers, empty states, and status announcements.
+1. Clean README stale structure, route list, script list, and test-count claims.
+2. Audit formula docs and README factor tables against `lib/carbon/factors.ts`.
+3. Add `audit:prod` to CI and keep the production smoke script checking `/api/health` plus core pages.
+4. Add stronger assistant evals for unsafe, off-topic, hallucination-prone, and provider-failure cases.
+5. Decide CSP path: implement nonce-based CSP or document the current `unsafe-inline` limitation plainly.
+6. Add performance budgets/thresholds on top of the existing bundle chunk report.
+7. Polish UI: richer category colors, table fallbacks, tabular numbers, empty states, and status announcements.
 
 ## Final Takeaway
 

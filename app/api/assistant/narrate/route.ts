@@ -24,6 +24,7 @@ export async function POST(request: Request) {
   headers.set("X-RateLimit-Limit", "10");
   headers.set("X-RateLimit-Remaining", String(limitRes.remaining));
   headers.set("X-RateLimit-Reset", String(resetSeconds));
+  headers.set("Cache-Control", "no-store, max-age=0");
 
   if (!limitRes.allowed) {
     headers.set("Retry-After", String(resetSeconds));
