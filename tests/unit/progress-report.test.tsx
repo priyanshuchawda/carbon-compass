@@ -33,14 +33,13 @@ describe("progress storage", () => {
     saveProgressHistory([entry], window.localStorage);
     appendProgressEntry(
       { ...entry, id: "entry-2", monthlyTotalKgCO2e: 210, ecoScore: 50 },
-      window.localStorage,
+      window.localStorage
     );
 
     const history = loadProgressHistory(window.localStorage);
     expect(history).toHaveLength(2);
     expect(history[1]?.monthlyTotalKgCO2e).toBe(210);
-    expect(window.localStorage.getItem(PROGRESS_STORAGE_KEY))
-      .toContain("\"schemaVersion\":1");
+    expect(window.localStorage.getItem(PROGRESS_STORAGE_KEY)).toContain('"schemaVersion":1');
   });
 
   it("creates a text trend summary with best improvement", () => {
@@ -62,22 +61,16 @@ describe("report page", () => {
       screen.getByRole("heading", {
         level: 1,
         name: /carbon compass report/i,
-      }),
+      })
     ).toBeInTheDocument();
     const reportSummary = screen.getByRole("region", {
       name: /report summary/i,
     });
-    expect(within(reportSummary).getByText(/^monthly footprint$/i))
-      .toBeInTheDocument();
-    expect(within(reportSummary).getByText(/^top source$/i))
-      .toBeInTheDocument();
-    expect(within(reportSummary).getByText(/^best action$/i))
-      .toBeInTheDocument();
-    expect(within(reportSummary).getByText(/^potential saving$/i))
-      .toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /print report/i }),
-    ).toBeInTheDocument();
+    expect(within(reportSummary).getByText(/^monthly footprint$/i)).toBeInTheDocument();
+    expect(within(reportSummary).getByText(/^top source$/i)).toBeInTheDocument();
+    expect(within(reportSummary).getByText(/^best action$/i)).toBeInTheDocument();
+    expect(within(reportSummary).getByText(/^potential saving$/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /print report/i })).toBeInTheDocument();
 
     const trend = screen.getByRole("region", { name: /progress trend/i });
     expect(trend).toHaveTextContent(/best improvement/i);
@@ -86,8 +79,6 @@ describe("report page", () => {
     });
     expect(textSummary).toHaveTextContent(/kg CO2e/i);
 
-    expect(
-      screen.getByRole("region", { name: /transparent assumptions/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: /transparent assumptions/i })).toBeInTheDocument();
   });
 });

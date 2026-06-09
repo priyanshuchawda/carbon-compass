@@ -11,9 +11,8 @@ export default function OnboardingPage() {
           Set your Carbon Compass context
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-700">
-          Tell Carbon Compass your city, household size, routine, and main goal
-          so later recommendations can match an urban Indian student or young
-          professional lifestyle.
+          Tell Carbon Compass your city, household size, routine, and main goal so later
+          recommendations can match an urban Indian student or young professional lifestyle.
         </p>
         <OnboardingForm />
       </section>

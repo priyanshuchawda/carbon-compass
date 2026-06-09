@@ -1,7 +1,12 @@
 import { CALCULATION_ASSUMPTIONS } from "@/lib/carbon/assumptions";
-import { EMISSION_FACTORS, WEEKS_PER_MONTH, POTENTIAL_SAVINGS_TARGET_FACTOR } from "@/lib/carbon/factors";
+import {
+  EMISSION_FACTORS,
+  WEEKS_PER_MONTH,
+  POTENTIAL_SAVINGS_TARGET_FACTOR,
+} from "@/lib/carbon/factors";
 import { calculateEcoScore } from "@/lib/carbon/scoring";
 import { round } from "@/lib/carbon/utils";
+import type { ActivityTypeId } from "@/lib/carbon/activity-types";
 import type {
   CarbonCategory,
   CategoryBreakdown,
@@ -26,10 +31,7 @@ const CATEGORY_LABELS: Record<CarbonCategory, string> = {
 
 // round() is provided by @/lib/carbon/utils
 
-function categoryResult(
-  category: CarbonCategory,
-  kgCO2e: number,
-): CategoryResult {
+function categoryResult(category: CarbonCategory, kgCO2e: number): CategoryResult {
   return {
     category,
     label: CATEGORY_LABELS[category],
@@ -44,13 +46,9 @@ export function calculateTransport(input: TransportInput): CategoryResult {
     input.carKmPerWeek * factors.carKgPerKm +
     input.publicTransportTripsPerWeek * factors.publicTransportKgPerTrip +
     input.cabAutoTripsPerWeek * factors.cabAutoKgPerTrip;
-  const monthlyFlights =
-    (input.flightsPerYear * factors.domesticFlightKgPerYear) / 12;
+  const monthlyFlights = (input.flightsPerYear * factors.domesticFlightKgPerYear) / 12;
 
-  return categoryResult(
-    "transport",
-    weeklyFuelTravel * WEEKS_PER_MONTH + monthlyFlights,
-  );
+  return categoryResult("transport", weeklyFuelTravel * WEEKS_PER_MONTH + monthlyFlights);
 }
 
 export function calculateEnergy(input: EnergyInput): CategoryResult {
@@ -69,8 +67,7 @@ export function calculateFood(input: FoodInput): CategoryResult {
   const base = factors.dietBaseKgPerMonth[input.dietType];
   const meat = input.meatMealsPerWeek * factors.meatMealKg * WEEKS_PER_MONTH;
   const dairy = factors.dairyKgPerMonth[input.dairyFrequency];
-  const delivery =
-    input.foodDeliveryPerWeek * factors.deliveryKg * WEEKS_PER_MONTH;
+  const delivery = input.foodDeliveryPerWeek * factors.deliveryKg * WEEKS_PER_MONTH;
   const waste = factors.wasteKgPerMonth[input.foodWasteLevel];
 
   return categoryResult("food", base + meat + dairy + delivery + waste);
@@ -93,16 +90,18 @@ export function calculateWaste(input: WasteInput): CategoryResult {
 
   return categoryResult(
     "waste",
-    factors.baselineKg + factors.plasticKgPerMonth[input.plasticUsage] - reductions,
+    factors.baselineKg + factors.plasticKgPerMonth[input.plasticUsage] - reductions
   );
 }
 
 export function getTopCategory(
-  breakdown: Pick<CategoryBreakdown, "category" | "kgCO2e">[],
+  breakdown: Pick<CategoryBreakdown, "category" | "kgCO2e">[]
 ): CarbonCategory {
-  return breakdown.reduce((top, current) =>
-    current.kgCO2e > top.kgCO2e ? current : top,
-  ).category;
+  if (breakdown.length === 0) {
+    throw new Error("Cannot determine top category from an empty breakdown");
+  }
+
+  return breakdown.reduce((top, current) => (current.kgCO2e > top.kgCO2e ? current : top)).category;
 }
 
 function addPercentages(results: CategoryResult[]): CategoryBreakdown[] {
@@ -114,10 +113,7 @@ function addPercentages(results: CategoryResult[]): CategoryBreakdown[] {
   }));
 }
 
-export function calculateFootprint(
-  input: FootprintInput,
-  profile: UserProfile,
-): FootprintResult {
+export function calculateFootprint(input: FootprintInput, profile: UserProfile): FootprintResult {
   const categoryResults = [
     calculateTransport(input.transport),
     calculateEnergy(input.energy),
@@ -126,12 +122,9 @@ export function calculateFootprint(
     calculateWaste(input.waste),
   ];
   const breakdown = addPercentages(categoryResults);
-  const monthlyTotalKgCO2e = round(
-    breakdown.reduce((sum, item) => sum + item.kgCO2e, 0),
-  );
+  const monthlyTotalKgCO2e = round(breakdown.reduce((sum, item) => sum + item.kgCO2e, 0));
   const topCategory = getTopCategory(breakdown);
-  const topCategoryKg =
-    breakdown.find((item) => item.category === topCategory)?.kgCO2e ?? 0;
+  const topCategoryKg = breakdown.find((item) => item.category === topCategory)?.kgCO2e ?? 0;
 
   return {
     monthlyTotalKgCO2e,
@@ -139,15 +132,17 @@ export function calculateFootprint(
     breakdown,
     topCategory,
     ecoScore: calculateEcoScore(monthlyTotalKgCO2e, input, profile),
-    potentialMonthlySavingKgCO2e: round(Math.max(topCategoryKg * POTENTIAL_SAVINGS_TARGET_FACTOR, 0)),
+    potentialMonthlySavingKgCO2e: round(
+      Math.max(topCategoryKg * POTENTIAL_SAVINGS_TARGET_FACTOR, 0)
+    ),
     assumptions: [...CALCULATION_ASSUMPTIONS],
   };
 }
 
 export function calculateActivityEmissions(
   category: CarbonCategory,
-  type: string,
-  value: number,
+  type: ActivityTypeId,
+  value: number
 ): number {
   const transport = EMISSION_FACTORS.transport;
   const energy = EMISSION_FACTORS.energy;
@@ -155,33 +150,40 @@ export function calculateActivityEmissions(
   const shopping = EMISSION_FACTORS.shopping;
   const waste = EMISSION_FACTORS.waste;
 
-  switch (category) {
-    case "transport":
-      if (type === "two_wheeler") return round(value * transport.twoWheelerKgPerKm);
-      if (type === "car") return round(value * transport.carKgPerKm);
-      if (type === "public_transport") return round(value * transport.publicTransportKgPerTrip);
-      if (type === "cab_auto") return round(value * transport.cabAutoKgPerTrip);
-      if (type === "flight") return round(value * transport.domesticFlightKgPerYear);
-      return 0;
-    case "energy":
-      if (type === "electricity") return round(value * energy.electricityKgPerKWh);
-      if (type === "lpg") return round(value * energy.lpgCylinderKg);
-      if (type === "ac") return round(value * energy.acKWhPerHour * energy.electricityKgPerKWh);
-      return 0;
-    case "food":
-      if (type === "meat_meal") return round(value * food.meatMealKg);
-      if (type === "delivery") return round(value * food.deliveryKg);
-      return 0;
-    case "shopping":
-      if (type === "clothes") return round(value * shopping.clothesKgPerItem);
-      if (type === "online") return round(value * shopping.onlineOrderKg);
-      if (type === "electronics") return round(value * shopping.electronicsKgPerYear);
-      return 0;
-    case "waste":
-      if (type === "recycling") return round(-value * waste.recyclingReductionKg);
-      if (type === "composting") return round(-value * waste.compostingReductionKg);
-      return 0;
-    default:
-      return 0;
+  const factorMap: Record<CarbonCategory, Partial<Record<ActivityTypeId, number>>> = {
+    transport: {
+      two_wheeler: transport.twoWheelerKgPerKm,
+      car: transport.carKgPerKm,
+      public_transport: transport.publicTransportKgPerTrip,
+      cab_auto: transport.cabAutoKgPerTrip,
+      flight: transport.domesticFlightKgPerYear,
+    },
+    energy: {
+      electricity: energy.electricityKgPerKWh,
+      lpg: energy.lpgCylinderKg,
+      ac: energy.acKWhPerHour * energy.electricityKgPerKWh,
+    },
+    food: {
+      meat_meal: food.meatMealKg,
+      delivery: food.deliveryKg,
+    },
+    shopping: {
+      clothes: shopping.clothesKgPerItem,
+      online: shopping.onlineOrderKg,
+      electronics: shopping.electronicsKgPerYear,
+    },
+    waste: {
+      recycling: -waste.recyclingReductionKg,
+      composting: -waste.compostingReductionKg,
+    },
+  };
+
+  const categoryMap = factorMap[category];
+  const factor = categoryMap ? categoryMap[type] : undefined;
+
+  if (factor === undefined) {
+    throw new Error(`Invalid activity type "${type}" for category "${category}"`);
   }
+
+  return round(value * factor);
 }

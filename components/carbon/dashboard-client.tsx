@@ -7,57 +7,25 @@ import { MetricCard } from "@/components/carbon/metric-card";
 import { RecommendationCard } from "@/components/carbon/recommendation-card";
 import { WhatIfSimulator } from "@/components/carbon/what-if-simulator";
 import { GoalSetter } from "@/components/carbon/goal-setter";
-import { calculateFootprint } from "@/lib/carbon/calculate";
-import { getRecommendations } from "@/lib/carbon/recommendations";
-import { loadSessionPayload } from "@/lib/carbon/session";
+import { useCarbonSessionState } from "@/lib/carbon/use-carbon-session-state";
 import { SIMULATION_ACTIONS, simulateAction } from "@/lib/carbon/simulator";
-import type { FootprintInput, FootprintResult, Recommendation, UserProfile } from "@/lib/carbon/types";
-import {
-  demoFootprintInput,
-  demoFootprintResult,
-  demoProfile,
-  demoRecommendations,
-} from "@/lib/carbon/demo";
 import { appendProgressEntry } from "@/lib/carbon/progress";
 
 function kg(value: number): string {
   return `${Math.round(value)} kg CO₂e`;
 }
 
-type DashboardState = {
-  result: FootprintResult;
-  recommendations: Recommendation[];
-  profile: UserProfile;
-  footprintInput: FootprintInput;
-  isDemo: boolean;
-};
-
-function buildDemoState(): DashboardState {
-  return {
-    result: demoFootprintResult,
-    recommendations: demoRecommendations,
-    profile: demoProfile,
-    footprintInput: demoFootprintInput,
-    isDemo: true,
-  };
-}
-
 export function DashboardClient() {
-  const [state] = useState<DashboardState>(() => {
-    const session = loadSessionPayload();
-    if (!session) return buildDemoState();
-
-    const result = calculateFootprint(session.footprint, session.profile);
-    const recommendations = getRecommendations(session.footprint, result, session.profile);
-    return { result, recommendations, profile: session.profile, footprintInput: session.footprint, isDemo: false };
-  });
-
+  const state = useCarbonSessionState();
   const { result, recommendations, profile, isDemo, footprintInput } = state;
   const [checkInSaved, setCheckInSaved] = useState(false);
 
   function handleSaveCheckIn() {
     const entry = {
-      id: `checkin-${Date.now()}`,
+      id:
+        typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+          ? crypto.randomUUID()
+          : `checkin-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       recordedAt: new Date().toISOString(),
       monthlyTotalKgCO2e: result.monthlyTotalKgCO2e,
       ecoScore: result.ecoScore,
@@ -67,25 +35,21 @@ export function DashboardClient() {
     setCheckInSaved(true);
   }
 
-  const topCategory = result.breakdown.find(
-    (item) => item.category === result.topCategory,
-  );
+  const topCategory = result.breakdown.find((item) => item.category === result.topCategory);
   const leadingRecommendation = recommendations[0];
   const simulations = useMemo(
-    () =>
-      SIMULATION_ACTIONS.map((action) =>
-        simulateAction(footprintInput, profile, action.id),
-      ),
-    [footprintInput, profile],
+    () => SIMULATION_ACTIONS.map((action) => simulateAction(footprintInput, profile, action.id)),
+    [footprintInput, profile]
   );
-
 
   return (
     <>
-      {/* ── header badge ─────────────────────────────────────────── */}
+      {/* Header badge */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <p className="w-fit rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-medium text-emerald-800">
-          {isDemo ? `Demo profile — ${profile.city} · ${profile.persona}` : `${profile.city} · ${profile.persona}`}
+          {isDemo
+            ? `Demo profile — ${profile.city} · ${profile.persona}`
+            : `${profile.city} · ${profile.persona}`}
         </p>
         {!isDemo && (
           <button
@@ -97,7 +61,9 @@ export function DashboardClient() {
                 : "bg-emerald-700 text-white hover:bg-emerald-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-emerald-700"
             }`}
           >
-            {checkInSaved ? "✓ Footprint saved to history" : "Save this check-in to progress history"}
+            {checkInSaved
+              ? "✓ Footprint saved to history"
+              : "Save this check-in to progress history"}
           </button>
         )}
       </div>
@@ -149,10 +115,7 @@ export function DashboardClient() {
       </div>
 
       {/* ── recommendation cards ──────────────────────────────────── */}
-      <section
-        aria-labelledby="dashboard-recommendations-heading"
-        className="mt-8"
-      >
+      <section aria-labelledby="dashboard-recommendations-heading" className="mt-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2

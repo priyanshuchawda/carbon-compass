@@ -61,8 +61,9 @@ describe("carbon API route handlers", () => {
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(body.result.monthlyTotalKgCO2e).toBeGreaterThan(0);
-    expect(body.result.topCategory).toBeTruthy();
+    expect(body.success).toBe(true);
+    expect(body.data.result.monthlyTotalKgCO2e).toBeGreaterThan(0);
+    expect(body.data.result.topCategory).toBeTruthy();
   });
 
   it("rejects invalid calculation input", async () => {
@@ -73,23 +74,23 @@ describe("carbon API route handlers", () => {
           ...footprint,
           transport: { ...footprint.transport, twoWheelerKmPerWeek: -5 },
         },
-      }),
+      })
     );
     const body = await response.json();
 
     expect(response.status).toBe(400);
-    expect(body.error).toMatch(/invalid input/i);
+    expect(body.success).toBe(false);
+    expect(body.error).toMatch(/validation failed|invalid input/i);
   });
 
   it("returns ranked recommendations for valid input", async () => {
-    const response = await recommendationsPost(
-      jsonRequest({ profile, footprint }),
-    );
+    const response = await recommendationsPost(jsonRequest({ profile, footprint }));
     const body = await response.json();
 
     expect(response.status).toBe(200);
-    expect(body.result.monthlyTotalKgCO2e).toBeGreaterThan(0);
-    expect(body.recommendations.length).toBeGreaterThanOrEqual(3);
+    expect(body.success).toBe(true);
+    expect(body.data.result.monthlyTotalKgCO2e).toBeGreaterThan(0);
+    expect(body.data.recommendations.length).toBeGreaterThanOrEqual(3);
   });
 
   it("returns status ok from the health API", async () => {

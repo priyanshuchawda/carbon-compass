@@ -12,9 +12,26 @@ const profile = {
 };
 
 const footprint = {
-  transport: { twoWheelerKmPerWeek: 120, carKmPerWeek: 50, publicTransportTripsPerWeek: 4, cabAutoTripsPerWeek: 2, flightsPerYear: 1 },
-  energy: { monthlyElectricityKWh: 150, lpgCylindersPerMonth: 1, acHoursPerDay: 4, renewableEnergy: false },
-  food: { dietType: "mixed" as const, meatMealsPerWeek: 3, dairyFrequency: "medium" as const, foodDeliveryPerWeek: 2, foodWasteLevel: "medium" as const },
+  transport: {
+    twoWheelerKmPerWeek: 120,
+    carKmPerWeek: 50,
+    publicTransportTripsPerWeek: 4,
+    cabAutoTripsPerWeek: 2,
+    flightsPerYear: 1,
+  },
+  energy: {
+    monthlyElectricityKWh: 150,
+    lpgCylindersPerMonth: 1,
+    acHoursPerDay: 4,
+    renewableEnergy: false,
+  },
+  food: {
+    dietType: "mixed" as const,
+    meatMealsPerWeek: 3,
+    dairyFrequency: "medium" as const,
+    foodDeliveryPerWeek: 2,
+    foodWasteLevel: "medium" as const,
+  },
   shopping: { clothesPerMonth: 2, onlineOrdersPerMonth: 4, electronicsPerYear: 1 },
   waste: { recycles: false, composts: false, plasticUsage: "medium" as const },
 };
@@ -28,7 +45,7 @@ describe("Performance CPU Budgets", () => {
     }
     const duration = performance.now() - start;
     const avgMs = duration / iterations;
-    
+
     console.log(`calculateFootprint average execution duration: ${avgMs.toFixed(4)} ms`);
     expect(avgMs).toBeLessThan(1.0);
   });
@@ -42,7 +59,7 @@ describe("Performance CPU Budgets", () => {
     }
     const duration = performance.now() - start;
     const avgMs = duration / iterations;
-    
+
     console.log(`getRecommendations average execution duration: ${avgMs.toFixed(4)} ms`);
     expect(avgMs).toBeLessThan(2.0);
   });

@@ -92,18 +92,54 @@ describe("calculate.ts – uncovered branches", () => {
   });
 
   it("calculateFood uses all dairy frequency variants", () => {
-    const low = calculateFood({ dietType: "vegetarian", meatMealsPerWeek: 0, dairyFrequency: "low", foodDeliveryPerWeek: 0, foodWasteLevel: "low" });
-    const medium = calculateFood({ dietType: "vegetarian", meatMealsPerWeek: 0, dairyFrequency: "medium", foodDeliveryPerWeek: 0, foodWasteLevel: "low" });
-    const high = calculateFood({ dietType: "vegetarian", meatMealsPerWeek: 0, dairyFrequency: "high", foodDeliveryPerWeek: 0, foodWasteLevel: "low" });
+    const low = calculateFood({
+      dietType: "vegetarian",
+      meatMealsPerWeek: 0,
+      dairyFrequency: "low",
+      foodDeliveryPerWeek: 0,
+      foodWasteLevel: "low",
+    });
+    const medium = calculateFood({
+      dietType: "vegetarian",
+      meatMealsPerWeek: 0,
+      dairyFrequency: "medium",
+      foodDeliveryPerWeek: 0,
+      foodWasteLevel: "low",
+    });
+    const high = calculateFood({
+      dietType: "vegetarian",
+      meatMealsPerWeek: 0,
+      dairyFrequency: "high",
+      foodDeliveryPerWeek: 0,
+      foodWasteLevel: "low",
+    });
 
     expect(medium.kgCO2e).toBeGreaterThan(low.kgCO2e);
     expect(high.kgCO2e).toBeGreaterThan(medium.kgCO2e);
   });
 
   it("calculateFood uses all food waste level variants", () => {
-    const low = calculateFood({ dietType: "vegetarian", meatMealsPerWeek: 0, dairyFrequency: "low", foodDeliveryPerWeek: 0, foodWasteLevel: "low" });
-    const medium = calculateFood({ dietType: "vegetarian", meatMealsPerWeek: 0, dairyFrequency: "low", foodDeliveryPerWeek: 0, foodWasteLevel: "medium" });
-    const high = calculateFood({ dietType: "vegetarian", meatMealsPerWeek: 0, dairyFrequency: "low", foodDeliveryPerWeek: 0, foodWasteLevel: "high" });
+    const low = calculateFood({
+      dietType: "vegetarian",
+      meatMealsPerWeek: 0,
+      dairyFrequency: "low",
+      foodDeliveryPerWeek: 0,
+      foodWasteLevel: "low",
+    });
+    const medium = calculateFood({
+      dietType: "vegetarian",
+      meatMealsPerWeek: 0,
+      dairyFrequency: "low",
+      foodDeliveryPerWeek: 0,
+      foodWasteLevel: "medium",
+    });
+    const high = calculateFood({
+      dietType: "vegetarian",
+      meatMealsPerWeek: 0,
+      dairyFrequency: "low",
+      foodDeliveryPerWeek: 0,
+      foodWasteLevel: "high",
+    });
 
     expect(medium.kgCO2e).toBeGreaterThan(low.kgCO2e);
     expect(high.kgCO2e).toBeGreaterThan(medium.kgCO2e);
@@ -128,8 +164,20 @@ describe("calculate.ts – uncovered branches", () => {
   });
 
   it("calculateTransport includes flights correctly", () => {
-    const noFlights = calculateTransport({ twoWheelerKmPerWeek: 0, carKmPerWeek: 0, publicTransportTripsPerWeek: 0, cabAutoTripsPerWeek: 0, flightsPerYear: 0 });
-    const withFlights = calculateTransport({ twoWheelerKmPerWeek: 0, carKmPerWeek: 0, publicTransportTripsPerWeek: 0, cabAutoTripsPerWeek: 0, flightsPerYear: 4 });
+    const noFlights = calculateTransport({
+      twoWheelerKmPerWeek: 0,
+      carKmPerWeek: 0,
+      publicTransportTripsPerWeek: 0,
+      cabAutoTripsPerWeek: 0,
+      flightsPerYear: 0,
+    });
+    const withFlights = calculateTransport({
+      twoWheelerKmPerWeek: 0,
+      carKmPerWeek: 0,
+      publicTransportTripsPerWeek: 0,
+      cabAutoTripsPerWeek: 0,
+      flightsPerYear: 4,
+    });
 
     expect(withFlights.kgCO2e).toBeGreaterThan(noFlights.kgCO2e);
   });
@@ -137,13 +185,30 @@ describe("calculate.ts – uncovered branches", () => {
   it("addPercentages handles zero total gracefully (all zeroes = 0%)", () => {
     const result = calculateFootprint(
       {
-        transport: { twoWheelerKmPerWeek: 0, carKmPerWeek: 0, publicTransportTripsPerWeek: 0, cabAutoTripsPerWeek: 0, flightsPerYear: 0 },
-        energy: { monthlyElectricityKWh: 0, lpgCylindersPerMonth: 0, acHoursPerDay: 0, renewableEnergy: false },
-        food: { dietType: "vegan", meatMealsPerWeek: 0, dairyFrequency: "low", foodDeliveryPerWeek: 0, foodWasteLevel: "low" },
+        transport: {
+          twoWheelerKmPerWeek: 0,
+          carKmPerWeek: 0,
+          publicTransportTripsPerWeek: 0,
+          cabAutoTripsPerWeek: 0,
+          flightsPerYear: 0,
+        },
+        energy: {
+          monthlyElectricityKWh: 0,
+          lpgCylindersPerMonth: 0,
+          acHoursPerDay: 0,
+          renewableEnergy: false,
+        },
+        food: {
+          dietType: "vegan",
+          meatMealsPerWeek: 0,
+          dairyFrequency: "low",
+          foodDeliveryPerWeek: 0,
+          foodWasteLevel: "low",
+        },
         shopping: { clothesPerMonth: 0, onlineOrdersPerMonth: 0, electronicsPerYear: 0 },
         waste: { recycles: true, composts: true, plasticUsage: "low" },
       },
-      profile,
+      profile
     );
 
     // Even with near-zero input, percentages must be finite
@@ -153,8 +218,16 @@ describe("calculate.ts – uncovered branches", () => {
   });
 
   it("calculateShopping correctly handles electronics spread over 12 months", () => {
-    const withElectronics = calculateShopping({ clothesPerMonth: 0, onlineOrdersPerMonth: 0, electronicsPerYear: 12 });
-    const withoutElectronics = calculateShopping({ clothesPerMonth: 0, onlineOrdersPerMonth: 0, electronicsPerYear: 0 });
+    const withElectronics = calculateShopping({
+      clothesPerMonth: 0,
+      onlineOrdersPerMonth: 0,
+      electronicsPerYear: 12,
+    });
+    const withoutElectronics = calculateShopping({
+      clothesPerMonth: 0,
+      onlineOrdersPerMonth: 0,
+      electronicsPerYear: 0,
+    });
 
     expect(withElectronics.kgCO2e).toBeGreaterThan(withoutElectronics.kgCO2e);
   });
@@ -184,7 +257,13 @@ describe("recommendations.ts – uncovered branches", () => {
     const perfectWasteInput: FootprintInput = {
       ...baseInput,
       // Make transport dominant (not waste) and give perfect waste habits
-      transport: { twoWheelerKmPerWeek: 500, carKmPerWeek: 200, publicTransportTripsPerWeek: 0, cabAutoTripsPerWeek: 0, flightsPerYear: 0 },
+      transport: {
+        twoWheelerKmPerWeek: 500,
+        carKmPerWeek: 200,
+        publicTransportTripsPerWeek: 0,
+        cabAutoTripsPerWeek: 0,
+        flightsPerYear: 0,
+      },
       waste: { recycles: true, composts: true, plasticUsage: "low" },
     };
     const result = calculateFootprint(perfectWasteInput, profile);
@@ -240,8 +319,8 @@ describe("simulator.ts – uncovered branches", () => {
   });
 
   it("simulateActions throws on unknown action ID", () => {
-    expect(() =>
-      simulateActions(baseInput, profile, ["unknown_action" as never]),
-    ).toThrow(/unknown simulation action/i);
+    expect(() => simulateActions(baseInput, profile, ["unknown_action" as never])).toThrow(
+      /unknown simulation action/i
+    );
   });
 });

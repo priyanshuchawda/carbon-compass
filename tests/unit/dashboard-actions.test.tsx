@@ -13,8 +13,8 @@ vi.mock("next/navigation", () => ({
 // Mock session so DashboardClient and ActionsClient don't touch real storage
 vi.mock("@/lib/carbon/session", () => ({
   loadSessionPayload: () => null,
-  saveSessionFootprint: vi.fn(),
-  saveSessionProfile: vi.fn(),
+  saveSessionFootprint: vi.fn(() => ({ ok: true })),
+  saveSessionProfile: vi.fn(() => ({ ok: true })),
   loadSessionFootprint: () => null,
   loadSessionProfile: () => null,
   clearSessionData: vi.fn(),
@@ -49,7 +49,7 @@ describe("dashboard and action plan", () => {
       screen.getByRole("heading", {
         level: 1,
         name: /your carbon compass dashboard/i,
-      }),
+      })
     ).toBeInTheDocument();
 
     expect(screen.getAllByText(/monthly footprint/i).length).toBeGreaterThan(0);
@@ -57,21 +57,20 @@ describe("dashboard and action plan", () => {
     expect(screen.getAllByText(/potential monthly saving/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/eco score/i).length).toBeGreaterThan(0);
 
-    expect(
-      screen.getByRole("region", { name: /category breakdown/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: /category breakdown/i })).toBeInTheDocument();
     const textSummary = screen.getByRole("list", {
       name: /category breakdown text summary/i,
     });
     expect(within(textSummary).getByText(/transport/i)).toBeInTheDocument();
     expect(within(textSummary).getByText(/home energy/i)).toBeInTheDocument();
 
-    expect(
-      screen.getByRole("region", { name: /compass assistant insight/i }),
-    ).toHaveTextContent(/transport is your largest source/i);
-    expect(
-      screen.getByRole("link", { name: /open full action plan/i }),
-    ).toHaveAttribute("href", "/actions");
+    expect(screen.getByRole("region", { name: /compass assistant insight/i })).toHaveTextContent(
+      /transport is your largest source/i
+    );
+    expect(screen.getByRole("link", { name: /open full action plan/i })).toHaveAttribute(
+      "href",
+      "/actions"
+    );
 
     const simulator = screen.getByRole("region", {
       name: /what-if simulator/i,
@@ -90,7 +89,7 @@ describe("dashboard and action plan", () => {
       screen.getByRole("heading", {
         level: 1,
         name: /weekly action plan/i,
-      }),
+      })
     ).toBeInTheDocument();
 
     const recommendations = screen.getAllByRole("article");

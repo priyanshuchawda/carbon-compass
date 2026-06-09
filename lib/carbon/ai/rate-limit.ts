@@ -25,7 +25,7 @@ export function rateLimit(
   key: string,
   limit = 20,
   windowMs = 60_000,
-  now: number = Date.now(),
+  now: number = Date.now()
 ): RateLimitResult {
   const existing = buckets.get(key);
 

@@ -20,7 +20,6 @@ vi.mock("@/lib/carbon/activity-log", async (importOriginal) => {
 describe("LogPage Activity Tracker Page", () => {
   beforeEach(() => {
     vi.resetAllMocks();
-    vi.spyOn(window, "confirm").mockImplementation(() => true);
   });
 
   it("renders log page empty state correctly", () => {
@@ -168,7 +167,10 @@ describe("LogPage Activity Tracker Page", () => {
     const clearAllBtn = screen.getByRole("button", { name: /clear all/i });
     fireEvent.click(clearAllBtn);
 
-    expect(window.confirm).toHaveBeenCalled();
+    // Dialog should be displayed; click the "Yes, Clear All" button inside the modal
+    const confirmBtn = screen.getByRole("button", { name: /yes, clear all/i });
+    fireEvent.click(confirmBtn);
+
     expect(activityLog.clearActivityLog).toHaveBeenCalled();
     expect(screen.getByText(/history cleared/i)).toBeInTheDocument();
   });

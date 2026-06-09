@@ -1,13 +1,5 @@
 import type { CarbonCategory } from "@/lib/carbon/types";
 
-export type ActivityTypeDefinition = {
-  id: string;
-  category: CarbonCategory;
-  label: string;
-  unit: string;
-  helperText: string;
-};
-
 export type ActivityCategoryMeta = {
   label: string;
   badgeClass: string;
@@ -36,7 +28,7 @@ export const ACTIVITY_CATEGORY_META: Record<CarbonCategory, ActivityCategoryMeta
   },
 };
 
-export const ACTIVITY_TYPES: readonly ActivityTypeDefinition[] = [
+const rawActivityTypes = [
   {
     id: "two_wheeler",
     category: "transport",
@@ -144,6 +136,18 @@ export const ACTIVITY_TYPES: readonly ActivityTypeDefinition[] = [
   },
 ] as const;
 
+export type ActivityTypeId = (typeof rawActivityTypes)[number]["id"];
+
+export type ActivityTypeDefinition = {
+  id: ActivityTypeId;
+  category: CarbonCategory;
+  label: string;
+  unit: string;
+  helperText: string;
+};
+
+export const ACTIVITY_TYPES: readonly ActivityTypeDefinition[] = rawActivityTypes;
+
 export const ACTIVITY_CATEGORIES: readonly CarbonCategory[] = [
   "transport",
   "energy",
@@ -152,19 +156,15 @@ export const ACTIVITY_CATEGORIES: readonly CarbonCategory[] = [
   "waste",
 ] as const;
 
-export function getActivityTypesForCategory(
-  category: CarbonCategory,
-): ActivityTypeDefinition[] {
+export function getActivityTypesForCategory(category: CarbonCategory): ActivityTypeDefinition[] {
   return ACTIVITY_TYPES.filter((activity) => activity.category === category);
 }
 
 export function getActivityType(
   category: CarbonCategory,
-  id: string,
+  id: string
 ): ActivityTypeDefinition | null {
   return (
-    ACTIVITY_TYPES.find(
-      (activity) => activity.category === category && activity.id === id,
-    ) ?? null
+    ACTIVITY_TYPES.find((activity) => activity.category === category && activity.id === id) ?? null
   );
 }

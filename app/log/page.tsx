@@ -18,6 +18,7 @@ export default function LogPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingEntry, setEditingEntry] = useState<ActivityLogEntry | null>(null);
   const [feedback, setFeedback] = useState("");
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   function handleShowForm() {
     if (editingEntry) {
@@ -67,15 +68,12 @@ export default function LogPage() {
   }
 
   function handleClearAll() {
-    if (!confirm("Are you sure you want to clear your entire activity log? This cannot be undone.")) {
-      return;
-    }
-
     clearActivityLog();
     setHistory([]);
     setFeedback("History cleared.");
     setEditingEntry(null);
     setShowForm(false);
+    setShowClearConfirm(false);
   }
 
   return (
@@ -101,7 +99,7 @@ export default function LogPage() {
             {history.length > 0 && (
               <button
                 type="button"
-                onClick={handleClearAll}
+                onClick={() => setShowClearConfirm(true)}
                 className="inline-flex min-h-10 items-center justify-center rounded-md border border-red-300 bg-white px-4 text-sm font-semibold text-red-700 shadow-sm transition hover:bg-red-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700"
               >
                 Clear All
@@ -140,6 +138,40 @@ export default function LogPage() {
           )}
         </section>
       </div>
+
+      {showClearConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+        >
+          <div className="w-full max-w-md rounded-lg border border-slate-200 bg-white p-6 shadow-lg">
+            <h2 id="modal-title" className="text-lg font-semibold text-slate-950">
+              Clear Activity Log
+            </h2>
+            <p className="mt-2 text-sm text-slate-700">
+              Are you sure you want to clear your entire activity log? This cannot be undone.
+            </p>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowClearConfirm(false)}
+                className="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleClearAll}
+                className="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+              >
+                Yes, Clear All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

@@ -54,7 +54,7 @@ async function runSmokeTests() {
     const response = await fetch(`${baseUrl}/api/assistant/chat`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         profile: {
@@ -63,7 +63,7 @@ async function runSmokeTests() {
           country: "India",
           householdSize: 1,
           persona: "student",
-          mainGoal: "reduce_carbon"
+          mainGoal: "reduce_carbon",
         },
         result: {
           monthlyTotalKgCO2e: 158,
@@ -73,24 +73,39 @@ async function runSmokeTests() {
             { category: "energy", label: "Home energy", kgCO2e: 50, percentage: 31.6 },
             { category: "food", label: "Food", kgCO2e: 58, percentage: 36.8 },
             { category: "shopping", label: "Shopping", kgCO2e: 0, percentage: 0 },
-            { category: "waste", label: "Waste", kgCO2e: 0, percentage: 0 }
+            { category: "waste", label: "Waste", kgCO2e: 0, percentage: 0 },
           ],
           topCategory: "food",
           ecoScore: 70,
           potentialMonthlySavingKgCO2e: 10,
-          assumptions: []
+          assumptions: [],
         },
         footprint: {
-          transport: { twoWheelerKmPerWeek: 0, carKmPerWeek: 0, publicTransportTripsPerWeek: 0, cabAutoTripsPerWeek: 0, flightsPerYear: 0 },
-          energy: { monthlyElectricityKWh: 0, lpgCylindersPerMonth: 0, acHoursPerDay: 0, renewableEnergy: false },
-          food: { dietType: "vegetarian", meatMealsPerWeek: 0, dairyFrequency: "low", foodDeliveryPerWeek: 0, foodWasteLevel: "low" },
+          transport: {
+            twoWheelerKmPerWeek: 0,
+            carKmPerWeek: 0,
+            publicTransportTripsPerWeek: 0,
+            cabAutoTripsPerWeek: 0,
+            flightsPerYear: 0,
+          },
+          energy: {
+            monthlyElectricityKWh: 0,
+            lpgCylindersPerMonth: 0,
+            acHoursPerDay: 0,
+            renewableEnergy: false,
+          },
+          food: {
+            dietType: "vegetarian",
+            meatMealsPerWeek: 0,
+            dairyFrequency: "low",
+            foodDeliveryPerWeek: 0,
+            foodWasteLevel: "low",
+          },
           shopping: { clothesPerMonth: 0, onlineOrdersPerMonth: 0, electronicsPerYear: 0 },
-          waste: { recycles: false, composts: false, plasticUsage: "low" }
+          waste: { recycles: false, composts: false, plasticUsage: "low" },
         },
-        messages: [
-          { role: "user", content: "Hi" }
-        ]
-      })
+        messages: [{ role: "user", content: "Hi" }],
+      }),
     });
 
     if (!response.ok && response.status !== 429) {
@@ -98,8 +113,10 @@ async function runSmokeTests() {
     }
 
     const reqId = response.headers.get("X-Request-ID");
-    const limit = response.headers.get("RateLimit-Limit") || response.headers.get("X-RateLimit-Limit");
-    const remaining = response.headers.get("RateLimit-Remaining") || response.headers.get("X-RateLimit-Remaining");
+    const limit =
+      response.headers.get("RateLimit-Limit") || response.headers.get("X-RateLimit-Limit");
+    const remaining =
+      response.headers.get("RateLimit-Remaining") || response.headers.get("X-RateLimit-Remaining");
 
     if (!reqId || !limit || !remaining) {
       throw new Error("Assistant API responses are missing Rate Limit headers or Request ID");
@@ -110,7 +127,10 @@ async function runSmokeTests() {
     console.log(`   └─ RateLimit-Limit: ${limit}`);
     console.log(`   └─ RateLimit-Remaining: ${remaining}`);
   } catch (err) {
-    console.error("❌ Assistant API headers check failed:", err instanceof Error ? err.message : err);
+    console.error(
+      "❌ Assistant API headers check failed:",
+      err instanceof Error ? err.message : err
+    );
     exit(1);
   }
 

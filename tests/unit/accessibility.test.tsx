@@ -18,8 +18,8 @@ vi.mock("next/navigation", () => ({
 // Mock session so DashboardClient and ActionsClient don't touch real storage
 vi.mock("@/lib/carbon/session", () => ({
   loadSessionPayload: () => null,
-  saveSessionFootprint: vi.fn(),
-  saveSessionProfile: vi.fn(),
+  saveSessionFootprint: vi.fn(() => ({ ok: true })),
+  saveSessionProfile: vi.fn(() => ({ ok: true })),
   loadSessionFootprint: () => null,
   loadSessionProfile: () => null,
   clearSessionData: vi.fn(),
@@ -42,7 +42,7 @@ describe("accessibility baseline", () => {
     render(<CategoryBreakdown breakdown={demoFootprintResult.breakdown} />);
 
     expect(
-      screen.getByRole("list", { name: /category breakdown text summary/i }),
+      screen.getByRole("list", { name: /category breakdown text summary/i })
     ).toHaveTextContent(/transport/i);
   });
 });

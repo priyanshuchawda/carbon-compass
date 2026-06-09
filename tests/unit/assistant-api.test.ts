@@ -1,6 +1,11 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { POST } from "../../app/api/assistant/narrate/route";
-import type { FootprintInput, FootprintResult, Recommendation, UserProfile } from "../../lib/carbon/types";
+import type {
+  FootprintInput,
+  FootprintResult,
+  Recommendation,
+  UserProfile,
+} from "../../lib/carbon/types";
 
 const mockProfile: UserProfile = {
   id: "user-1",
@@ -44,18 +49,45 @@ const mockFootprint: FootprintInput = {
   },
 };
 
-const mockResult = (topCategory: "transport" | "energy" | "food" | "shopping" | "waste" = "transport"): FootprintResult => ({
+const mockResult = (
+  topCategory: "transport" | "energy" | "food" | "shopping" | "waste" = "transport"
+): FootprintResult => ({
   monthlyTotalKgCO2e: 100,
   annualTotalKgCO2e: 1200,
   potentialMonthlySavingKgCO2e: 18,
   ecoScore: 65,
   topCategory,
   breakdown: [
-    { category: "transport", label: "Transport", kgCO2e: topCategory === "transport" ? 60 : 10, percentage: topCategory === "transport" ? 60 : 10 },
-    { category: "energy", label: "Home energy", kgCO2e: topCategory === "energy" ? 60 : 10, percentage: topCategory === "energy" ? 60 : 10 },
-    { category: "food", label: "Food", kgCO2e: topCategory === "food" ? 60 : 10, percentage: topCategory === "food" ? 60 : 10 },
-    { category: "shopping", label: "Shopping", kgCO2e: topCategory === "shopping" ? 60 : 10, percentage: topCategory === "shopping" ? 60 : 10 },
-    { category: "waste", label: "Waste", kgCO2e: topCategory === "waste" ? 60 : 10, percentage: topCategory === "waste" ? 60 : 10 },
+    {
+      category: "transport",
+      label: "Transport",
+      kgCO2e: topCategory === "transport" ? 60 : 10,
+      percentage: topCategory === "transport" ? 60 : 10,
+    },
+    {
+      category: "energy",
+      label: "Home energy",
+      kgCO2e: topCategory === "energy" ? 60 : 10,
+      percentage: topCategory === "energy" ? 60 : 10,
+    },
+    {
+      category: "food",
+      label: "Food",
+      kgCO2e: topCategory === "food" ? 60 : 10,
+      percentage: topCategory === "food" ? 60 : 10,
+    },
+    {
+      category: "shopping",
+      label: "Shopping",
+      kgCO2e: topCategory === "shopping" ? 60 : 10,
+      percentage: topCategory === "shopping" ? 60 : 10,
+    },
+    {
+      category: "waste",
+      label: "Waste",
+      kgCO2e: topCategory === "waste" ? 60 : 10,
+      percentage: topCategory === "waste" ? 60 : 10,
+    },
   ],
   assumptions: [],
 });
@@ -133,7 +165,9 @@ describe("Assistant Narration API Route", () => {
 
     const responseEnergy = await POST(requestEnergy);
     const jsonEnergy = await responseEnergy.json();
-    expect(jsonEnergy.narrative).toContain("Home energy usage represents your primary carbon footprint opportunity");
+    expect(jsonEnergy.narrative).toContain(
+      "Home energy usage represents your primary carbon footprint opportunity"
+    );
     expect(jsonEnergy.weeklyChallenge).toContain("Reduce daily AC usage by 1 hour");
   });
 

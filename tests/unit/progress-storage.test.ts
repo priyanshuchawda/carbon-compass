@@ -16,7 +16,7 @@ const makeEntry = (
   id: string,
   monthlyTotalKgCO2e: number,
   ecoScore: number,
-  daysAgo = 0,
+  daysAgo = 0
 ): ProgressEntry => ({
   id,
   recordedAt: new Date(Date.now() - daysAgo * 86_400_000).toISOString(),
@@ -29,8 +29,12 @@ const mockStorage = () => {
   const store: Record<string, string> = {};
   return {
     getItem: (key: string) => store[key] ?? null,
-    setItem: (key: string, value: string) => { store[key] = value; },
-    removeItem: (key: string) => { delete store[key]; },
+    setItem: (key: string, value: string) => {
+      store[key] = value;
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
   };
 };
 
@@ -57,10 +61,7 @@ describe("progress storage – edge cases", () => {
 
   it("returns empty array when schema version mismatches", () => {
     const storage = mockStorage();
-    storage.setItem(
-      PROGRESS_STORAGE_KEY,
-      JSON.stringify({ schemaVersion: 99, entries: [] }),
-    );
+    storage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify({ schemaVersion: 99, entries: [] }));
     expect(loadProgressHistory(storage)).toEqual([]);
   });
 
@@ -70,8 +71,16 @@ describe("progress storage – edge cases", () => {
       PROGRESS_STORAGE_KEY,
       JSON.stringify({
         schemaVersion: PROGRESS_SCHEMA_VERSION,
-        entries: [{ id: "", recordedAt: "not-a-date", monthlyTotalKgCO2e: -1, ecoScore: 999, topCategory: "bad" }],
-      }),
+        entries: [
+          {
+            id: "",
+            recordedAt: "not-a-date",
+            monthlyTotalKgCO2e: -1,
+            ecoScore: 999,
+            topCategory: "bad",
+          },
+        ],
+      })
     );
     expect(loadProgressHistory(storage)).toEqual([]);
   });
@@ -102,7 +111,7 @@ describe("progress storage – edge cases", () => {
   it("caps history at 12 entries via appendProgressEntry", () => {
     const storage = mockStorage();
     const existing = Array.from({ length: 12 }, (_, i) =>
-      makeEntry(`e${i}`, 200 - i, 40 + i, 12 - i),
+      makeEntry(`e${i}`, 200 - i, 40 + i, 12 - i)
     );
     saveProgressHistory(existing, storage);
     appendProgressEntry(makeEntry("e13", 150, 65, 0), storage);
@@ -149,7 +158,7 @@ describe("bestMonthlyImprovement", () => {
         makeEntry("e1", 100, 70, 20),
         makeEntry("e2", 150, 60, 10),
         makeEntry("e3", 200, 50, 0),
-      ]),
+      ])
     ).toBe(0);
   });
 
@@ -157,7 +166,7 @@ describe("bestMonthlyImprovement", () => {
     const best = bestMonthlyImprovement([
       makeEntry("e1", 300, 30, 60),
       makeEntry("e2", 250, 40, 30), // saved 50
-      makeEntry("e3", 230, 43, 0),  // saved 20
+      makeEntry("e3", 230, 43, 0), // saved 20
     ]);
     expect(best).toBe(50);
   });

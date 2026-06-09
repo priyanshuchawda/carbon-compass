@@ -1,17 +1,8 @@
-export type CarbonCategory =
-  | "transport"
-  | "energy"
-  | "food"
-  | "shopping"
-  | "waste";
+export type CarbonCategory = "transport" | "energy" | "food" | "shopping" | "waste";
 
 export type Persona = "student" | "working" | "family";
 
-export type MainGoal =
-  | "save_money"
-  | "reduce_carbon"
-  | "learn"
-  | "habit_building";
+export type MainGoal = "save_money" | "reduce_carbon" | "learn" | "habit_building";
 
 export type Difficulty = "easy" | "medium" | "hard";
 

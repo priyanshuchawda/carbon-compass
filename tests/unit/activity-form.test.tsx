@@ -28,7 +28,7 @@ describe("ActivityForm", () => {
         activityType: "electricity",
         value: 100,
         kgCO2e: 71,
-      }),
+      })
     );
   });
 
@@ -40,9 +40,7 @@ describe("ActivityForm", () => {
     fireEvent.click(screen.getByRole("button", { name: /submit activity/i }));
 
     expect(onSave).not.toHaveBeenCalled();
-    expect(
-      screen.getByText(/please enter a valid non-negative quantity/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/please enter a valid non-negative quantity/i)).toBeInTheDocument();
   });
 
   it("shows validation feedback for invalid date", () => {

@@ -1,80 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { PrintReportButton } from "@/components/carbon/print-report-button";
 import { ProgressTrend } from "@/components/carbon/progress-trend";
-import { calculateFootprint } from "@/lib/carbon/calculate";
-import { getRecommendations } from "@/lib/carbon/recommendations";
-import { loadSessionPayload } from "@/lib/carbon/session";
+import { useCarbonSessionState } from "@/lib/carbon/use-carbon-session-state";
 import { loadProgressHistory } from "@/lib/carbon/progress";
-import type { FootprintResult, Recommendation, UserProfile } from "@/lib/carbon/types";
-import type { ProgressEntry } from "@/lib/carbon/progress";
-import {
-  demoFootprintResult,
-  demoProfile,
-  demoRecommendations,
-} from "@/lib/carbon/demo";
 import { demoProgressHistory } from "@/lib/carbon/demo-progress";
 
 function kg(value: number): string {
   return `${Math.round(value)} kg CO2e`;
 }
 
-type ReportState = {
-  result: FootprintResult;
-  recommendations: Recommendation[];
-  profile: UserProfile;
-  progressHistory: ProgressEntry[];
-  isDemo: boolean;
-};
-
-function buildDemoState(): ReportState {
-  return {
-    result: demoFootprintResult,
-    recommendations: demoRecommendations,
-    profile: demoProfile,
-    progressHistory: demoProgressHistory,
-    isDemo: true,
-  };
-}
-
 export function ReportClient() {
-  const [state] = useState<ReportState>(() => {
-    const session = loadSessionPayload();
-    if (!session) return buildDemoState();
+  const state = useCarbonSessionState();
+  const { result, recommendations, profile, isDemo } = state;
 
-    const result = calculateFootprint(session.footprint, session.profile);
-    const recommendations = getRecommendations(session.footprint, result, session.profile);
-    
-    // Load real progress history. If it's empty, we construct a basic history with the current entry.
-    let progressHistory = loadProgressHistory();
-    if (progressHistory.length === 0) {
-      progressHistory = [
+  const progressHistory = useMemo(() => {
+    if (isDemo) return demoProgressHistory;
+    let history = loadProgressHistory();
+    if (history.length === 0) {
+      history = [
         {
-          id: `initial-checkin-${Date.now()}`,
-          recordedAt: new Date().toISOString(),
+          id: "initial-checkin",
+          recordedAt: "2026-06-09T00:00:00.000Z",
           monthlyTotalKgCO2e: result.monthlyTotalKgCO2e,
           ecoScore: result.ecoScore,
           topCategory: result.topCategory,
-        }
+        },
       ];
     }
-    
-    return {
-      result,
-      recommendations,
-      profile: session.profile,
-      progressHistory,
-      isDemo: false,
-    };
-  });
+    return history;
+  }, [isDemo, result]);
 
-  const { result, recommendations, profile, progressHistory, isDemo } = state;
-
-  const topCategory = result.breakdown.find(
-    (item) => item.category === result.topCategory,
-  );
+  const topCategory = result.breakdown.find((item) => item.category === result.topCategory);
   const bestAction = recommendations[0];
 
   return (
@@ -88,10 +47,9 @@ export function ReportClient() {
             Carbon Compass report
           </h1>
           <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-700">
-            {isDemo 
+            {isDemo
               ? `A judge-ready demo report for ${profile.city}, showing the estimate, top source, strongest action, progress trend, and transparent assumptions.`
-              : `Your personalised lifestyle carbon report for ${profile.city}, showing your footprint breakdown, best actions, and tracking trend.`
-            }
+              : `Your personalised lifestyle carbon report for ${profile.city}, showing your footprint breakdown, best actions, and tracking trend.`}
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -120,12 +78,10 @@ export function ReportClient() {
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-emerald-700">
             Carbon Compass
           </p>
-          <h2 className="mt-2 text-3xl font-semibold text-slate-950">
-            Lifestyle footprint report
-          </h2>
+          <h2 className="mt-2 text-3xl font-semibold text-slate-950">Lifestyle footprint report</h2>
           <p className="mt-2 text-sm text-slate-600">
-            {isDemo ? "Demo profile: " : "Profile: "}{profile.persona}, {profile.city},{" "}
-            {profile.country}
+            {isDemo ? "Demo profile: " : "Profile: "}
+            {profile.persona}, {profile.city}, {profile.country}
           </p>
         </header>
 
@@ -166,12 +122,10 @@ export function ReportClient() {
             aria-label="Transparent assumptions"
             className="rounded-lg border border-slate-200 bg-slate-50 p-5"
           >
-            <h2 className="text-2xl font-semibold text-slate-950">
-              Transparent assumptions
-            </h2>
+            <h2 className="text-2xl font-semibold text-slate-950">Transparent assumptions</h2>
             <p className="mt-2 text-sm leading-6 text-slate-700">
-              This report is an educational estimate, not a certified carbon
-              audit. It avoids exact addresses and unnecessary personal data.
+              This report is an educational estimate, not a certified carbon audit. It avoids exact
+              addresses and unnecessary personal data.
             </p>
             <ul className="mt-4 grid gap-2 text-sm leading-6 text-slate-700">
               {result.assumptions.map((assumption) => (

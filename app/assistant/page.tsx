@@ -1,13 +1,9 @@
 "use client";
 
-/* eslint-disable react-hooks/set-state-in-effect */
-
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { loadSessionPayload } from "@/lib/carbon/session";
-import { calculateFootprint } from "@/lib/carbon/calculate";
-import type { FootprintResult, UserProfile, FootprintInput } from "@/lib/carbon/types";
-import { demoProfile, demoFootprintInput, demoFootprintResult } from "@/lib/carbon/demo";
+import { useCarbonSessionState } from "@/lib/carbon/use-carbon-session-state";
+import { chatApiResponseSchema } from "@/lib/validation/schemas";
 
 type Message = {
   role: "user" | "assistant";
@@ -18,14 +14,11 @@ const SUGGESTIONS = [
   "What is driving my emissions the most?",
   "Give me three practical ways to cut my footprint.",
   "How does my footprint compare to the India average?",
-  "What does my eco score mean and how can I improve it?"
+  "What does my eco score mean and how can I improve it?",
 ];
 
 export default function AssistantPage() {
-  const [profile, setProfile] = useState<UserProfile>(demoProfile);
-  const [footprint, setFootprint] = useState<FootprintInput>(demoFootprintInput);
-  const [result, setResult] = useState<FootprintResult>(demoFootprintResult);
-  const [isDemo, setIsDemo] = useState(true);
+  const { profile, footprintInput: footprint, result, isDemo } = useCarbonSessionState();
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -33,17 +26,6 @@ export default function AssistantPage() {
   const [error, setError] = useState("");
 
   const chatEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const session = loadSessionPayload();
-    if (session) {
-      setProfile(session.profile);
-      setFootprint(session.footprint);
-      const res = calculateFootprint(session.footprint, session.profile);
-      setResult(res);
-      setIsDemo(false);
-    }
-  }, []);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -67,15 +49,15 @@ export default function AssistantPage() {
           profile,
           result,
           footprint,
-          messages: nextMessages
-        })
+          messages: nextMessages,
+        }),
       });
 
       if (!response.ok) {
         throw new Error("Failed to get response from assistant.");
       }
 
-      const data = await response.json();
+      const data = chatApiResponseSchema.parse(await response.json());
       if (data.content) {
         setMessages((prev) => [...prev, { role: "assistant", content: data.content }]);
       } else if (data.error) {
@@ -136,7 +118,8 @@ export default function AssistantPage() {
                 <div>
                   <h3 className="text-lg font-medium text-slate-900">How can I help you today?</h3>
                   <p className="mt-1 text-sm text-slate-500 max-w-sm">
-                    Select a suggestion below or write a custom question about your carbon footprint.
+                    Select a suggestion below or write a custom question about your carbon
+                    footprint.
                   </p>
                 </div>
                 <div className="grid gap-2 w-full max-w-md">

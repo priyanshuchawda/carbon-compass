@@ -22,8 +22,8 @@ vi.mock("next/navigation", () => ({
 // Mock session so DashboardClient and ActionsClient don't touch real storage
 vi.mock("@/lib/carbon/session", () => ({
   loadSessionPayload: () => null,
-  saveSessionFootprint: vi.fn(),
-  saveSessionProfile: vi.fn(),
+  saveSessionFootprint: vi.fn(() => ({ ok: true })),
+  saveSessionProfile: vi.fn(() => ({ ok: true })),
   loadSessionFootprint: () => null,
   loadSessionProfile: () => null,
   clearSessionData: vi.fn(),
@@ -61,8 +61,7 @@ describe("foundation routes", () => {
   it.each(plannedRoutes)("$name route has one clear h1", ({ Component, heading }) => {
     render(<Component />);
 
-    expect(screen.getByRole("heading", { level: 1, name: heading }))
-      .toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: heading })).toBeInTheDocument();
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
   });
 });

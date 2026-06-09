@@ -69,10 +69,18 @@ function makeMemoryStorage(): Storage {
   const store: Record<string, string> = {};
   return {
     getItem: (key: string) => store[key] ?? null,
-    setItem: (key: string, value: string) => { store[key] = value; },
-    removeItem: (key: string) => { delete store[key]; },
-    clear: () => { Object.keys(store).forEach((k) => delete store[k]); },
-    get length() { return Object.keys(store).length; },
+    setItem: (key: string, value: string) => {
+      store[key] = value;
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    clear: () => {
+      Object.keys(store).forEach((k) => delete store[k]);
+    },
+    get length() {
+      return Object.keys(store).length;
+    },
     key: (i: number) => Object.keys(store)[i] ?? null,
   };
 }
@@ -111,7 +119,10 @@ describe("session bridge — footprint", () => {
   });
 
   it("returns null when stored JSON fails Zod validation (negative km)", () => {
-    const bad = { ...validFootprint, transport: { ...validFootprint.transport, twoWheelerKmPerWeek: -1 } };
+    const bad = {
+      ...validFootprint,
+      transport: { ...validFootprint.transport, twoWheelerKmPerWeek: -1 },
+    };
     memStorage.setItem("carbon-compass.session.footprint", JSON.stringify(bad));
     expect(loadSessionFootprint()).toBeNull();
   });

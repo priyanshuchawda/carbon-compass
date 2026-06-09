@@ -38,7 +38,9 @@ describe("sanitizeText", () => {
 describe("escapeHtml", () => {
   it("escapes special HTML characters", () => {
     const input = `<script>alert("hello & welcome's");</script>`;
-    expect(escapeHtml(input)).toBe("&lt;script&gt;alert(&quot;hello &amp; welcome&#39;s&quot;);&lt;/script&gt;");
+    expect(escapeHtml(input)).toBe(
+      "&lt;script&gt;alert(&quot;hello &amp; welcome&#39;s&quot;);&lt;/script&gt;"
+    );
   });
 });
 
@@ -54,7 +56,8 @@ describe("redactSecrets", () => {
   });
 
   it("redacts jwt tokens", () => {
-    const input = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    const input =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
     expect(redactSecrets(input)).toContain("[redacted-jwt]");
   });
 });

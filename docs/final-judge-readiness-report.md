@@ -6,7 +6,7 @@ This report summarizes the state, demo validation flow, and security-hardened fe
 
 ## 1. Executive Summary
 
-Carbon Compass is a full-stack Next.js application designed to calculate, track, and reduce personal carbon emissions for urban Indian households. The application is completely local-first: all user-entered profiles and calculation inputs are stored within the browser's `sessionStorage` or `localStorage` to preserve privacy. 
+Carbon Compass is a full-stack Next.js application designed to calculate, track, and reduce personal carbon emissions for urban Indian households. The application is completely local-first: all user-entered profiles and calculation inputs are stored within the browser's `sessionStorage` or `localStorage` to preserve privacy.
 
 Every claim made in the features documentation is fully validated by automated type checking, linting, unit test blocks, and Playwright E2E browser tests run against production builds.
 

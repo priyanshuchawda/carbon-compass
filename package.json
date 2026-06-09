@@ -12,6 +12,8 @@
     "start": "next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -21,7 +23,8 @@
     "perf:bundle-report": "node scripts/inspect-client-chunks.mjs",
     "smoke": "node scripts/smoke.mjs",
     "quality": "pnpm typecheck && pnpm lint && pnpm test && pnpm build && pnpm perf:bundle-report",
-    "verify": "pnpm quality"
+    "verify": "pnpm quality",
+    "clean": "node scripts/clean.mjs"
   },
   "dependencies": {
     "next": "16.2.7",
@@ -48,6 +51,7 @@
     "eslint-config-next": "16.2.7",
     "jsdom": "^29.1.1",
     "playwright": "^1.60.0",
+    "prettier": "^3.8.4",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.8"

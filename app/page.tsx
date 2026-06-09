@@ -30,13 +30,11 @@ export default function Home() {
             Built for urban students and young professionals in India
           </p>
           <h1 className="max-w-4xl text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
-            Track your lifestyle carbon footprint and get practical ways to
-            reduce it.
+            Track your lifestyle carbon footprint and get practical ways to reduce it.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-700">
-            Carbon Compass estimates your impact across commute, home energy,
-            food, shopping, and waste, then turns the result into simple weekly
-            actions.
+            Carbon Compass estimates your impact across commute, home energy, food, shopping, and
+            waste, then turns the result into simple weekly actions.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -63,35 +61,24 @@ export default function Home() {
             <p className="text-sm font-medium uppercase tracking-[0.18em] text-emerald-200">
               Compass Assistant
             </p>
-            <h2 className="mt-3 text-2xl font-semibold">
-              Your biggest opportunity is transport.
-            </h2>
+            <h2 className="mt-3 text-2xl font-semibold">Your biggest opportunity is transport.</h2>
             <p className="mt-4 text-sm leading-6 text-emerald-50">
-              Because weekly scooter and cab travel is higher than other
-              categories, replacing two short fuel trips can create a visible
-              monthly reduction.
+              Because weekly scooter and cab travel is higher than other categories, replacing two
+              short fuel trips can create a visible monthly reduction.
             </p>
           </div>
           <dl className="mt-6 grid gap-3 sm:grid-cols-3">
             {demoStats.map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-md border border-slate-200 bg-slate-50 p-4"
-              >
+              <div key={stat.label} className="rounded-md border border-slate-200 bg-slate-50 p-4">
                 <dt className="text-sm text-slate-600">{stat.label}</dt>
-                <dd className="mt-2 text-lg font-semibold text-slate-950">
-                  {stat.value}
-                </dd>
+                <dd className="mt-2 text-lg font-semibold text-slate-950">{stat.value}</dd>
               </div>
             ))}
           </dl>
         </aside>
       </section>
 
-      <section
-        aria-labelledby="features-heading"
-        className="border-t border-emerald-100 bg-white"
-      >
+      <section aria-labelledby="features-heading" className="border-t border-emerald-100 bg-white">
         <div className="mx-auto max-w-7xl px-6 py-14 sm:px-8 lg:px-10">
           <h2
             id="features-heading"
@@ -101,16 +88,9 @@ export default function Home() {
           </h2>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
             {featureCards.map((card) => (
-              <article
-                key={card.title}
-                className="rounded-lg border border-slate-200 bg-white p-5"
-              >
-                <h3 className="text-lg font-semibold text-slate-950">
-                  {card.title}
-                </h3>
-                <p className="mt-3 text-sm leading-6 text-slate-700">
-                  {card.body}
-                </p>
+              <article key={card.title} className="rounded-lg border border-slate-200 bg-white p-5">
+                <h3 className="text-lg font-semibold text-slate-950">{card.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-700">{card.body}</p>
               </article>
             ))}
           </div>

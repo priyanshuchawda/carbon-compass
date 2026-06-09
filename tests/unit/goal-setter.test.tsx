@@ -10,7 +10,7 @@ vi.mock("@/lib/carbon/progress", async (importOriginal) => {
   return {
     ...original,
     loadMonthlyGoal: vi.fn(),
-    saveMonthlyGoal: vi.fn(),
+    saveMonthlyGoal: vi.fn(() => ({ ok: true })),
   };
 });
 
@@ -29,12 +29,12 @@ describe("GoalSetter Component", () => {
     expect(screen.queryByText(/target reached/i)).not.toBeInTheDocument();
   });
 
-  it("renders goal state when a goal is loaded", () => {
+  it("renders goal state when a goal is loaded", async () => {
     vi.mocked(progressLib.loadMonthlyGoal).mockReturnValue(250);
 
     render(<GoalSetter currentMonthlyKg={200} />);
 
-    expect(screen.getByDisplayValue("250")).toBeInTheDocument();
+    expect(await screen.findByDisplayValue("250")).toBeInTheDocument();
     expect(screen.getByText(/80% of target reached/i)).toBeInTheDocument();
     expect(screen.getByText(/Goal Met/i)).toBeInTheDocument();
   });
@@ -61,7 +61,7 @@ describe("GoalSetter Component", () => {
 
     render(<GoalSetter currentMonthlyKg={200} />);
 
-    const clearButton = screen.getByRole("button", { name: /clear/i });
+    const clearButton = await screen.findByRole("button", { name: /clear/i });
     await user.click(clearButton);
 
     expect(progressLib.saveMonthlyGoal).toHaveBeenCalledWith(null);

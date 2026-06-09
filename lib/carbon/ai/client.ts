@@ -2,6 +2,7 @@ import "server-only";
 import { MODELS, getGeminiApiKey, INPUT_COST_PER_MILLION, OUTPUT_COST_PER_MILLION } from "./config";
 import { ASSISTANT_TOOLS } from "../assistant-tools";
 import { GEMINI_RESPONSE_SCHEMA } from "./prompt";
+import { geminiResponseBodySchema } from "@/lib/validation/schemas";
 
 export interface GeminiPart {
   text?: string;
@@ -69,7 +70,7 @@ async function fetchGeminiRaw(
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
-    signal
+    signal,
   });
 }
 
@@ -101,8 +102,8 @@ export async function callGeminiWithFallback(
       tools: [{ functionDeclarations: ASSISTANT_TOOLS }],
       generationConfig: {
         responseMimeType: "application/json",
-        responseSchema: GEMINI_RESPONSE_SCHEMA
-      }
+        responseSchema: GEMINI_RESPONSE_SCHEMA,
+      },
     };
 
     for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
@@ -110,11 +111,11 @@ export async function callGeminiWithFallback(
         const response = await fetchGeminiRaw(apiKey, model, payload, signal);
 
         if (response.ok) {
-          const responseBody = (await response.json()) as GeminiResponseBody;
-          
+          const responseBody = geminiResponseBodySchema.parse(await response.json());
+
           const promptTokens = responseBody.usageMetadata?.promptTokenCount ?? 0;
           const candidatesTokens = responseBody.usageMetadata?.candidatesTokenCount ?? 0;
-          
+
           const costUSD = Number(
             (
               (promptTokens / 1_000_000) * INPUT_COST_PER_MILLION +
@@ -125,7 +126,7 @@ export async function callGeminiWithFallback(
           return {
             responseBody,
             costUSD,
-            modelUsed: model
+            modelUsed: model,
           };
         }
 
@@ -133,12 +134,12 @@ export async function callGeminiWithFallback(
         if (status === 429 || status >= 500) {
           const retryAfterHeader = response.headers.get("retry-after");
           const retryAfterMs = parseRetryAfter(retryAfterHeader);
-          
+
           const backoffMs = INITIAL_DELAY_MS * 2 ** (attempt - 1);
           const delayMs = retryAfterMs ? Math.max(backoffMs, retryAfterMs) : backoffMs;
           const jitter = (Math.random() * 2 - 1) * delayMs * JITTER_RATIO;
           const finalDelay = Math.max(0, Math.round(delayMs + jitter));
-          
+
           await new Promise((resolve) => setTimeout(resolve, finalDelay));
         } else {
           // Client errors (400, 403, etc.) should fail fast and not be retried

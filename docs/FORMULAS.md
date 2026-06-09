@@ -11,15 +11,16 @@ Activity calculations are evaluated per week and converted to monthly estimates:
 $$\text{Monthly Commute Emissions (kg CO}_2\text{e)} = (\text{Commute Distance (km/week)} \times \text{Factor (kg CO}_2\text{e/km)} \times 4.33) + \frac{\text{Annual Flights} \times \text{Flight Factor}}{12}$$
 
 ### Commute Emission Factors
+
 We reference standard vehicular emission factors:
 
-| Vehicle Type | Factor | Unit | Source Reference |
-| :--- | :--- | :--- | :--- |
-| **Car (Petrol)** | `0.18` | kg CO₂/km | IPCC AR6 Baseline |
-| **Two-Wheeler (Petrol)** | `0.12` | kg CO₂/km | IPCC AR6 (India petrol scooter average) |
-| **Public Transport (Bus/Metro)** | `0.30` | kg CO₂/trip | India urban bus/metro average |
-| **Cab / Auto (LPG/CNG)** | `1.20` | kg CO₂/trip | India shared cab average |
-| **Flights (Domestic)** | `250.0` | kg CO₂/flight | ICAO Carbon Calculator standard short-haul |
+| Vehicle Type                     | Factor  | Unit          | Source Reference                           |
+| :------------------------------- | :------ | :------------ | :----------------------------------------- |
+| **Car (Petrol)**                 | `0.18`  | kg CO₂/km     | IPCC AR6 Baseline                          |
+| **Two-Wheeler (Petrol)**         | `0.12`  | kg CO₂/km     | IPCC AR6 (India petrol scooter average)    |
+| **Public Transport (Bus/Metro)** | `0.30`  | kg CO₂/trip   | India urban bus/metro average              |
+| **Cab / Auto (LPG/CNG)**         | `1.20`  | kg CO₂/trip   | India shared cab average                   |
+| **Flights (Domestic)**           | `250.0` | kg CO₂/flight | ICAO Carbon Calculator standard short-haul |
 
 ---
 
@@ -30,6 +31,7 @@ Activity is calculated based on monthly bill units or average hourly consumption
 $$\text{Monthly Energy Emissions (kg CO}_2\text{e)} = \text{Electricity (kWh)} \times \text{Grid Factor} \times (\text{Renewable Credit? } 0.5 : 1) + \text{LPG Cylinders} \times \text{LPG Factor}$$
 
 ### Energy Emission Factors
+
 We utilize specific regional metrics for grid density:
 
 - **India Grid Electricity Factor**: `0.710 kg CO₂/kWh`

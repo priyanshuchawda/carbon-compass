@@ -32,10 +32,10 @@ Instead, please email: **priyanshuchawda20@gmail.com**
 
 This project implements the following security practices:
 
-- **Strict Input Validation**: All public API endpoints (`/api/calculate`, `/api/recommendations`, and `/api/assistant/narrate`) enforce strict JSON body schemas using Zod's `.strict()` parser. Any additional or malformed properties are rejected.
+- **Strict Input Validation**: All public API endpoints (`/api/calculate`, `/api/recommendations`, `/api/assistant/narrate`, and `/api/assistant/chat`) enforce strict JSON body schemas using Zod's `.strict()` parser. Any additional or malformed properties are rejected.
 - **Sensitive Data Redaction**: The custom utility `lib/carbon/redaction.ts` recursively scrubs API keys, Bearer tokens, and URL query params from server-side logs and error outputs before sending them back to the client.
 - **Session Data Re-verification**: The session bridge (`lib/carbon/session.ts`) parses and validates sessionStorage data with Zod on every read to prevent crashes or manipulation of local state.
-- **Rate Limiting**: Public AI endpoints (`/api/assistant/narrate`) are protected by an in-memory IP rate limiter to mitigate API key abuse and exhaustions.
+- **Rate Limiting**: Public AI endpoints (`/api/assistant/narrate` and `/api/assistant/chat`) are protected by an in-memory IP rate limiter to mitigate API key abuse and exhaustions.
 - **Secure Headers Suite**: Next.js configurations (`next.config.ts`) enforce modern security headers, including:
   - **Content-Security-Policy (CSP)**: Restrictions on script and connect destinations (permitting 'unsafe-inline' for Next.js hydration but disallowing third-party script sources).
   - **X-Frame-Options**: Set to `DENY` to prevent clickjacking.

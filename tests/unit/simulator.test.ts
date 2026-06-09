@@ -1,10 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { calculateFootprint } from "@/lib/carbon/calculate";
-import {
-  SIMULATION_ACTIONS,
-  simulateAction,
-  simulateActions,
-} from "@/lib/carbon/simulator";
+import { SIMULATION_ACTIONS, simulateAction, simulateActions } from "@/lib/carbon/simulator";
 import type { FootprintInput, UserProfile } from "@/lib/carbon/types";
 
 const profile: UserProfile = {
@@ -67,10 +63,11 @@ describe("what-if simulator", () => {
 
     expect(input).toEqual(original);
     expect(simulation.afterInput.transport.twoWheelerKmPerWeek).toBeLessThan(
-      input.transport.twoWheelerKmPerWeek,
+      input.transport.twoWheelerKmPerWeek
     );
-    expect(simulation.afterInput.transport.publicTransportTripsPerWeek)
-      .toBeGreaterThan(input.transport.publicTransportTripsPerWeek);
+    expect(simulation.afterInput.transport.publicTransportTripsPerWeek).toBeGreaterThan(
+      input.transport.publicTransportTripsPerWeek
+    );
     expect(simulation.savingKgCO2e).toBeGreaterThan(0);
     expect(simulation.categorySavings.transport).toBeGreaterThan(0);
   });
@@ -80,8 +77,9 @@ describe("what-if simulator", () => {
       const simulation = simulateAction(input, profile, action.id);
 
       expect(simulation.savingKgCO2e).toBeGreaterThan(0);
-      expect(simulation.afterResult.monthlyTotalKgCO2e)
-        .toBeLessThan(simulation.beforeResult.monthlyTotalKgCO2e);
+      expect(simulation.afterResult.monthlyTotalKgCO2e).toBeLessThan(
+        simulation.beforeResult.monthlyTotalKgCO2e
+      );
     }
   });
 
@@ -96,13 +94,11 @@ describe("what-if simulator", () => {
       "start_composting",
     ]);
 
-    expect(simulation.beforeResult.monthlyTotalKgCO2e)
-      .toBe(before.monthlyTotalKgCO2e);
-    expect(simulation.afterResult.monthlyTotalKgCO2e)
-      .toBeLessThan(before.monthlyTotalKgCO2e);
+    expect(simulation.beforeResult.monthlyTotalKgCO2e).toBe(before.monthlyTotalKgCO2e);
+    expect(simulation.afterResult.monthlyTotalKgCO2e).toBeLessThan(before.monthlyTotalKgCO2e);
     expect(simulation.savingKgCO2e).toBeCloseTo(
       before.monthlyTotalKgCO2e - simulation.afterResult.monthlyTotalKgCO2e,
-      2,
+      2
     );
     expect(simulation.appliedActions).toHaveLength(6);
   });

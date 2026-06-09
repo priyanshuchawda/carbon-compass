@@ -82,11 +82,7 @@ describe("Assistant Tools executeTool Validation", () => {
   });
 
   it("successfully runs compare_to_india_average with valid monthlyKg", async () => {
-    const result = await executeTool(
-      "compare_to_india_average",
-      { monthlyKg: 316 },
-      mockContext
-    );
+    const result = await executeTool("compare_to_india_average", { monthlyKg: 316 }, mockContext);
     expect(result).toHaveProperty("userMonthlyKg", 316);
     expect(result).toHaveProperty("userPerCapitaMonthlyKg", 158); // 316 / 2
     expect(result).toHaveProperty("nationalPerCapitaMonthlyAvg", 158);

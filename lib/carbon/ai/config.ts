@@ -1,7 +1,7 @@
 import "server-only";
 
 export const INPUT_COST_PER_MILLION = 0.075;
-export const OUTPUT_COST_PER_MILLION = 0.30;
+export const OUTPUT_COST_PER_MILLION = 0.3;
 
 export const MODELS = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
 

@@ -15,18 +15,22 @@ export type ProgressEntry = {
 
 type ProgressStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
-const progressEntrySchema = z.object({
-  id: z.string().min(1),
-  recordedAt: z.string().datetime(),
-  monthlyTotalKgCO2e: z.number().finite().nonnegative(),
-  ecoScore: z.number().finite().min(0).max(100),
-  topCategory: z.enum(["transport", "energy", "food", "shopping", "waste"]),
-});
+const progressEntrySchema = z
+  .object({
+    id: z.string().min(1),
+    recordedAt: z.string().datetime(),
+    monthlyTotalKgCO2e: z.number().finite().nonnegative(),
+    ecoScore: z.number().finite().min(0).max(100),
+    topCategory: z.enum(["transport", "energy", "food", "shopping", "waste"]),
+  })
+  .strict();
 
-const progressPayloadSchema = z.object({
-  schemaVersion: z.literal(PROGRESS_SCHEMA_VERSION),
-  entries: z.array(progressEntrySchema),
-});
+const progressPayloadSchema = z
+  .object({
+    schemaVersion: z.literal(PROGRESS_SCHEMA_VERSION),
+    entries: z.array(progressEntrySchema),
+  })
+  .strict();
 
 export {
   ACTIVITY_LOG_SCHEMA_VERSION as ACTIVITY_SCHEMA_VERSION,
@@ -35,7 +39,6 @@ export {
   saveActivityLog,
   type ActivityLogEntry,
 } from "@/lib/carbon/activity-log";
-
 
 function safeStorage(): ProgressStorage | undefined {
   if (typeof window === "undefined") {
@@ -47,16 +50,11 @@ function safeStorage(): ProgressStorage | undefined {
 
 function sortHistory(entries: ProgressEntry[]): ProgressEntry[] {
   return [...entries].sort(
-    (left, right) =>
-      new Date(left.recordedAt).getTime() - new Date(right.recordedAt).getTime(),
+    (left, right) => new Date(left.recordedAt).getTime() - new Date(right.recordedAt).getTime()
   );
 }
 
-
-
-export function loadProgressHistory(
-  storage = safeStorage(),
-): ProgressEntry[] {
+export function loadProgressHistory(storage = safeStorage()): ProgressEntry[] {
   if (!storage) {
     return [];
   }
@@ -78,30 +76,36 @@ export function loadProgressHistory(
 
 export function saveProgressHistory(
   entries: ProgressEntry[],
-  storage = safeStorage(),
-): void {
+  storage = safeStorage()
+): { ok: boolean; reason?: string } {
   if (!storage) {
-    return;
+    return { ok: false, reason: "Storage not available" };
   }
 
   const safeEntries = z.array(progressEntrySchema).safeParse(entries);
 
   if (!safeEntries.success) {
-    return;
+    return { ok: false, reason: "Validation failed: " + safeEntries.error.message };
   }
 
-  storage.setItem(
-    PROGRESS_STORAGE_KEY,
-    JSON.stringify({
-      schemaVersion: PROGRESS_SCHEMA_VERSION,
-      entries: sortHistory(safeEntries.data),
-    }),
-  );
+  try {
+    storage.setItem(
+      PROGRESS_STORAGE_KEY,
+      JSON.stringify({
+        schemaVersion: PROGRESS_SCHEMA_VERSION,
+        entries: sortHistory(safeEntries.data),
+      })
+    );
+    return { ok: true };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Write failed";
+    return { ok: false, reason: msg };
+  }
 }
 
 export function appendProgressEntry(
   entry: ProgressEntry,
-  storage = safeStorage(),
+  storage = safeStorage()
 ): ProgressEntry[] {
   const history = [...loadProgressHistory(storage), entry];
   const latest = sortHistory(history).slice(-12);
@@ -148,10 +152,7 @@ export function bestMonthlyImprovement(entries: ProgressEntry[]): number {
     const current = history[index];
 
     if (previous && current) {
-      best = Math.max(
-        best,
-        previous.monthlyTotalKgCO2e - current.monthlyTotalKgCO2e,
-      );
+      best = Math.max(best, previous.monthlyTotalKgCO2e - current.monthlyTotalKgCO2e);
     }
   }
 
@@ -176,17 +177,25 @@ export function loadMonthlyGoal(storage = safeStorage()): number | null {
   }
 }
 
-export function saveMonthlyGoal(target: number | null, storage = safeStorage()): void {
+export function saveMonthlyGoal(
+  target: number | null,
+  storage = safeStorage()
+): { ok: boolean; reason?: string } {
   if (!storage) {
-    return;
+    return { ok: false, reason: "Storage not available" };
+  }
+  if (target !== null && (!Number.isFinite(target) || target < 0)) {
+    return { ok: false, reason: "Goal must be a non-negative number" };
   }
   try {
-    if (target === null || !Number.isFinite(target)) {
+    if (target === null) {
       storage.removeItem(GOAL_STORAGE_KEY);
     } else {
       storage.setItem(GOAL_STORAGE_KEY, String(target));
     }
-  } catch {
-    // ignore
+    return { ok: true };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : "Write failed";
+    return { ok: false, reason: msg };
   }
 }

@@ -11,9 +11,8 @@ export default function CalculatorPage() {
           Calculate your monthly footprint
         </h1>
         <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-700">
-          Enter commute, electricity, food, shopping, and waste habits. The
-          final result is validated and calculated through the server-safe carbon
-          engine.
+          Enter commute, electricity, food, shopping, and waste habits. The final result is
+          validated and calculated through the server-safe carbon engine.
         </p>
         <FootprintForm />
       </section>
