@@ -267,17 +267,6 @@ See [`RULES.md`](./RULES.md) for the full coding contract. Key points:
 | `pnpm verify` | Alias for `pnpm quality` |
 
 ---
-
-## Roadmap
-
-- [ ] Persist calculator input across sessions (URL params / localStorage)
-- [ ] Multi-user household mode
-- [ ] Monthly email digest (opt-in)
-- [ ] City-level peer comparison
-- [ ] Hindi / regional language support
-
----
-
 ## License
 
 MIT
