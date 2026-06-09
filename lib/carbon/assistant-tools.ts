@@ -1,12 +1,38 @@
 import { simulateAction } from "@/lib/carbon/simulator";
 import type { SimulationActionId } from "@/lib/carbon/simulator";
 import type { FootprintInput, UserProfile, FootprintResult, CarbonCategory } from "@/lib/carbon/types";
+import { z } from "zod";
 
 export interface ToolContext {
   profile: UserProfile;
   footprintInput: FootprintInput;
   result: FootprintResult;
 }
+
+const getEmissionBreakdownSchema = z.object({
+  category: z.enum(["transport", "energy", "food", "shopping", "waste"], {
+    message: "category must be one of: transport, energy, food, shopping, waste"
+  }),
+});
+
+const compareToIndiaAverageSchema = z.object({
+  monthlyKg: z.number({
+    message: "monthlyKg must be a finite number"
+  }).finite(),
+});
+
+const simulateActionSchema = z.object({
+  actionId: z.enum([
+    "metro_bus_substitution",
+    "reduce_ac_one_hour_daily",
+    "low_carbon_meal_day",
+    "reduce_delivery",
+    "start_recycling",
+    "start_composting"
+  ], {
+    message: "actionId must be a valid simulation action"
+  }),
+});
 
 export const ASSISTANT_TOOLS = [
   {
@@ -62,7 +88,11 @@ export async function executeTool(
 ): Promise<unknown> {
   switch (name) {
     case "get_emission_breakdown": {
-      const category = args["category"] as CarbonCategory;
+      const parsed = getEmissionBreakdownSchema.safeParse(args);
+      if (!parsed.success) {
+        return { error: `Invalid parameters: ${parsed.error.issues.map(i => i.message).join(", ")}` };
+      }
+      const category = parsed.data.category;
       const detail = context.result.breakdown.find(b => b.category === category);
       let inputs: Record<string, unknown> | undefined = {};
       if (category === "transport") {
@@ -85,7 +115,11 @@ export async function executeTool(
       };
     }
     case "compare_to_india_average": {
-      const monthlyKg = args["monthlyKg"] as number;
+      const parsed = compareToIndiaAverageSchema.safeParse(args);
+      if (!parsed.success) {
+        return { error: `Invalid parameters: ${parsed.error.issues.map(i => i.message).join(", ")}` };
+      }
+      const monthlyKg = parsed.data.monthlyKg;
       const householdSize = Math.max(context.profile.householdSize, 1);
       const perCapitaKg = monthlyKg / householdSize;
       
@@ -112,7 +146,11 @@ export async function executeTool(
       };
     }
     case "simulate_action": {
-      const actionId = args["actionId"] as SimulationActionId;
+      const parsed = simulateActionSchema.safeParse(args);
+      if (!parsed.success) {
+        return { error: `Invalid parameters: ${parsed.error.issues.map(i => i.message).join(", ")}` };
+      }
+      const actionId = parsed.data.actionId;
       const simulation = simulateAction(context.footprintInput, context.profile, actionId);
       return {
         actionId,

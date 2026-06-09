@@ -117,8 +117,26 @@ export const assistantRequestSchema = z
   })
   .strict();
 
+export const chatMessageSchema = z
+  .object({
+    role: z.enum(["user", "assistant"]),
+    content: z.string().trim().min(1).max(2000),
+  })
+  .strict();
+
+export const assistantChatRequestSchema = z
+  .object({
+    profile: userProfileSchema,
+    result: footprintResultSchema,
+    footprint: footprintInputSchema,
+    messages: z.array(chatMessageSchema),
+  })
+  .strict();
+
 export type UserProfileInput = z.infer<typeof userProfileSchema>;
 export type FootprintInputPayload = z.infer<typeof footprintInputSchema>;
 export type FootprintRequestPayload = z.infer<typeof footprintRequestSchema>;
 export type AssistantRequestPayload = z.infer<typeof assistantRequestSchema>;
+export type AssistantChatRequestPayload = z.infer<typeof assistantChatRequestSchema>;
+export type ChatMessagePayload = z.infer<typeof chatMessageSchema>;
 

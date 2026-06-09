@@ -6,6 +6,7 @@ import { CategoryBreakdown } from "@/components/carbon/category-breakdown";
 import { MetricCard } from "@/components/carbon/metric-card";
 import { RecommendationCard } from "@/components/carbon/recommendation-card";
 import { WhatIfSimulator } from "@/components/carbon/what-if-simulator";
+import { GoalSetter } from "@/components/carbon/goal-setter";
 import { calculateFootprint } from "@/lib/carbon/calculate";
 import { getRecommendations } from "@/lib/carbon/recommendations";
 import { loadSessionPayload } from "@/lib/carbon/session";
@@ -153,8 +154,9 @@ export function DashboardClient() {
         </div>
       </section>
 
-      {/* ── simulator ─────────────────────────────────────────────── */}
-      <div className="mt-8">
+      {/* ── goal tracker & simulator ───────────────────────────────── */}
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_1.5fr]">
+        <GoalSetter currentMonthlyKg={result.monthlyTotalKgCO2e} isDemo={isDemo} />
         <WhatIfSimulator simulations={simulations} />
       </div>
     </>

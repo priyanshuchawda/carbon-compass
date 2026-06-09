@@ -13,7 +13,7 @@ export type ProgressEntry = {
   topCategory: CarbonCategory;
 };
 
-type ProgressStorage = Pick<Storage, "getItem" | "setItem">;
+type ProgressStorage = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
 const progressEntrySchema = z.object({
   id: z.string().min(1),
@@ -147,4 +147,37 @@ export function bestMonthlyImprovement(entries: ProgressEntry[]): number {
   }
 
   return round(best, 0);
+}
+
+export const GOAL_STORAGE_KEY = "carbon-compass:goal:v1";
+
+export function loadMonthlyGoal(storage = safeStorage()): number | null {
+  if (!storage) {
+    return null;
+  }
+  try {
+    const raw = storage.getItem(GOAL_STORAGE_KEY);
+    if (!raw) {
+      return null;
+    }
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveMonthlyGoal(target: number | null, storage = safeStorage()): void {
+  if (!storage) {
+    return;
+  }
+  try {
+    if (target === null || !Number.isFinite(target)) {
+      storage.removeItem(GOAL_STORAGE_KEY);
+    } else {
+      storage.setItem(GOAL_STORAGE_KEY, String(target));
+    }
+  } catch {
+    // ignore
+  }
 }

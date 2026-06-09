@@ -4,6 +4,7 @@ const primaryLinks = [
   { href: "/calculator", label: "Calculator" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/actions", label: "Actions" },
+  { href: "/assistant", label: "AI Assistant" },
   { href: "/report", label: "Report" },
 ] as const;
 

@@ -116,3 +116,47 @@ export function getFallbackResponse(data: AssistantRequestPayload): {
     isDemo: true
   };
 }
+
+export function buildChatPrompt(data: {
+  profile: any;
+  result: any;
+  footprint: any;
+}): string {
+  const { profile, result } = data;
+  return `
+    You are the Compass Chat Assistant for Carbon Compass.
+    Ground your answers strictly in the user's carbon footprint data:
+    - City: ${profile.city}
+    - Persona: ${profile.persona}
+    - Monthly Footprint: ${result.monthlyTotalKgCO2e} kg CO2e
+    - Eco Score: ${result.ecoScore}/100
+    - Top Category: ${result.topCategory}
+    
+    Breakdown:
+    ${result.breakdown.map((b: any) => `- ${b.label}: ${b.kgCO2e} kg CO2e (${b.percentage}%)`).join("\n")}
+    
+    Guiding Rules:
+    1. Answer questions concisely and professionally in under 4 sentences.
+    2. Do NOT invent or make up exact savings metrics. Keep it grounded in the calculations.
+    3. Refuse to answer questions about medical, legal, or financial topics.
+    4. If the user asks an unrelated or off-topic question, politely redirect them back to carbon tracking.
+    5. When asked to compare, explain that the Indian average carbon footprint is about 158 kg CO2e per month per capita.
+  `;
+}
+
+export function getFallbackChatResponse(userMessage: string): string {
+  const lowercase = userMessage.toLowerCase();
+  if (lowercase.includes("medical") || lowercase.includes("legal") || lowercase.includes("doctor") || lowercase.includes("lawyer")) {
+    return "I am a carbon footprint assistant and cannot provide medical, legal, or professional advice. Please consult a qualified professional.";
+  }
+  if (lowercase.includes("hi") || lowercase.includes("hello") || lowercase.includes("hey")) {
+    return "Hello! I am your Carbon Compass assistant. How can I help you understand or reduce your carbon footprint today?";
+  }
+  if (lowercase.includes("biggest") || lowercase.includes("highest") || lowercase.includes("driver") || lowercase.includes("source") || lowercase.includes("driving")) {
+    return "Based on your inputs, your top emission category is estimated to be your transport or energy consumption. You can see a detailed breakdown on the Dashboard.";
+  }
+  if (lowercase.includes("reduce") || lowercase.includes("cut") || lowercase.includes("lower")) {
+    return "To lower your footprint, focus on reducing private vehicle trips, conserving home energy (especially air conditioning), planning meals to minimize food waste, and recycling dry waste.";
+  }
+  return "I am here to help you understand your carbon footprint and suggest practical ways to reduce it. Feel free to ask about your emissions breakdown or ways to save energy and transportation footprint.";
+}

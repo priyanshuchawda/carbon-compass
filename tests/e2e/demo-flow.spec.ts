@@ -87,3 +87,30 @@ test("falls back to demo data when accessing dashboard directly with no session"
   await expect(page.getByText(/monthly footprint/i).first()).toBeVisible();
   await expect(page.getByText(/eco score/i).first()).toBeVisible();
 });
+
+test("allows setting monthly goal and chatting with assistant", async ({ page }) => {
+  await page.goto("/dashboard");
+  
+  // Verify that the GoalSetter is present
+  await expect(page.getByRole("heading", { name: /monthly carbon goal/i })).toBeVisible();
+  
+  // Set a goal
+  const goalInput = page.locator("#goal-input");
+  await goalInput.fill("200");
+  await page.getByRole("button", { name: "Save" }).click();
+  
+  // Verify that goal is set (or warning on demo mode)
+  // Since we are accessing dashboard directly with no session, it is in demo mode.
+  // In demo mode, it shows a warning feedback message.
+  await expect(page.getByText(/Complete the calculator first to set a goal/i)).toBeVisible();
+  
+  // Go to Assistant page
+  await page.getByRole("link", { name: /ai assistant/i }).first().click();
+  await expect(page).toHaveURL(/\/assistant$/);
+  
+  // Click a suggestion
+  await page.getByRole("button", { name: /what is driving my emissions/i }).click();
+  
+  // Wait for the response and make sure it renders the fallback text
+  await expect(page.getByText(/detailed breakdown on the Dashboard/i)).toBeVisible();
+});

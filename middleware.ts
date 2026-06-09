@@ -22,9 +22,13 @@ export function middleware(request: NextRequest): NextResponse {
     if (request.method === "POST") {
       const origin = request.headers.get("origin");
       if (origin) {
-        const originUrl = new URL(origin);
-        if (originUrl.host !== request.nextUrl.host) {
-          return jsonResponse({ error: "Forbidden: Cross-origin requests are not allowed." }, 403);
+        try {
+          const originUrl = new URL(origin);
+          if (originUrl.host !== request.nextUrl.host) {
+            return jsonResponse({ error: "Forbidden: Cross-origin requests are not allowed." }, 403);
+          }
+        } catch {
+          return jsonResponse({ error: "Forbidden: Malformed origin header." }, 403);
         }
       }
     }

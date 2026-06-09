@@ -37,7 +37,7 @@ This project implements the following security practices:
 - **Session Data Re-verification**: The session bridge (`lib/carbon/session.ts`) parses and validates sessionStorage data with Zod on every read to prevent crashes or manipulation of local state.
 - **Rate Limiting**: Public AI endpoints (`/api/assistant/narrate`) are protected by an in-memory IP rate limiter to mitigate API key abuse and exhaustions.
 - **Secure Headers Suite**: Next.js configurations (`next.config.ts`) enforce modern security headers, including:
-  - **Content-Security-Policy (CSP)**: Restrictions on script and connect destinations (disallowing unsafe script execution).
+  - **Content-Security-Policy (CSP)**: Restrictions on script and connect destinations (permitting 'unsafe-inline' for Next.js hydration but disallowing third-party script sources).
   - **X-Frame-Options**: Set to `DENY` to prevent clickjacking.
   - **X-Content-Type-Options**: Set to `nosniff`.
   - **Referrer-Policy**: Set to `strict-origin-when-cross-origin`.

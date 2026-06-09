@@ -7,6 +7,8 @@ import {
   loadProgressHistory,
   progressHistoryTextSummary,
   saveProgressHistory,
+  loadMonthlyGoal,
+  saveMonthlyGoal,
 } from "@/lib/carbon/progress";
 import type { ProgressEntry } from "@/lib/carbon/progress";
 
@@ -28,6 +30,7 @@ const mockStorage = () => {
   return {
     getItem: (key: string) => store[key] ?? null,
     setItem: (key: string, value: string) => { store[key] = value; },
+    removeItem: (key: string) => { delete store[key]; },
   };
 };
 
@@ -157,5 +160,26 @@ describe("bestMonthlyImprovement", () => {
       makeEntry("e3", 230, 43, 0),  // saved 20
     ]);
     expect(best).toBe(50);
+  });
+});
+
+describe("monthly goal storage", () => {
+  it("returns null when no goal is saved", () => {
+    const storage = mockStorage();
+    expect(loadMonthlyGoal(storage)).toBeNull();
+  });
+
+  it("saves and loads a valid goal", () => {
+    const storage = mockStorage();
+    saveMonthlyGoal(180, storage);
+    expect(loadMonthlyGoal(storage)).toBe(180);
+  });
+
+  it("removes the goal when saving null or invalid value", () => {
+    const storage = mockStorage();
+    saveMonthlyGoal(180, storage);
+    expect(loadMonthlyGoal(storage)).toBe(180);
+    saveMonthlyGoal(null, storage);
+    expect(loadMonthlyGoal(storage)).toBeNull();
   });
 });
