@@ -57,7 +57,7 @@ During this readiness phase, we implemented several major improvements based on 
 - **Conversational Assistant Workspace**: Added `/assistant` chat page with grounded rule checks and bounded history limit (`min(1).max(12)`).
 - **API Zod Argument Validation & Payload Limits**: Hardened `/api/assistant/chat` and `/api/assistant/narrate` by validating AI tool call arguments with strict schemas, and streaming request payloads with a strict 64KB body read boundary helper.
 - **System Health Status (`/api/health`)**: Exposed a dedicated system availability route returning basic health checks.
-- **Secure middleware checks**: Malformed headers are caught to fail closed with 403. Removed `X-Powered-By` header in Next.js.
+- **Secure edge proxy checks**: Malformed headers are caught to fail closed with 403. Removed `X-Powered-By` header in Next.js.
 - **Production-Build E2E Testing**: Playwright E2E now builds the application in production mode (`next build`) and runs tests against a live server (`next start`), simulating exactly what a production judge will experience.
 
 ---
@@ -66,5 +66,5 @@ During this readiness phase, we implemented several major improvements based on 
 
 - **TypeScript Typecheck**: Successfully passes (`tsc --noEmit`).
 - **ESLint Checks**: Successfully passes with no errors.
-- **Unit Tests**: **206 tests passed** across 37 files in Vitest (latest known verification snapshot).
-- **E2E Tests**: **7 browser flows passed** in Playwright (latest known verification snapshot, covering navigation, goal setting, assistant chat, accessibility checks, skip-link focus, reduced-motion behavior, and 390px mobile viewport overflow checks).
+- **Unit Tests**: `pnpm test` is the current Vitest unit/component verification gate. Re-run before submission for the current count.
+- **E2E Tests**: `pnpm test:e2e` is the current Playwright browser and accessibility verification gate, covering navigation, goal setting, assistant chat, skip-link focus, reduced-motion behavior, and 390px mobile viewport overflow checks.

@@ -94,6 +94,10 @@ describe("Assistant Chat API Route", () => {
     expect(json.isDemo).toBe(true);
     expect(json.content).toContain("detailed breakdown on the Dashboard");
     expect(json.costUSD).toBe(0);
+    expect(response.headers.get("Cache-Control")).toContain("no-store");
+    expect(response.headers.get("RateLimit-Limit")).toBe("10");
+    expect(response.headers.get("X-RateLimit-Limit")).toBe("10");
+    expect(response.headers.get("X-Request-ID")).toMatch(/^req_/);
   });
 
   it("fails with 400 Bad Request on invalid request body schema", async () => {

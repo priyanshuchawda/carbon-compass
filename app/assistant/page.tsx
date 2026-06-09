@@ -125,7 +125,12 @@ export default function AssistantPage() {
         {/* Chat window */}
         <div className="flex-1 min-h-[400px] rounded-lg border border-slate-200 bg-white shadow-sm flex flex-col overflow-hidden">
           {/* Chat messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[500px]">
+          <div
+            role="log"
+            aria-live="polite"
+            aria-label="Conversation with Carbon Compass assistant"
+            className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[500px]"
+          >
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-6 gap-6">
                 <div>

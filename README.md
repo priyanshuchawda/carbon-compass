@@ -39,7 +39,7 @@ This table connects evaluation criteria to concrete implementations, unit test f
 | **Logical Decisions** | Pure-function carbon engine with India-specific emission factors, Eco-Score calculations, and Commute simulator. | `lib/carbon/calculate.ts`<br>`lib/carbon/scoring.ts`<br>`lib/carbon/simulator.ts` | `tests/unit/calculate.test.ts`<br>`tests/unit/scoring.test.ts`<br>`tests/unit/simulator.test.ts` | Returns empty/safe metrics defaults if inputs are fully blank. | Calculations are educational estimates using static national grid baselines; not a certified carbon audit. |
 | **Real Usability** | Dynamic onboarding, transport/energy/shopping calculators, GoalSetter tracking, activity logs, printable reports. | `components/carbon/footprint-form.tsx`<br>`components/carbon/dashboard-client.tsx`<br>`app/log/page.tsx`<br>`app/report/page.tsx` | `tests/unit/footprint-form.test.tsx`<br>`tests/unit/goal-setter.test.tsx`<br>`tests/unit/progress-report.test.tsx`<br>`tests/e2e/demo-flow.spec.ts` | Falls back to pre-populated Pune student profile if the user skips onboarding or form is empty. | Data is browser-locked and stored locally using sessionStorage and localStorage. |
 | **Code Quality** | Strict compiler settings (`strict: true`, exhaustive switch matching, no implicit overrides), clean client/server separation. | `tsconfig.json`<br>`eslint.config.mjs`<br>`lib/carbon/types.ts` | `tests/unit/eslint-rules.test.ts`<br>`pnpm quality` task | Builds fail in CI if compiler or linting errors are introduced. | Linter rules are verified locally in ESLint config. |
-| **Security & Privacy** | Zod input schema boundary checks, recursive error redaction, bounded payload readers, safe same-origin checks, secure headers. | `lib/validation/schemas.ts`<br>`lib/carbon/redaction.ts`<br>`lib/carbon/utils.ts`<br>`middleware.ts`<br>`next.config.ts` | `tests/unit/validation.test.ts`<br>`tests/unit/redaction.test.ts`<br>`tests/unit/api-routes.test.ts` | Rejects payload and fails closed on invalid schemas, same-origin violations, or oversized bodies. | All inputs are local-only; geo-grid mapping is done at the city level only. |
+| **Security & Privacy** | Zod input schema boundary checks, recursive error redaction, bounded payload readers, safe same-origin checks, secure headers. | `lib/validation/schemas.ts`<br>`lib/carbon/redaction.ts`<br>`lib/carbon/utils.ts`<br>`proxy.ts`<br>`next.config.ts` | `tests/unit/validation.test.ts`<br>`tests/unit/redaction.test.ts`<br>`tests/unit/api-routes.test.ts` | Rejects payload and fails closed on invalid schemas, same-origin violations, or oversized bodies. | All inputs are local-only; geo-grid mapping is done at the city level only. |
 | **Accessibility** | Skip-to-main link, semantic single-H1 layout, form labels, chart text alternatives, Axe-audited UI controls. | `app/layout.tsx`<br>`components/carbon/category-breakdown.tsx`<br>`docs/ACCESSIBILITY.md` | `tests/unit/accessibility.test.tsx`<br>`tests/e2e/demo-flow.spec.ts` | Screen readers announce details via text summaries beside the SVG charts. | Display fits mobile portrait viewport sizes down to 390px. |
 | **Efficiency & Perf** | Static-first pages, Turbopack optimizer, light CSS, client-bundle chunk inspector. | `next.config.ts`<br>`scripts/inspect-client-chunks.mjs` | `pnpm perf:bundle-report`<br>`pnpm quality` | Next.js optimizes static routes and chunks compilation for fast initial loading. | Bundle size is bounded by Recharts core rendering libraries. |
 | **Verification & Docs** | Comprehensive docs (Formulas, Security, A11y, Judge Readiness, Quality checks), Unit/E2E test suites. | `README.md`<br>`docs/`<br>`tests/` | `pnpm quality` verification task | Automated CI verify pipeline runs on every repository code commit. | Reports show latest known verification snapshot. |
@@ -88,11 +88,13 @@ lib/
   carbon/
     types.ts          shared TypeScript interfaces
     factors.ts        India emission factors with sources
-    calculator.ts     pure footprint calculation functions
+    calculate.ts      pure footprint calculation functions
     scoring.ts        eco-score (0-100) calculation
     recommendations.ts deterministic recommendation engine
     simulator.ts      immutable what-if action simulator
-    progress.ts       schema-versioned localStorage helpers
+    activity-types.ts natural-unit activity metadata
+    activity-log.ts   schema-versioned activity history helpers
+    progress.ts       schema-versioned progress and goal helpers
     demo.ts           shared demo inputs and results
 
 tests/
@@ -254,7 +256,7 @@ See [`RULES.md`](./RULES.md) for the full coding contract. Key points:
 | `pnpm dev` | Next.js dev server on port 3000 |
 | `pnpm build` | Production build compilation |
 | `pnpm start` | Start production compiled Next.js server |
-| `pnpm test` | Vitest unit suite (206 tests, latest known verification) |
+| `pnpm test` | Vitest unit and component suite |
 | `pnpm test:e2e` | Playwright Chromium E2E browser flows |
 | `pnpm typecheck` | `tsc --noEmit` |
 | `pnpm lint` | ESLint checks |

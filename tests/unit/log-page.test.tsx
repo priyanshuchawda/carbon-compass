@@ -1,16 +1,19 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import LogPage from "@/app/log/page";
-import * as progressLib from "@/lib/carbon/progress";
-import type { ActivityLogEntry } from "@/lib/carbon/progress";
+import * as activityLog from "@/lib/carbon/activity-log";
+import type { ActivityLogEntry } from "@/lib/carbon/activity-log";
 
-// Mock progress helpers
-vi.mock("@/lib/carbon/progress", async (importOriginal) => {
-  const original = await importOriginal<typeof import("@/lib/carbon/progress")>();
+// Mock activity log helpers
+vi.mock("@/lib/carbon/activity-log", async (importOriginal) => {
+  const original = await importOriginal<typeof import("@/lib/carbon/activity-log")>();
   return {
     ...original,
     loadActivityLog: vi.fn(),
-    saveActivityLog: vi.fn(),
+    addActivityLogEntry: vi.fn(),
+    updateActivityLogEntry: vi.fn(),
+    deleteActivityLogEntry: vi.fn(),
+    clearActivityLog: vi.fn(),
   };
 });
 
@@ -21,7 +24,7 @@ describe("LogPage Activity Tracker Page", () => {
   });
 
   it("renders log page empty state correctly", () => {
-    vi.mocked(progressLib.loadActivityLog).mockReturnValue([]);
+    vi.mocked(activityLog.loadActivityLog).mockReturnValue([]);
 
     render(<LogPage />);
 
@@ -40,7 +43,7 @@ describe("LogPage Activity Tracker Page", () => {
         kgCO2e: 27,
       },
     ];
-    vi.mocked(progressLib.loadActivityLog).mockReturnValue(mockEntries);
+    vi.mocked(activityLog.loadActivityLog).mockReturnValue(mockEntries);
 
     render(<LogPage />);
 
@@ -51,7 +54,8 @@ describe("LogPage Activity Tracker Page", () => {
   });
 
   it("allows adding a new manual activity", () => {
-    vi.mocked(progressLib.loadActivityLog).mockReturnValue([]);
+    vi.mocked(activityLog.loadActivityLog).mockReturnValue([]);
+    vi.mocked(activityLog.addActivityLogEntry).mockImplementation((entry) => [entry]);
 
     const { container } = render(<LogPage />);
 
@@ -72,12 +76,12 @@ describe("LogPage Activity Tracker Page", () => {
     expect(form).toBeInTheDocument();
     fireEvent.submit(form!);
 
-    expect(progressLib.saveActivityLog).toHaveBeenCalled();
+    expect(activityLog.addActivityLogEntry).toHaveBeenCalled();
     expect(screen.getByText(/activity logged successfully!/i)).toBeInTheDocument();
   });
 
   it("displays validation messages for bad input in the form", () => {
-    vi.mocked(progressLib.loadActivityLog).mockReturnValue([]);
+    vi.mocked(activityLog.loadActivityLog).mockReturnValue([]);
 
     const { container } = render(<LogPage />);
 
@@ -102,7 +106,8 @@ describe("LogPage Activity Tracker Page", () => {
         kgCO2e: 27,
       },
     ];
-    vi.mocked(progressLib.loadActivityLog).mockReturnValue(mockEntries);
+    vi.mocked(activityLog.loadActivityLog).mockReturnValue(mockEntries);
+    vi.mocked(activityLog.updateActivityLogEntry).mockImplementation((_id, entry) => [entry]);
 
     const { container } = render(<LogPage />);
 
@@ -118,7 +123,7 @@ describe("LogPage Activity Tracker Page", () => {
     expect(form).toBeInTheDocument();
     fireEvent.submit(form!);
 
-    expect(progressLib.saveActivityLog).toHaveBeenCalled();
+    expect(activityLog.updateActivityLogEntry).toHaveBeenCalled();
     expect(screen.getByText(/entry updated successfully!/i)).toBeInTheDocument();
   });
 
@@ -133,14 +138,15 @@ describe("LogPage Activity Tracker Page", () => {
         kgCO2e: 27,
       },
     ];
-    vi.mocked(progressLib.loadActivityLog).mockReturnValue(mockEntries);
+    vi.mocked(activityLog.loadActivityLog).mockReturnValue(mockEntries);
+    vi.mocked(activityLog.deleteActivityLogEntry).mockReturnValue([]);
 
     render(<LogPage />);
 
     const deleteBtn = screen.getByRole("button", { name: /delete/i });
     fireEvent.click(deleteBtn);
 
-    expect(progressLib.saveActivityLog).toHaveBeenCalledWith([]);
+    expect(activityLog.deleteActivityLogEntry).toHaveBeenCalledWith("activity-1");
     expect(screen.getByText(/entry deleted/i)).toBeInTheDocument();
   });
 
@@ -155,7 +161,7 @@ describe("LogPage Activity Tracker Page", () => {
         kgCO2e: 27,
       },
     ];
-    vi.mocked(progressLib.loadActivityLog).mockReturnValue(mockEntries);
+    vi.mocked(activityLog.loadActivityLog).mockReturnValue(mockEntries);
 
     render(<LogPage />);
 
@@ -163,7 +169,7 @@ describe("LogPage Activity Tracker Page", () => {
     fireEvent.click(clearAllBtn);
 
     expect(window.confirm).toHaveBeenCalled();
-    expect(progressLib.saveActivityLog).toHaveBeenCalledWith([]);
+    expect(activityLog.clearActivityLog).toHaveBeenCalled();
     expect(screen.getByText(/history cleared/i)).toBeInTheDocument();
   });
 });

@@ -2,13 +2,13 @@ import { NextResponse, type NextRequest } from "next/server";
 import { securityHeaders } from "./lib/carbon/security/headers";
 
 /**
- * Edge/runtime middleware: enforces security headers, request body size limits,
+ * Edge/runtime proxy: enforces security headers, request body size limits,
  * and Origin checks to defend against CSRF on API endpoints.
  */
 
 const MAX_API_BODY_BYTES = 256 * 1024; // 256 KB
 
-export function middleware(request: NextRequest): NextResponse {
+export function proxy(request: NextRequest): NextResponse {
   const { pathname } = request.nextUrl;
 
   // 1. API Guard: reject oversized bodies or invalid origins
@@ -34,7 +34,7 @@ export function middleware(request: NextRequest): NextResponse {
     }
   }
 
-  // 2. Bypass header mutation for the assistant endpoint to allow streaming if needed (or standard next)
+  // 2. Bypass header mutation for the assistant endpoint to allow streaming if needed.
   if (pathname === "/api/assistant/narrate") {
     return NextResponse.next();
   }
