@@ -143,3 +143,45 @@ export function calculateFootprint(
     assumptions: [...CALCULATION_ASSUMPTIONS],
   };
 }
+
+export function calculateActivityEmissions(
+  category: CarbonCategory,
+  type: string,
+  value: number,
+): number {
+  const transport = EMISSION_FACTORS.transport;
+  const energy = EMISSION_FACTORS.energy;
+  const food = EMISSION_FACTORS.food;
+  const shopping = EMISSION_FACTORS.shopping;
+  const waste = EMISSION_FACTORS.waste;
+
+  switch (category) {
+    case "transport":
+      if (type === "two_wheeler") return round(value * transport.twoWheelerKgPerKm);
+      if (type === "car") return round(value * transport.carKgPerKm);
+      if (type === "public_transport") return round(value * transport.publicTransportKgPerTrip);
+      if (type === "cab_auto") return round(value * transport.cabAutoKgPerTrip);
+      if (type === "flight") return round(value * transport.domesticFlightKgPerYear);
+      return 0;
+    case "energy":
+      if (type === "electricity") return round(value * energy.electricityKgPerKWh);
+      if (type === "lpg") return round(value * energy.lpgCylinderKg);
+      if (type === "ac") return round(value * energy.acKWhPerHour * energy.electricityKgPerKWh);
+      return 0;
+    case "food":
+      if (type === "meat_meal") return round(value * food.meatMealKg);
+      if (type === "delivery") return round(value * food.deliveryKg);
+      return 0;
+    case "shopping":
+      if (type === "clothes") return round(value * shopping.clothesKgPerItem);
+      if (type === "online") return round(value * shopping.onlineOrderKg);
+      if (type === "electronics") return round(value * shopping.electronicsKgPerYear);
+      return 0;
+    case "waste":
+      if (type === "recycling") return round(-value * waste.recyclingReductionKg);
+      if (type === "composting") return round(-value * waste.compostingReductionKg);
+      return 0;
+    default:
+      return 0;
+  }
+}

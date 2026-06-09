@@ -140,3 +140,11 @@ export type AssistantRequestPayload = z.infer<typeof assistantRequestSchema>;
 export type AssistantChatRequestPayload = z.infer<typeof assistantChatRequestSchema>;
 export type ChatMessagePayload = z.infer<typeof chatMessageSchema>;
 
+export const assistantResponseContractSchema = z
+  .object({
+    narrative: z.string().trim().min(5).max(4000),
+    weeklyChallenge: z.string().trim().min(5).max(1000),
+    goalTip: z.string().trim().min(5).max(1000),
+  })
+  .strict();
+

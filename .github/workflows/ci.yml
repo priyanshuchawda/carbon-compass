@@ -31,6 +31,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Dependency Audit (Production)
+        run: pnpm audit:prod
+
       - name: Lint
         run: pnpm lint
 
@@ -42,6 +45,9 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Check bundle budgets
+        run: pnpm perf:bundle-report
 
       - name: Verify the AI key never reaches the client bundle
         run: |

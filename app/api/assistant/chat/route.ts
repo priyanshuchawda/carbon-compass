@@ -11,13 +11,21 @@ import type { GeminiContent, GeminiPart } from "@/lib/carbon/ai/client";
 import { readBoundedBody } from "@/lib/carbon/utils";
 
 export async function POST(request: Request) {
-  // 1. Rate Limiting
+  // 1. Rate Limiting & Request ID
   const ip = request.headers.get("x-forwarded-for") || "unknown-ip";
   const limitRes = rateLimit(ip, 10, 60_000);
+  const requestId = `req_${Math.random().toString(36).substring(2, 11)}`;
+  const headers = new Headers();
+  headers.set("X-Request-ID", requestId);
+  headers.set("RateLimit-Limit", "10");
+  headers.set("RateLimit-Remaining", String(limitRes.remaining));
+  headers.set("RateLimit-Reset", String(Math.ceil(Math.max(0, limitRes.resetAt - Date.now()) / 1000)));
+
   if (!limitRes.allowed) {
+    headers.set("Retry-After", String(Math.ceil(Math.max(0, limitRes.resetAt - Date.now()) / 1000)));
     return NextResponse.json(
       { error: "Too many requests. Please try again later." },
-      { status: 429 }
+      { status: 429, headers }
     );
   }
 
@@ -30,7 +38,7 @@ export async function POST(request: Request) {
     if (!result.success) {
       return NextResponse.json(
         { error: "Validation failed: " + result.error.message },
-        { status: 400 }
+        { status: 400, headers }
       );
     }
     validatedData = result.data;
@@ -38,7 +46,7 @@ export async function POST(request: Request) {
     const msg = err instanceof Error ? err.message : "Invalid JSON request payload";
     return NextResponse.json(
       { error: msg },
-      { status: 400 }
+      { status: 400, headers }
     );
   }
 
@@ -58,7 +66,7 @@ export async function POST(request: Request) {
       content: fallbackText,
       costUSD: 0,
       isDemo: true
-    });
+    }, { headers });
   }
 
   try {
@@ -72,7 +80,7 @@ export async function POST(request: Request) {
       }
     ];
 
-    // Append history (excluding system prompt helper message)
+    // Append history
     for (const msg of messages) {
       contents.push({
         role: msg.role === "user" ? "user" : "model",
@@ -146,19 +154,19 @@ export async function POST(request: Request) {
         content: candidateText.trim(),
         costUSD: accumulatedCost,
         isDemo: false
-      });
+      }, { headers });
     }
 
     throw new Error("Failed to retrieve final text from Gemini API");
 
   } catch (err) {
     const safeError = redactError(err);
-    console.error("Chat API Endpoint Failure:", safeError);
+    console.error(`Chat API Endpoint Failure [ReqID: ${requestId}]:`, safeError);
 
     return NextResponse.json({
       content: fallbackText,
       error: safeError.message,
       isDemo: true
-    });
+    }, { headers });
   }
 }

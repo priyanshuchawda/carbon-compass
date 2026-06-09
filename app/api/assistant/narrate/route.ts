@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { redactError } from "@/lib/carbon/redaction";
 import { sanitizeText } from "@/lib/carbon/sanitize";
-import { assistantRequestSchema } from "@/lib/validation/schemas";
+import { assistantRequestSchema, assistantResponseContractSchema } from "@/lib/validation/schemas";
 import { executeTool } from "@/lib/carbon/assistant-tools";
 import { rateLimit } from "@/lib/carbon/ai/rate-limit";
 import { getGeminiApiKey } from "@/lib/carbon/ai/config";
@@ -11,13 +11,25 @@ import type { GeminiContent, GeminiPart } from "@/lib/carbon/ai/client";
 import { readBoundedBody } from "@/lib/carbon/utils";
 
 export async function POST(request: Request) {
-  // 1. Rate Limiting (double protection; also handled in middleware)
+  // 1. Rate Limiting & Request ID
   const ip = request.headers.get("x-forwarded-for") || "unknown-ip";
   const limitRes = rateLimit(ip, 10, 60_000);
+  const requestId = `req_${Math.random().toString(36).substring(2, 11)}`;
+  const headers = new Headers();
+  const resetSeconds = Math.ceil(Math.max(0, limitRes.resetAt - Date.now()) / 1000);
+  headers.set("X-Request-ID", requestId);
+  headers.set("RateLimit-Limit", "10");
+  headers.set("RateLimit-Remaining", String(limitRes.remaining));
+  headers.set("RateLimit-Reset", String(resetSeconds));
+  headers.set("X-RateLimit-Limit", "10");
+  headers.set("X-RateLimit-Remaining", String(limitRes.remaining));
+  headers.set("X-RateLimit-Reset", String(resetSeconds));
+
   if (!limitRes.allowed) {
+    headers.set("Retry-After", String(resetSeconds));
     return NextResponse.json(
       { error: "Too many requests. Please try again later." },
-      { status: 429 }
+      { status: 429, headers }
     );
   }
 
@@ -30,7 +42,7 @@ export async function POST(request: Request) {
     if (!result.success) {
       return NextResponse.json(
         { error: "Validation failed: " + result.error.message },
-        { status: 400 }
+        { status: 400, headers }
       );
     }
     validatedData = result.data;
@@ -38,36 +50,47 @@ export async function POST(request: Request) {
     const msg = err instanceof Error ? err.message : "Invalid JSON request payload";
     return NextResponse.json(
       { error: msg },
-      { status: 400 }
+      { status: 400, headers }
     );
   }
 
-  const { profile, result, footprint } = validatedData;
+  const { profile, result, recommendations, footprint } = validatedData;
 
-  // Sanitize user-provided string fields before they are used in prompts or fallbacks
+  // Sanitize user inputs
   profile.city = sanitizeText(profile.city, 80);
   profile.country = sanitizeText(profile.country, 80);
 
-  // Prepare fallback narrative options
-  const fallback = getFallbackResponse(validatedData);
+  const fallbackJSON = getFallbackResponse({ profile, result, recommendations, footprint });
 
   // 3. API Key check
   const apiKey = getGeminiApiKey();
   if (!apiKey) {
-    return NextResponse.json(fallback);
+    return NextResponse.json({
+      narrative: fallbackJSON.narrative,
+      weeklyChallenge: fallbackJSON.weeklyChallenge,
+      goalTip: fallbackJSON.goalTip,
+      costUSD: 0,
+      isDemo: true
+    }, { headers });
   }
 
   try {
-    const prompt = buildAssistantPrompt(validatedData);
+    const systemInstruction = buildAssistantPrompt({
+      profile,
+      result,
+      recommendations,
+      footprint
+    });
+
     const contents: GeminiContent[] = [
       {
         role: "user",
-        parts: [{ text: prompt }]
+        parts: [{ text: systemInstruction }]
       }
     ];
 
-    let finalJSON: { narrative: string; weeklyChallenge: string; goalTip: string } | null = null;
     let accumulatedCost = 0;
+    let finalJSON = null;
 
     // Up to 4 turns of tool calling
     for (let turn = 0; turn < 4; turn++) {
@@ -92,13 +115,11 @@ export async function POST(request: Request) {
       );
 
       if (functionCalls.length > 0) {
-        // Record model turn in conversation history
         contents.push({
           role: "model",
           parts
         });
 
-        // Execute function calls
         const functionResponses: GeminiPart[] = [];
         for (const call of functionCalls) {
           const { name, args } = call.functionCall;
@@ -132,11 +153,9 @@ export async function POST(request: Request) {
         throw new Error("No text or function call in Gemini response");
       }
 
-      finalJSON = JSON.parse(candidateText.trim()) as {
-        narrative: string;
-        weeklyChallenge: string;
-        goalTip: string;
-      };
+      const rawJSON = JSON.parse(candidateText.trim());
+      // Zod contract check
+      finalJSON = assistantResponseContractSchema.parse(rawJSON);
       break;
     }
 
@@ -150,15 +169,18 @@ export async function POST(request: Request) {
       goalTip: finalJSON.goalTip,
       costUSD: accumulatedCost,
       isDemo: false
-    });
+    }, { headers });
 
   } catch (err) {
     const safeError = redactError(err);
-    console.error("Narrate API Endpoint Failure:", safeError);
+    console.error(`Narrate API Endpoint Failure [ReqID: ${requestId}]:`, safeError);
 
     return NextResponse.json({
-      ...fallback,
+      narrative: fallbackJSON.narrative,
+      weeklyChallenge: fallbackJSON.weeklyChallenge,
+      goalTip: fallbackJSON.goalTip,
       error: safeError.message,
-    });
+      isDemo: true
+    }, { headers });
   }
 }

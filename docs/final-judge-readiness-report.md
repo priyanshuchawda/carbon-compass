@@ -51,7 +51,7 @@ To evaluate the application, we recommend following this 5-minute walk-through s
 
 During this readiness phase, we implemented several major improvements based on the reference architectures of `carbon-footprint-assistant` and `election-clarity-india`:
 
-- **Activity Tracker Log (`/log`)**: Added a persistent, local-first manual tracker log page where users can manually log carbon check-ins with top drivers, footprint amounts, and eco scores, or delete/clear history.
+- **Activity Tracker Log (`/log`)**: Added a persistent, local-first manual tracker log page with natural activity tracking (e.g. km traveled, kWh used, delivery counts), allowing users to manually log, edit, and delete daily actions which automatically compute to carbon emissions.
 - **Real-World Report Page**: Removed mock dashboard data on `/report`. It now loads actual user session inputs and progress history.
 - **Monthly Goal Tracker UI**: Integrated goal persistence and visualization directly on the dashboard.
 - **Conversational Assistant Workspace**: Added `/assistant` chat page with grounded rule checks and bounded history limit (`min(1).max(12)`).
@@ -66,5 +66,5 @@ During this readiness phase, we implemented several major improvements based on 
 
 - **TypeScript Typecheck**: Successfully passes (`tsc --noEmit`).
 - **ESLint Checks**: Successfully passes with no errors.
-- **Unit Tests**: **201 tests passed** across 36 files in Vitest (latest known verification snapshot).
+- **Unit Tests**: **206 tests passed** across 37 files in Vitest (latest known verification snapshot).
 - **E2E Tests**: **7 browser flows passed** in Playwright (latest known verification snapshot, covering navigation, goal setting, assistant chat, accessibility checks, skip-link focus, reduced-motion behavior, and 390px mobile viewport overflow checks).

@@ -9,7 +9,7 @@ A **full-stack Next.js application** purpose-built for Indian urban households t
 ## Live demo flow
 
 ```
-/ (landing) → /onboarding → /calculator → /dashboard → /actions → /report
+/ (landing) → /onboarding → /calculator → /dashboard → /assistant → /log → /actions → /report
 ```
 
 Every page is **server-rendered by default**; only interactive chart widgets and form controls are client boundaries.
@@ -70,11 +70,17 @@ app/
   onboarding/         step 1 – context form
   calculator/         step 2 – footprint input form
   dashboard/          step 3 – metrics, chart, simulator
-  actions/            step 4 – weekly action plan
-  report/             step 5 – printable progress report
+  assistant/          step 4 – AI chat interface
+  actions/            step 5 – weekly action plan
+  log/                step 6 – manual activity tracker
+  report/             step 7 – printable progress report
   api/
     calculate/        POST /api/calculate   (Zod-validated)
     recommendations/  POST /api/recommendations
+    health/           GET /api/health
+    assistant/
+      chat/           POST /api/assistant/chat
+      narrate/        POST /api/assistant/narrate
 components/
   carbon/             domain-specific UI components
   layout/             site header / footer
@@ -90,7 +96,7 @@ lib/
     demo.ts           shared demo inputs and results
 
 tests/
-  unit/               Vitest + Testing Library specs (50 tests)
+  unit/               Vitest + Testing Library specs
   e2e/                Playwright demo-flow spec
 ```
 
@@ -246,14 +252,17 @@ See [`RULES.md`](./RULES.md) for the full coding contract. Key points:
 | Script | What it runs |
 |---|---|
 | `pnpm dev` | Next.js dev server on port 3000 |
-| `pnpm build` | Production build |
-| `pnpm test` | Vitest unit suite (89 tests) |
-| `pnpm test:e2e` | Playwright Chromium E2E flow |
+| `pnpm build` | Production build compilation |
+| `pnpm start` | Start production compiled Next.js server |
+| `pnpm test` | Vitest unit suite (206 tests, latest known verification) |
+| `pnpm test:e2e` | Playwright Chromium E2E browser flows |
 | `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm lint` | ESLint |
-| `pnpm quality` | typecheck + lint + test + build |
-| `scripts/ai-test.ps1` | Compact test output for AI agents |
-| `scripts/ai-quality.ps1` | Compact quality gate for AI agents |
+| `pnpm lint` | ESLint checks |
+| `pnpm audit:prod` | Production dependency vulnerability audit |
+| `pnpm perf:bundle-report` | Inspect client chunk sizes (Recharts, AI boundaries) |
+| `pnpm smoke` | Production smoke checks against `/api/health`, core pages, and assistant routes |
+| `pnpm quality` | All quality checks: typecheck + lint + test + build + bundle budget |
+| `pnpm verify` | Alias for `pnpm quality` |
 
 ---
 

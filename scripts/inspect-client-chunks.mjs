@@ -28,7 +28,20 @@ if (chunkFiles.length === 0) {
   process.exit(0);
 }
 
+const BUDGET_KB = 400; // 400 KiB limit per chunk
+let exceededBudget = false;
+
 console.log("Client JS Chunk Bundle Sizes:");
 for (const chunkFile of chunkFiles) {
-  console.log(`- ${chunkFile.file}: ${(chunkFile.bytes / 1024).toFixed(2)} KiB`);
+  const sizeKB = chunkFile.bytes / 1024;
+  console.log(`- ${chunkFile.file}: ${sizeKB.toFixed(2)} KiB`);
+  if (sizeKB > BUDGET_KB) {
+    console.error(`  ❌ ERROR: Chunk ${chunkFile.file} exceeds the ${BUDGET_KB} KiB budget.`);
+    exceededBudget = true;
+  }
+}
+
+if (exceededBudget) {
+  console.error("Bundle size budget exceeded. Build failed.");
+  process.exit(1);
 }
